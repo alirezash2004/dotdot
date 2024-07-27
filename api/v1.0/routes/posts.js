@@ -6,6 +6,6 @@ const router = express.Router();
 // Get single post by postId
 router.get('/posts/:postId', getPostByPostId);
 
-router.post('/posts/:postId', newPost)
+router.post('/posts/newPost', newPost)
 
 export default router;

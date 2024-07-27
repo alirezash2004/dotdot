@@ -9,6 +9,6 @@ export let postComments = [
 ];
 
 export let postMedia = [
-    { id: 1, postId: 1, slideNumber: 0, assetUrl: '/assets/pic.jpg' },
-    { id: 1, postId: 2, slideNumber: 0, assetUrl: '/assets/pic.jpg' },
+    { id: 1, postId: 1, slideNumber: 0, assetUrl: '/assets/pic', ext: 'png', createdTimestamp: 1722067018755 },
+    { id: 1, postId: 2, slideNumber: 0, assetUrl: '/assets/pic', ext: 'png', createdTimestamp: 1722067018755 },
 ];

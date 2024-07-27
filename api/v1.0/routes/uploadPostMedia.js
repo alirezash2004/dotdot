@@ -31,19 +31,8 @@ const uploadSingleImage = multer({
     },
 }).single('postImage');
 
-router.post('/postMedia/uploadPostMedia', (req, res, next) => {
+router.post('/postMedia/uploadPostMedia/singleImage', (req, res, next) => {
     uploadSingleImage(req, res, (err) => {
-        const { body } = req;
-        const mediaType = body.mediatype;
-
-        if (!mediaType) {
-            return res.status(500).json({ success: false, msg: `Media Type Must Be Specified` })
-        }
-
-        if (mediaType !== 'photo') {
-            return res.status(500).json({ success: false, msg: `Only Photo's are currently acceptable` })
-        }
-
         // console.log(req.body);
         if (err instanceof multer.MulterError) {
             return res.status(500).json({ success: false, msg: 'Filesize must be under 15 MB' })

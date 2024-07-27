@@ -1,4 +1,6 @@
 import { posts, postMedia, postComments } from '../helpers/mockdata.js';
+import { tmpFiles } from '../helpers/mockfilemanager.js';
+import { isJson } from '../utils/checkIsJson.js';
 
 // @desc   Get signle post
 // @route  GET /api/v1.0/posts/:postId
@@ -53,11 +55,14 @@ export const getPostByPostId = (req, res, next) => {
 }
 
 export const newPost = (req, res, next) => {
+    // TODO: validate all inputs
     // single image post
-    const { body: { pageId, type, assetType, caption, postMedia } } = req;
+    const { body: { pageId, type, assetType, caption, postmedia } } = req;
+
+    const postId = posts[posts.length - 1].id + 1;
 
     const post = {
-        id: posts[posts.length - 1].id + 1,
+        id: postId,
         pageId: parseInt(pageId),
         assetType: assetType,
         type: type,
@@ -67,10 +72,51 @@ export const newPost = (req, res, next) => {
         LikeCount: 0
     }
 
-    postMedia = JSON.parse(postMedia);
+    if (!isJson(postmedia)) {
+        const error = new Error(`PostMadia data is invalid!`);
+        error.status = 400;
+        return next(error);
+    }
+
+    const pm = JSON.parse(postmedia);
 
     if (assetType === 'picture') {
-        
+        const mediaAccessTokens = pm.mediaAccessTokens;
+        const medias = [];
+
+        for (let i = 0; i < mediaAccessTokens.length; i++) {
+            const mediaAccessToken = mediaAccessTokens[i];
+
+            const media = tmpFiles.find(media => media.fileAccesstoken === mediaAccessToken);
+
+            if (!media) {
+                const error = new Error(`A postmedia with token ${mediaAccessToken} was not found!`);
+                error.status = 404;
+                return next(error);
+            }
+
+            medias.push(media);
+        }
+
+
+        for (let i = 0; i < medias.length; i++) {
+            const media = medias[i];
+
+            postMedia.push({
+                id: postMedia[postMedia.length - 1] + 1,
+                postId: postId,
+                slideNumber: i,
+                assetUrl: media.path,
+                ext: media.fileExt,
+                createdTimestamp: media.createdTimestamp
+            })
+        }
+
+        posts.push(post);
+
+        console.log(postMedia);
+        res.status(200).json(post);
+
     } else if (assetType === 'video') {
         // TODO: upload video
     } else {
