@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Document</title>
+	</head>
+	<body>
+		<form action="http://localhost:5000/api/v1.0/postMedia/uploadPostMedia" enctype="multipart/form-data" method="post">
+			<div class="form-group">
+				<input type="file" class="form-control-file" name="postImage" />
+				<input
+					type="text"
+					class="form-control"
+					placeholder="mediatype"
+					name="mediatype"
+				/>
+				<input
+					type="submit"
+					value="submit"
+					class="btn btn-default"
+				/>
+			</div>
+		</form>
+	</body>
+</html>
