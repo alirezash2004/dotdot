@@ -62,7 +62,7 @@ export const deletepageSettings = (req, res, next) => {
 
     // check can delete
 
-    samplepageSettingss.splice(samplepageSettings.indexOf(pageSettings), 1);
+    samplepageSettings.splice(samplepageSettings.indexOf(pageSettings), 1);
 
-    res.status(200).json({ msg: 'pageSettings deleted', samplepageSettingss });
+    res.status(200).json({ msg: 'pageSettings deleted', samplepageSettings });
 }
