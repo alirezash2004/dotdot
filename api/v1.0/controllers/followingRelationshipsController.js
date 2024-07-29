@@ -24,10 +24,10 @@ export const checkIsFollowing = (req, res, next) => {
 
     const isFollowing = sampleFollowingRelationship.find(followingRelationship => followingRelationship.pageId === pageId && followingRelationship.followedPageId === followedPageId);
     if (!isFollowing) {
-        return res.status(200).json({ result: false });
+        return res.status(200).json({ isFollowing: false });
     }
 
-    res.status(200).json({ result: true });
+    res.status(200).json({ isFollowing: true });
 }
 
 export const newFollowing = (req, res, next) => {
@@ -103,7 +103,7 @@ export const removeFollowing = (req, res, next) => {
 
     sampleFollowingRelationship.splice(sampleFollowingRelationship.indexOf(followingRelationship), 1);
 
-    res.status(200).json(sampleFollowingRelationship);
+    res.status(200).json({ success: true });
 }
 
 export const getFollowingsCount = (req) => {
