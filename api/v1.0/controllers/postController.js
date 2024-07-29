@@ -125,3 +125,33 @@ export const newPost = (req, res, next) => {
         return next(error);
     }
 }
+
+export const deletePostByPostId = (req, res, next) => {
+    const postId = parseInt(req.params.postId);
+    const post = posts.find((post) => post.id === postId);
+
+    if (!post) {
+        const error = new Error(`A post with post id ${postId} was not found`);
+        error.status = 404;
+        return next(error);
+    }
+
+    // delete all post media
+    const CurrentpostMedias = postMedia.filter(postMedia => postMedia.postId === postId);
+    for (let i = 0; i < CurrentpostMedias.length; i++) {
+        const CurrentpostMedia = CurrentpostMedias[i];
+        postMedia.splice(postMedia.indexOf(CurrentpostMedia), 1);
+    }
+
+    // delete all post comments
+    const currentPostComments = postComments.filter((comment) => comment.postId === postId);
+    for (let i = 0; i < currentPostComments.length; i++) {
+        const currentPostComment = currentPostComments[i];
+        postComments.splice(postComments.indexOf(currentPostComment), 1);
+    }
+
+    // delete post
+    posts.splice(posts.indexOf(post), 1);
+
+    res.status(200).json({msg: 'post deleted!'});
+}
