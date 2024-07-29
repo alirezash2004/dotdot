@@ -29,18 +29,18 @@ export const updatepageSettings = (req, res, next) => {
         return next(error);
     }
 
-    const pageSettings = samplepageSettings.find(pgprofile => pgprofile.pageId === pageId);
+    const pageSettings = samplepageSettings.find(pageSettings => pageSettings.pageId === pageId);
     if (!pageSettings) {
         const error = new Error(`Page with pageid '${pageId}' has no pageSettings!`);
         error.status = 500;
         return next(error);
     }
 
-    const { body: { bio, website, birthdate } } = req;
+    const { body: { theme, language, country } } = req;
 
-    pageSettings.bio = bio;
-    pageSettings.website = website;
-    pageSettings.birthdate = birthdate;
+    pageSettings.theme = theme;
+    pageSettings.language = language;
+    pageSettings.country = country;
 
     res.status(200).json({ msg: 'pageSettings updated', pageSettings });
 }
