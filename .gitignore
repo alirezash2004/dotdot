@@ -4,3 +4,4 @@ node_modules/
 .env
 *tmp.js
 *_tmp*
+*id_rsa*

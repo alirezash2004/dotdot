@@ -5,6 +5,7 @@ import v1_0 from './api/v1.0/versionRouter.js';
 import { fileURLToPath } from 'url';
 import cookieParser from "cookie-parser";
 import session from "express-session";
+import passport from "passport";
 // import { __filename, __dirname } from './currentPath.js';
 
 // server port
@@ -28,6 +29,10 @@ app.use(session({
         maxAge: 60000 * 60, // 1 hour
     }
 }))
+
+// passport init
+app.use(passport.initialize());
+app.use(passport.session());
 
 app.use(logger); // Logger middleware
 

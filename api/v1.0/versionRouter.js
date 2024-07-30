@@ -1,4 +1,5 @@
 import express from 'express';
+import auth from './routes/auth.js';
 import posts from './routes/posts.js';
 import pageProfiles from './routes/pageProfiles.js';
 import pageSettings from './routes/pageSettings.js';
@@ -10,6 +11,8 @@ import errorHandler from './middleware/errorHandler.js';
 import { __filename, __dirname } from '../../currentPath.js';
 
 const router = express.Router();
+
+router.use(auth);
 
 router.use(posts);
 
