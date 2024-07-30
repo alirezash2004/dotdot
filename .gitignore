@@ -3,3 +3,4 @@ node_modules/
 **/assets/**
 .env
 *tmp.js
+*_tmp*
