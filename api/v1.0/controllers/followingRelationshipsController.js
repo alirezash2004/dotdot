@@ -1,9 +1,16 @@
 import { sampleFollowingRelationship } from '../helpers/mockuser.js';
+import { matchedData, validationResult } from 'express-validator';
 
 export const checkIsFollowing = (req, res, next) => {
-    const { body } = req;
-    const pageId = parseInt(body.pageId);
-    const followedPageId = parseInt(body.followedPageId);
+    const result = validationResult(req).array({ onlyFirstError: true });
+    if (result.length !== 0) {
+        return res.status(400).send({ msg: result[0].msg });
+    }
+
+    const data = matchedData(req);
+
+    const pageId = parseInt(data.pageId);
+    const followedPageId = parseInt(data.followedPageId);
 
     if (pageId === followedPageId) {
         const error = new Error(`A page cannot have a following relationship with itself!`);
@@ -31,9 +38,14 @@ export const checkIsFollowing = (req, res, next) => {
 }
 
 export const newFollowing = (req, res, next) => {
-    const { body } = req;
-    const pageId = parseInt(body.pageId);
-    const followedPageId = parseInt(body.followedPageId);
+    const result = validationResult(req).array({ onlyFirstError: true });
+    if (result.length !== 0) {
+        return res.status(400).send({ msg: result[0].msg });
+    }
+
+    const data = matchedData(req);
+    const pageId = parseInt(data.pageId);
+    const followedPageId = parseInt(data.followedPageId);
 
     if (pageId === followedPageId) {
         const error = new Error(`A page cannot have a following relationship with itself!`);
@@ -73,9 +85,14 @@ export const newFollowing = (req, res, next) => {
 }
 
 export const removeFollowing = (req, res, next) => {
-    const { body } = req;
-    const pageId = parseInt(body.pageId);
-    const followedPageId = parseInt(body.followedPageId);
+    const result = validationResult(req).array({ onlyFirstError: true });
+    if (result.length !== 0) {
+        return res.status(400).send({ msg: result[0].msg });
+    }
+
+    const data = matchedData(req);
+    const pageId = parseInt(data.pageId);
+    const followedPageId = parseInt(data.followedPageId);
 
     if (pageId === followedPageId) {
         const error = new Error(`A page cannot have a following relationship with itself!`);

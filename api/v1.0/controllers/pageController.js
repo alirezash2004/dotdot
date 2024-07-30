@@ -1,11 +1,19 @@
 import { samplePages, samplePageProfiles, samplepageSettings } from '../helpers/mockuser.js';
 import { getFollowingsCount, getFollowersCount } from './followingRelationshipsController.js';
+import { matchedData, validationResult } from 'express-validator';
 
 // @desc   Get page
 // @route  POST /api/v1.0/@:pageId
 // Access
 export const getPage = (req, res, next) => {
-    const pageId = parseInt(req.params.pageId);
+    const result = validationResult(req);
+    if (!result.isEmpty()) {
+        return res.status(401).send({ msg: 'pageId invalid' })
+    }
+
+    const data = matchedData(req);
+
+    const pageId = parseInt(data.pageId);
     if (!pageId) {
         const error = new Error(`An Error Accrued While Fetching Page Id!`);
         error.status = 500;
@@ -54,9 +62,16 @@ export const getPage = (req, res, next) => {
 }
 
 export const newPage = (req, res, next) => {
-    const { body: { username, fullname, email, password, pagetype } } = req;
+    const result = validationResult(req).array({ onlyFirstError: true });
+    if (result.length !== 0) {
+        return res.status(400).send({ success: false, msg: result[0].msg })
+    }
 
-    // validate input -- exist - notempty
+    const data = matchedData(req);
+
+    const { username, fullname, email, password, pagetype } = data;
+
+    // TODO: check if username is unique
 
     // make new page
     const page = {
@@ -98,17 +113,27 @@ export const newPage = (req, res, next) => {
 }
 
 export const updatePageinfo = (req, res, next) => {
-    const { params, body: { username, fullname, email, password, pagetype } } = req;
-    const pageId = parseInt(params.pageId);
-    if (!pageId) {
+    const result = validationResult(req).array({ onlyFirstError: true });
+    if (result.length !== 0) {
+        return res.status(400).send({ success: false, msg: result[0].msg })
+    }
+
+    const data = matchedData(req);
+    console.log(data);
+
+    const { username, fullname, email, password, pagetype, pageId } = data;
+
+    // TODO: check if username is unique
+    const pageIdInt = parseInt(pageId);
+    if (!pageIdInt) {
         const error = new Error(`An Error Accrued While Fetching Page id!`);
         error.status = 500;
         return next(error);
     }
 
-    const page = samplePages.find((page) => page.id === pageId);
+    const page = samplePages.find((page) => page.id === pageIdInt);
     if (!page) {
-        const error = new Error(`A page with id '${pageId}' was not found!`);
+        const error = new Error(`A page with id '${pageIdInt}' was not found!`);
         error.status = 404;
         return next(error);
     }

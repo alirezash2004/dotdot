@@ -1,10 +1,18 @@
+import { matchedData, validationResult } from "express-validator";
 import { samplepageSettings } from "../helpers/mockuser.js";
 
 export const getpageSettings = (req, res, next) => {
     // TODO: check if page is public -> return bio 
     // if not public -> check if is follower
 
-    const pageId = parseInt(req.params.pageId);
+    const result = validationResult(req).array({ onlyFirstError: true });
+    if (result.length !== 0) {
+        return res.status(400).send({ msg: result[0].msg });
+    }
+
+    const data = matchedData(req);
+
+    const pageId = parseInt(data.pageId);
     if (!pageId) {
         const error = new Error(`An Error Accrued While Fetching Page Username!`);
         error.status = 500;
@@ -22,7 +30,14 @@ export const getpageSettings = (req, res, next) => {
 }
 
 export const updatepageSettings = (req, res, next) => {
-    const pageId = parseInt(req.params.pageId);
+    const result = validationResult(req).array({ onlyFirstError: true });
+    if (result.length !== 0) {
+        return res.status(400).send({ msg: result[0].msg });
+    }
+
+    const data = matchedData(req);
+
+    const pageId = parseInt(data.pageId);
     if (!pageId) {
         const error = new Error(`An Error Accrued While Fetching Page Username!`);
         error.status = 500;
@@ -46,7 +61,14 @@ export const updatepageSettings = (req, res, next) => {
 }
 
 export const deletepageSettings = (req, res, next) => { 
-    const pageId = parseInt(req.params.pageId);
+    const result = validationResult(req).array({ onlyFirstError: true });
+    if (result.length !== 0) {
+        return res.status(400).send({ msg: result[0].msg });
+    }
+
+    const data = matchedData(req);
+
+    const pageId = parseInt(data.pageId);
     if (!pageId) {
         const error = new Error(`An Error Accrued While Fetching Page Username!`);
         error.status = 500;

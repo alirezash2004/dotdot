@@ -1,3 +1,4 @@
+import { matchedData, validationResult } from 'express-validator';
 import { posts, postMedia, postComments } from '../helpers/mockdata.js';
 import { tmpFiles } from '../helpers/mockfilemanager.js';
 import { isJson } from '../utils/checkIsJson.js';
@@ -6,7 +7,13 @@ import { isJson } from '../utils/checkIsJson.js';
 // @route  GET /api/v1.0/posts/:postId
 // Access
 export const getPostByPostId = (req, res, next) => {
-    const postId = parseInt(req.params.postId);
+    const result = validationResult(req).array({ onlyFirstError: true });
+    if (result.length !== 0) {
+        return res.status(400).send({ msg: result[0].msg });
+    }
+
+    const data = matchedData(req);
+    const postId = parseInt(data.postId);
     const post = posts.find((post) => post.id === postId);
 
     if (!post) {
@@ -57,7 +64,16 @@ export const getPostByPostId = (req, res, next) => {
 export const newPost = (req, res, next) => {
     // TODO: validate all inputs
     // single image post
-    const { body: { pageId, type, assetType, caption, postmedia } } = req;
+
+    const result = validationResult(req).array({ onlyFirstError: true });
+    if (result.length !== 0) {
+        return res.status(400).send({ success: false, msg: result[0].msg })
+    }
+
+    const data = matchedData(req);
+    console.log(data);
+
+    const { pageId, type, assetType, caption, postmedia } = data;
 
     const postId = posts[posts.length - 1].id + 1;
 
@@ -127,7 +143,14 @@ export const newPost = (req, res, next) => {
 }
 
 export const deletePostByPostId = (req, res, next) => {
-    const postId = parseInt(req.params.postId);
+    const result = validationResult(req).array({ onlyFirstError: true });
+    if (result.length !== 0) {
+        return res.status(400).send({ msg: result[0].msg });
+    }
+
+    const data = matchedData(req);
+
+    const postId = parseInt(data.postId);
     const post = posts.find((post) => post.id === postId);
 
     if (!post) {
@@ -153,5 +176,5 @@ export const deletePostByPostId = (req, res, next) => {
     // delete post
     posts.splice(posts.indexOf(post), 1);
 
-    res.status(200).json({msg: 'post deleted!'});
+    res.status(200).json({ msg: 'post deleted!' });
 }
