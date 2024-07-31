@@ -6,6 +6,7 @@ import { fileURLToPath } from 'url';
 import cookieParser from "cookie-parser";
 import session from "express-session";
 import passport from "passport";
+import mongoose from 'mongoose';
 // import { __filename, __dirname } from './currentPath.js';
 
 // server port
@@ -17,6 +18,10 @@ const __dirname = path.dirname(__filename);
 
 // create app
 const app = express();
+
+mongoose.connect('mongodb://localhost:27017/dotdot')
+    .then(() => console.log('Connected to database'['bgCyan']))
+    .catch(err => console.log(`Error: ${err}`)['bgRed']);
 
 app.use(express.json()) // for parsing application/json
 app.use(express.urlencoded({ extended: true })) // for parsing application/x-www-form-urlencoded
