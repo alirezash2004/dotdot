@@ -15,7 +15,7 @@ const PORT = process.env.PORT || 8000;
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-
+// create app
 const app = express();
 
 app.use(express.json()) // for parsing application/json
@@ -28,7 +28,7 @@ app.use(session({
     cookie: {
         maxAge: 60000 * 60, // 1 hour
     }
-}))
+})) // request.session
 
 // passport init
 app.use(passport.initialize());

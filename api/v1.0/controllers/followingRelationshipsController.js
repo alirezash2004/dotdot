@@ -1,7 +1,9 @@
 import { sampleFollowingRelationship } from '../helpers/mockuser.js';
 import { matchedData, validationResult } from 'express-validator';
 
+// checks if pageId is following followedPageId
 export const checkIsFollowing = (req, res, next) => {
+    // input validation
     const result = validationResult(req).array({ onlyFirstError: true });
     if (result.length !== 0) {
         return res.status(400).send({ msg: result[0].msg });
@@ -37,6 +39,7 @@ export const checkIsFollowing = (req, res, next) => {
     res.status(200).json({ isFollowing: true });
 }
 
+// makes pageId follow-> followedPageId
 export const newFollowing = (req, res, next) => {
     const result = validationResult(req).array({ onlyFirstError: true });
     if (result.length !== 0) {
@@ -84,6 +87,7 @@ export const newFollowing = (req, res, next) => {
     res.status(200).json(sampleFollowingRelationship);
 }
 
+// pageId unfollows followedPageId
 export const removeFollowing = (req, res, next) => {
     const result = validationResult(req).array({ onlyFirstError: true });
     if (result.length !== 0) {
