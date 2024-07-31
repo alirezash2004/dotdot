@@ -157,8 +157,13 @@ export const updatePageinfo = (req, res, next) => {
 }
 
 export const deletePage = (req, res, next) => {
-    const { params } = req;
-    const pageId = parseInt(params.pageId);
+    const result = validationResult(req).array({ onlyFirstError: true });
+    if (result.length !== 0) {
+        return res.status(400).send({ success: false, msg: result[0].msg })
+    }
+
+    const data = matchedData(req);
+    const pageId = parseInt(data.pageId);
     if (!pageId) {
         const error = new Error(`An Error Accrued While Fetching Page id!`);
         error.status = 500;
