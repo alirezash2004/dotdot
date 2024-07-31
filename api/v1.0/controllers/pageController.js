@@ -1,4 +1,5 @@
 import { samplePages, samplePageProfiles, samplepageSettings } from '../helpers/mockuser.js';
+import { genPassword } from '../utils/passwordsUtil.js';
 import { getFollowingsCount, getFollowersCount } from './followingRelationshipsController.js';
 import { matchedData, validationResult } from 'express-validator';
 
@@ -73,13 +74,16 @@ export const newPage = (req, res, next) => {
 
     // TODO: check if username is unique
 
+    const hashedPass = genPassword(password);
+
     // make new page
     const page = {
         id: samplePages[samplePages.length - 1].id + 1,
         username: username,
         fullname: fullname,
         email: email,
-        password: password,
+        password: hashedPass.hash,
+        salt: hashedPass.salt,
         pagetype: pagetype,
         userSince: Date(),
         lastLogin: Date(),
@@ -138,12 +142,13 @@ export const updatePageinfo = (req, res, next) => {
         return next(error);
     }
 
-    // validate input -- exist - notempty
+    const hashedPass = genPassword(password)
 
     page.username = username;
     page.fullname = fullname;
     page.email = email;
-    page.password = password;
+    page.password = hashedPass.hash;
+    page.salt = hashedPass.salt;
     page.pageType = pagetype;
 
     samplePages[samplePages.indexOf(page)] = page;

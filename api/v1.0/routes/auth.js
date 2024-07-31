@@ -5,6 +5,7 @@ import '../strategies/jwt-strategy.js';
 import { checkSchema, matchedData, validationResult } from 'express-validator';
 import { samplePages } from '../helpers/mockuser.js';
 import { issueJWT } from '../utils/jwtUtil.js';
+import { validatePassword } from '../utils/passwordsUtil.js';
 const router = Router();
 
 router.post('/auth/local',
@@ -61,7 +62,7 @@ router.post('/auth/jwt/',
             return next(error);
         }
 
-        if (findPage.password !== password) {
+        if (!validatePassword(password, findPage.password, findPage.salt)) {
             const error = new Error('invalid credentials');
             error.status = 500;
             return next(error);

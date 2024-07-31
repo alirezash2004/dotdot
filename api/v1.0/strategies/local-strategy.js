@@ -1,6 +1,7 @@
 import passport from "passport";
 import { Strategy } from "passport-local";
 import { samplePages } from "../helpers/mockuser.js";
+import { validatePassword } from "../utils/passwordsUtil.js";
 
 passport.serializeUser((user, done) => {
     // console.log('serializeUser');
@@ -26,7 +27,7 @@ passport.use(
         try {
             const findPage = samplePages.find(page => page.username === username);
             if (!findPage) throw new Error('Page not found');
-            if (findPage.password !== password) throw new Error('invalid credentials');
+            if (!validatePassword(password, findPage.password, findPage.salt)) throw new Error('invalid credentials');
             done(null, findPage);
         } catch (err) {
             done(err, null);
