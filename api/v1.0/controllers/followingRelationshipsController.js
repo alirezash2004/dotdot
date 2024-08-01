@@ -1,8 +1,9 @@
-import { sampleFollowingRelationship } from '../helpers/mockuser.js';
 import { matchedData, validationResult } from 'express-validator';
+import { FollowingRelationship, Page } from '../mongoose/schemas/page.js';
+import mongoose from 'mongoose';
 
 // checks if pageId is following followedPageId
-export const checkIsFollowing = (req, res, next) => {
+export const checkIsFollowing = async (req, res, next) => {
     // input validation
     const result = validationResult(req).array({ onlyFirstError: true });
     if (result.length !== 0) {
@@ -11,8 +12,8 @@ export const checkIsFollowing = (req, res, next) => {
 
     const data = matchedData(req);
 
-    const pageId = parseInt(data.pageId);
-    const followedPageId = parseInt(data.followedPageId);
+    const pageId = data.pageId;
+    const followedPageId = data.followedPageId;
 
     if (pageId === followedPageId) {
         const error = new Error(`A page cannot have a following relationship with itself!`);
@@ -20,18 +21,23 @@ export const checkIsFollowing = (req, res, next) => {
         return next(error);
     }
 
-    if (!pageId) {
-        const error = new Error(`pageId ${pageId} is not correct`);
-        error.status = 400;
-        return next(error);
-    }
-    if (!followedPageId) {
-        const error = new Error(`followedPageId ${followedPageId} is not correct`);
-        error.status = 400;
-        return next(error);
+    const isValidPageId = mongoose.Types.ObjectId.isValid(pageId);
+
+    if (!isValidPageId) {
+        const err = new Error(`pageId is not valid!`);
+        err.status = 400;
+        return next(err);
     }
 
-    const isFollowing = sampleFollowingRelationship.find(followingRelationship => followingRelationship.pageId === pageId && followingRelationship.followedPageId === followedPageId);
+    const isValidFollowedPageId = mongoose.Types.ObjectId.isValid(followedPageId);
+
+    if (!isValidFollowedPageId) {
+        const err = new Error(`followedPageId is not valid!`);
+        err.status = 400;
+        return next(err);
+    }
+
+    const isFollowing = await FollowingRelationship.exists({ pageId: pageId, followedPageId: followedPageId }).exec();
     if (!isFollowing) {
         return res.status(200).json({ isFollowing: false });
     }
@@ -40,15 +46,15 @@ export const checkIsFollowing = (req, res, next) => {
 }
 
 // makes pageId follow-> followedPageId
-export const newFollowing = (req, res, next) => {
+export const newFollowing = async (req, res, next) => {
     const result = validationResult(req).array({ onlyFirstError: true });
     if (result.length !== 0) {
         return res.status(400).send({ msg: result[0].msg });
     }
 
     const data = matchedData(req);
-    const pageId = parseInt(data.pageId);
-    const followedPageId = parseInt(data.followedPageId);
+    const pageId = data.pageId;
+    const followedPageId = data.followedPageId;
 
     if (pageId === followedPageId) {
         const error = new Error(`A page cannot have a following relationship with itself!`);
@@ -56,47 +62,63 @@ export const newFollowing = (req, res, next) => {
         return next(error);
     }
 
-    if (!pageId) {
-        const error = new Error(`pageId ${pageId} is not correct`);
-        error.status = 400;
-        return next(error);
-    }
-    if (!followedPageId) {
-        const error = new Error(`followedPageId ${followedPageId} is not correct`);
-        error.status = 400;
-        return next(error);
+    const isValidPageId = mongoose.Types.ObjectId.isValid(pageId);
+
+    if (!isValidPageId) {
+        const err = new Error(`pageId is not valid!`);
+        err.status = 400;
+        return next(err);
     }
 
-    const isCurrentyFollowing = sampleFollowingRelationship.find(followingRelationship => followingRelationship.pageId === pageId && followingRelationship.followedPageId === followedPageId);
+    const isValidFollowedPageId = mongoose.Types.ObjectId.isValid(followedPageId);
+
+    if (!isValidFollowedPageId) {
+        const err = new Error(`followedPageId is not valid!`);
+        err.status = 400;
+        return next(err);
+    }
+
+
+    const isCurrentyFollowing = await FollowingRelationship.exists({ pageId: pageId, followedPageId: followedPageId }).exec();
     if (isCurrentyFollowing) {
         const error = new Error(`Page with id ${pageId} is currently following ${followedPageId}`);
         error.status = 409;
         return next(error);
     }
 
-    const followingRelationship =
+    const followingRelationshipData =
     {
-        id: sampleFollowingRelationship[sampleFollowingRelationship.length - 1].id + 1,
         pageId: pageId,
         followedPageId: followedPageId,
-        followedAt: Date()
+        followedAt: Date.now()
     };
 
-    sampleFollowingRelationship.push(followingRelationship);
+    const followingRelationship = new FollowingRelationship(followingRelationshipData);
 
-    res.status(200).json(sampleFollowingRelationship);
+    followingRelationship.save()
+        .then((val) => {
+            Page.findByIdAndUpdate(pageId, { $inc: { followingCount: 1 } }).exec();
+            Page.findByIdAndUpdate(followedPageId, { $inc: { followersCount: 1 } }).exec();
+
+            res.status(200).json(val);
+        })
+        .catch((err) => {
+            const error = new Error(err);
+            error.status = 500;
+            return next(error);
+        })
 }
 
 // pageId unfollows followedPageId
-export const removeFollowing = (req, res, next) => {
+export const removeFollowing = async (req, res, next) => {
     const result = validationResult(req).array({ onlyFirstError: true });
     if (result.length !== 0) {
         return res.status(400).send({ msg: result[0].msg });
     }
 
     const data = matchedData(req);
-    const pageId = parseInt(data.pageId);
-    const followedPageId = parseInt(data.followedPageId);
+    const pageId = data.pageId;
+    const followedPageId = data.followedPageId;
 
     if (pageId === followedPageId) {
         const error = new Error(`A page cannot have a following relationship with itself!`);
@@ -104,43 +126,38 @@ export const removeFollowing = (req, res, next) => {
         return next(error);
     }
 
-    if (!pageId) {
-        const error = new Error(`pageId ${pageId} is not correct`);
-        error.status = 400;
-        return next(error);
-    }
-    if (!followedPageId) {
-        const error = new Error(`followedPageId ${followedPageId} is not correct`);
-        error.status = 400;
-        return next(error);
+    const isValidPageId = mongoose.Types.ObjectId.isValid(pageId);
+
+    if (!isValidPageId) {
+        const err = new Error(`pageId is not valid!`);
+        err.status = 400;
+        return next(err);
     }
 
-    const followingRelationship = sampleFollowingRelationship.find(followingRelationship => followingRelationship.pageId === pageId && followingRelationship.followedPageId === followedPageId);
-    if (!followingRelationship) {
+    const isValidFollowedPageId = mongoose.Types.ObjectId.isValid(followedPageId);
+
+    if (!isValidFollowedPageId) {
+        const err = new Error(`followedPageId is not valid!`);
+        err.status = 400;
+        return next(err);
+    }
+
+    const isCurrentyFollowing = await FollowingRelationship.exists({ pageId: pageId, followedPageId: followedPageId }).exec();
+    if (!isCurrentyFollowing) {
         const error = new Error(`Page with id ${pageId} is not following ${followedPageId}`);
-        error.status = 406;
+        error.status = 409;
         return next(error);
     }
 
-    sampleFollowingRelationship.splice(sampleFollowingRelationship.indexOf(followingRelationship), 1);
+    FollowingRelationship.findOneAndDelete({ pageId: pageId, followedPageId: followedPageId })
+        .exec()
+        .then(() => {
+            Page.findByIdAndUpdate(pageId, { $inc: { followingCount: -1 } }).exec();
+            Page.findByIdAndUpdate(followedPageId, { $inc: { followersCount: -1 } }).exec();
 
-    res.status(200).json({ success: true });
-}
-
-export const getFollowingsCount = (req) => {
-    const { body } = req;
-    const pageId = parseInt(body.pageId);
-
-    const followingRelationships = sampleFollowingRelationship.filter(followingRelationship => followingRelationship.pageId === pageId);
-
-    return followingRelationships.length;
-}
-
-export const getFollowersCount = (req) => {
-    const { body } = req;
-    const pageId = parseInt(body.pageId);
-
-    const followingRelationships = sampleFollowingRelationship.filter(followingRelationship => followingRelationship.followedPageId === pageId);
-
-    return followingRelationships.length;
+            res.status(200).json({ success: true });
+        })
+        .catch((err) => {
+            res.status(500).json({ success: false, err });
+        })
 }

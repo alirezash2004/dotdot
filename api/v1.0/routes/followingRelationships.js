@@ -10,4 +10,6 @@ router.post('/followingRelationships/newFollowing', checkSchema(followingRelatio
 
 router.delete('/followingRelationships/removeFollowing', checkSchema(followingRelationshipShcema), removeFollowing);
 
+// TODO: add get followings and get followers
+
 export default router;

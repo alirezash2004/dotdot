@@ -26,8 +26,8 @@ const PageSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.String,
         required: true,
     },
-    userSince: { type: mongoose.Schema.Types.Date, default: Date.now },
-    lastLogin: { type: mongoose.Schema.Types.Date, default: Date.now },
+    userSince: { type: mongoose.Schema.Types.Date, default: Date.now() },
+    lastLogin: { type: mongoose.Schema.Types.Date, default: Date.now() },
     active: mongoose.Schema.Types.Number,
     profilePicture: mongoose.Schema.Types.String,
     pageProfile: { type: mongoose.Schema.Types.ObjectId, ref: 'PageProfile' },
@@ -58,3 +58,13 @@ const PageSettingSchema = new mongoose.Schema({
 })
 
 export const PageSetting = mongoose.model('PageSetting', PageSettingSchema);
+
+
+
+const FollowingRelationshipSchema = new mongoose.Schema({
+    pageId: { type: mongoose.Schema.Types.ObjectId, ref: 'Page' },
+    followedPageId: { type: mongoose.Schema.Types.ObjectId, ref: 'Page' },
+    followedAt: { type: mongoose.Schema.Types.Date, default: Date.now() },
+})
+
+export const FollowingRelationship = mongoose.model('FollowingRelationship', FollowingRelationshipSchema);

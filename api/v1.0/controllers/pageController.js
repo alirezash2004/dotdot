@@ -1,7 +1,5 @@
-import { samplePages, samplePageProfiles, samplepageSettings } from '../helpers/mockuser.js';
 import { Page, PageProfile, PageSetting } from '../mongoose/schemas/page.js';
 import { genPassword } from '../utils/passwordsUtil.js';
-import { getFollowingsCount, getFollowersCount } from './followingRelationshipsController.js';
 import { matchedData, validationResult } from 'express-validator';
 import mongoose from 'mongoose';
 
