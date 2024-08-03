@@ -12,7 +12,7 @@ export const getpageSettings = (req, res, next) => {
 
     const data = matchedData(req);
 
-    const pageId = parseInt(data.pageId);
+    const pageId = data.pageId;
     if (!pageId) {
         const error = new Error(`An Error Accrued While Fetching Page Username!`);
         error.status = 500;
@@ -37,7 +37,7 @@ export const updatepageSettings = (req, res, next) => {
 
     const data = matchedData(req);
 
-    const pageId = parseInt(data.pageId);
+    const pageId = data.pageId;
     if (!pageId) {
         const error = new Error(`An Error Accrued While Fetching Page Username!`);
         error.status = 500;
@@ -51,7 +51,7 @@ export const updatepageSettings = (req, res, next) => {
         return next(error);
     }
 
-    const { body: { theme, language, country } } = req;
+    const { theme, language, country } = data;
 
     pageSettings.theme = theme;
     pageSettings.language = language;

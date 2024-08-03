@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { getpageSettings, updatepageSettings } from '../controllers/pageSettingsController.js';
 import { checkSchema } from 'express-validator';
+import { updatePageSettingSchema } from '../validators/schemas/pageSettingSchema.js';
 const router = Router();
 
 router.get('/pageSettings/:pageId', checkSchema({
@@ -21,6 +22,6 @@ router.post('/pageSettings/:pageId', checkSchema({
         isEmpty: { negated: true },
         trim: true
     }
-}, ['params']), updatepageSettings);
+}, ['params']), checkSchema(updatePageSettingSchema), updatepageSettings);
 
 export default router;
