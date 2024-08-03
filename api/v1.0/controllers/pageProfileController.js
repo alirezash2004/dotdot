@@ -1,7 +1,9 @@
 import { matchedData, validationResult } from "express-validator";
 import { samplePageProfiles } from "../helpers/mockuser.js";
+import { Page, PageProfile } from "../mongoose/schemas/page.js";
+import mongoose from "mongoose";
 
-export const getPageProfile = (req, res, next) => {
+export const getPageProfile = async (req, res, next) => {
     // TODO: check if page is public -> return bio 
     // if not public -> check if is follower
 
@@ -12,24 +14,27 @@ export const getPageProfile = (req, res, next) => {
 
     const data = matchedData(req);
 
-    const pageId = parseInt(data.pageId);
-    if (!pageId) {
-        const error = new Error(`An Error Accrued While Fetching Page Username!`);
-        error.status = 500;
-        return next(error);
+    const pageId = data.pageId;
+
+    const isValidId = mongoose.Types.ObjectId.isValid(pageId);
+
+    if (!isValidId) {
+        const err = new Error(`pageId is not valid!`);
+        err.status = 400;
+        return next(err);
     }
 
-    const pageprofile = samplePageProfiles.find(pgprofile => pgprofile.pageId === pageId);
+    const pageprofile = await Page.findById(pageId).select('pageProfile').populate('pageProfile').exec()
     if (!pageprofile) {
-        const error = new Error(`Page with pageid '${pageId}' has no pageprofile!`);
-        error.status = 500;
-        return next(error);
+        const err = new Error(`A pageprofile with pageid '${pageId}' was not found!`);
+        err.status = 404;
+        return next(err);
     }
 
-    res.status(200).json({ msg: 'success', pageprofile });
+    res.status(200).json({ msg: 'success', pageProfile: pageprofile.pageProfile });
 }
 
-export const updatePageProfile = (req, res, next) => {
+export const updatePageProfile = async (req, res, next) => {
     const result = validationResult(req).array({ onlyFirstError: true });
     if (result.length !== 0) {
         return res.status(400).send({ msg: result[0].msg });
@@ -37,54 +42,34 @@ export const updatePageProfile = (req, res, next) => {
 
     const data = matchedData(req);
 
-    const pageId = parseInt(data.pageId);
-    if (!pageId) {
-        const error = new Error(`An Error Accrued While Fetching Page Username!`);
-        error.status = 500;
-        return next(error);
+    const pageId = data.pageId;
+
+    const isValidId = mongoose.Types.ObjectId.isValid(pageId);
+
+    if (!isValidId) {
+        const err = new Error(`pageId is not valid!`);
+        err.status = 400;
+        return next(err);
     }
 
-    const pageprofile = samplePageProfiles.find(pgprofile => pgprofile.pageId === pageId);
-    if (!pageprofile) {
-        const error = new Error(`Page with pageid '${pageId}' has no pageprofile!`);
-        error.status = 500;
-        return next(error);
+    const { bio, website, birthdate } = data;
+
+    const page = await Page.findById(pageId).select('pageProfile').populate('pageProfile').exec();
+    if (!page) {
+        const err = new Error(`A pageprofile with pageid '${pageId}' was not found!`);
+        err.status = 404;
+        return next(err);
     }
 
-    const { body: { bio, website, birthdate } } = req;
+    const pageprofileId = page.pageProfile._id.toString();
 
-    pageprofile.bio = bio;
-    pageprofile.website = website;
-    pageprofile.birthdate = birthdate;
+    const queryResult = await PageProfile.updateOne({ _id: pageprofileId }, { bio, website, birthdate });
 
-    res.status(200).json({ msg: 'pageprofile updated', pageprofile });
-}
-
-export const deletePageProfile = (req, res, next) => {
-    const result = validationResult(req).array({ onlyFirstError: true });
-    if (result.length !== 0) {
-        return res.status(400).send({ msg: result[0].msg });
+    if (!queryResult.acknowledged) {
+        const err = new Error(`Something went wrong updating bio!`);
+        err.status = 500;
+        return next(err);
     }
 
-    const data = matchedData(req);
-
-    const pageId = parseInt(data.pageId);
-    if (!pageId) {
-        const error = new Error(`An Error Accrued While Fetching Page Username!`);
-        error.status = 500;
-        return next(error);
-    }
-
-    const pageprofile = samplePageProfiles.find(pgprofile => pgprofile.pageId === pageId);
-    if (!pageprofile) {
-        const error = new Error(`Page with pageid '${pageId}' has no pageprofile!`);
-        error.status = 500;
-        return next(error);
-    }
-
-    // check can delete
-
-    samplePageProfiles.splice(samplePageProfiles.indexOf(pageprofile), 1);
-
-    res.status(200).json({ msg: 'pageprofile deleted', samplePageProfiles });
+    res.status(200).json({ msg: 'pageprofile updated' });
 }
