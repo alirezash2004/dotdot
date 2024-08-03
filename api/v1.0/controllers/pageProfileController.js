@@ -66,7 +66,7 @@ export const updatePageProfile = async (req, res, next) => {
     const queryResult = await PageProfile.updateOne({ _id: pageprofileId }, { bio, website, birthdate });
 
     if (!queryResult.acknowledged) {
-        const err = new Error(`Something went wrong updating bio!`);
+        const err = new Error(`Something went wrong updating pageprofile!`);
         err.status = 500;
         return next(err);
     }
