@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { deletepageSettings, getpageSettings, updatepageSettings } from '../controllers/pageSettingsController.js';
+import { getpageSettings, updatepageSettings } from '../controllers/pageSettingsController.js';
 import { checkSchema } from 'express-validator';
 const router = Router();
 
@@ -22,15 +22,5 @@ router.post('/pageSettings/:pageId', checkSchema({
         trim: true
     }
 }, ['params']), updatepageSettings);
-
-router.delete('/pageSettings/:pageId', checkSchema({
-    pageId: {
-        exists: {
-            errorMessage: 'pageId is required'
-        },
-        isEmpty: { negated: true },
-        trim: true
-    }
-}, ['params']), deletepageSettings);
 
 export default router;
