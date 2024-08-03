@@ -1,22 +1,15 @@
-import { matchedData, validationResult } from "express-validator";
-import { samplePageProfiles } from "../helpers/mockuser.js";
 import { Page, PageProfile } from "../mongoose/schemas/page.js";
-import mongoose from "mongoose";
+import { isValidObjectId } from 'mongoose';
 
 export const getPageProfile = async (req, res, next) => {
     // TODO: check if page is public -> return bio 
     // if not public -> check if is follower
 
-    const result = validationResult(req).array({ onlyFirstError: true });
-    if (result.length !== 0) {
-        return res.status(400).send({ msg: result[0].msg });
-    }
-
-    const data = matchedData(req);
+    const data = req.validatedData;
 
     const pageId = data.pageId;
 
-    const isValidId = mongoose.Types.ObjectId.isValid(pageId);
+    const isValidId = isValidObjectId(pageId);
 
     if (!isValidId) {
         const err = new Error(`pageId is not valid!`);
@@ -35,16 +28,11 @@ export const getPageProfile = async (req, res, next) => {
 }
 
 export const updatePageProfile = async (req, res, next) => {
-    const result = validationResult(req).array({ onlyFirstError: true });
-    if (result.length !== 0) {
-        return res.status(400).send({ msg: result[0].msg });
-    }
-
-    const data = matchedData(req);
+    const data = req.validatedData;
 
     const pageId = data.pageId;
 
-    const isValidId = mongoose.Types.ObjectId.isValid(pageId);
+    const isValidId = isValidObjectId(pageId);
 
     if (!isValidId) {
         const err = new Error(`pageId is not valid!`);

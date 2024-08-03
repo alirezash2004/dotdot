@@ -3,29 +3,15 @@ import express from 'express';
 import { deletePostByPostId, getPostByPostId, newPost } from '../controllers/postController.js';
 import { checkSchema } from 'express-validator';
 import postsSchema from '../validators/schemas/postsSchema.js';
+import validationResultHandler from '../middleware/validationResultHandler.js';
+import pageIdSchema from '../validators/schemas/pageIdSchema.js';
 const router = express.Router();
 
 // Get single post by postId
-router.get('/posts/:postId', checkSchema({
-    postId: {
-        exists: {
-            errorMessage: 'postId is required'
-        },
-        isEmpty: { negated: true },
-        trim: true
-    }
-}, ['params']), getPostByPostId);
+router.get('/posts/:postId', checkSchema(pageIdSchema, ['params']), validationResultHandler, getPostByPostId);
 
-router.post('/posts/newPost', checkSchema(postsSchema), newPost);
+router.post('/posts/newPost', checkSchema(postsSchema), validationResultHandler, newPost);
 
-router.delete('/posts/delPost/:postId', checkSchema({
-    postId: {
-        exists: {
-            errorMessage: 'postId is required'
-        },
-        isEmpty: { negated: true },
-        trim: true
-    }
-}, ['params']), deletePostByPostId);
+router.delete('/posts/delPost/:postId', checkSchema(pageIdSchema, ['params']), validationResultHandler, deletePostByPostId);
 
 export default router;

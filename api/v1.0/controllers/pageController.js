@@ -1,22 +1,16 @@
 import { Page, PageProfile, PageSetting } from '../mongoose/schemas/page.js';
 import { genPassword } from '../utils/passwordsUtil.js';
-import { matchedData, validationResult } from 'express-validator';
-import mongoose from 'mongoose';
+import { isValidObjectId } from 'mongoose';
 
 // @desc   Get page
 // @route  POST /api/v1.0/@:pageId
 // Access
 export const getPage = async (req, res, next) => {
-    const result = validationResult(req);
-    if (!result.isEmpty()) {
-        return res.status(401).send({ msg: 'pageId invalid' })
-    }
-
-    const data = matchedData(req);
+    const data = req.validatedData;
 
     const pageId = data.pageId;
 
-    const isValidId = mongoose.Types.ObjectId.isValid(pageId);
+    const isValidId = isValidObjectId(pageId);
 
     if (!isValidId) {
         const err = new Error(`pageId is not valid!`);
@@ -35,12 +29,7 @@ export const getPage = async (req, res, next) => {
 }
 
 export const newPage = async (req, res, next) => {
-    const result = validationResult(req).array({ onlyFirstError: true });
-    if (result.length !== 0) {
-        return res.status(400).send({ success: false, msg: result[0].msg })
-    }
-
-    const data = matchedData(req);
+    const data = req.validatedData;
 
     const { username, fullname, email, password, pagetype } = data;
 
@@ -104,16 +93,11 @@ export const newPage = async (req, res, next) => {
 }
 
 export const updatePageinfo = async (req, res, next) => {
-    const result = validationResult(req).array({ onlyFirstError: true });
-    if (result.length !== 0) {
-        return res.status(400).send({ success: false, msg: result[0].msg })
-    }
-
-    const data = matchedData(req);
+    const data = req.validatedData;
 
     const { username, fullname, email, password, pagetype, pageId } = data;
 
-    const isValidId = mongoose.Types.ObjectId.isValid(pageId);
+    const isValidId = isValidObjectId(pageId);
 
     if (!isValidId) {
         const err = new Error(`pageId is not valid!`);
@@ -150,15 +134,10 @@ export const updatePageinfo = async (req, res, next) => {
 }
 
 export const deletePage = async (req, res, next) => {
-    const result = validationResult(req).array({ onlyFirstError: true });
-    if (result.length !== 0) {
-        return res.status(400).send({ success: false, msg: result[0].msg })
-    }
-
-    const data = matchedData(req);
+    const data = req.validatedData;
     const pageId = data.pageId;
 
-    const isValidId = mongoose.Types.ObjectId.isValid(pageId);
+    const isValidId = isValidObjectId(pageId);
 
     if (!isValidId) {
         const err = new Error(`pageId is not valid!`);

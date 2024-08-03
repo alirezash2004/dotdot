@@ -1,4 +1,3 @@
-import { matchedData, validationResult } from 'express-validator';
 import { posts, postMedia, postComments } from '../helpers/mockdata.js';
 import { tmpFiles } from '../helpers/mockfilemanager.js';
 import { isJson } from '../utils/checkIsJson.js';
@@ -7,12 +6,7 @@ import { isJson } from '../utils/checkIsJson.js';
 // @route  GET /api/v1.0/posts/:postId
 // Access
 export const getPostByPostId = (req, res, next) => {
-    const result = validationResult(req).array({ onlyFirstError: true });
-    if (result.length !== 0) {
-        return res.status(400).send({ msg: result[0].msg });
-    }
-
-    const data = matchedData(req);
+    const data = req.validatedData;
     const postId = parseInt(data.postId);
     const post = posts.find((post) => post.id === postId);
 
@@ -65,12 +59,7 @@ export const newPost = (req, res, next) => {
     // TODO: validate all inputs
     // single image post
 
-    const result = validationResult(req).array({ onlyFirstError: true });
-    if (result.length !== 0) {
-        return res.status(400).send({ success: false, msg: result[0].msg })
-    }
-
-    const data = matchedData(req);
+    const data = req.validatedData;
     console.log(data);
 
     const { pageId, type, assetType, caption, postmedia } = data;
@@ -143,12 +132,7 @@ export const newPost = (req, res, next) => {
 }
 
 export const deletePostByPostId = (req, res, next) => {
-    const result = validationResult(req).array({ onlyFirstError: true });
-    if (result.length !== 0) {
-        return res.status(400).send({ msg: result[0].msg });
-    }
-
-    const data = matchedData(req);
+    const data = req.validatedData;
 
     const postId = parseInt(data.postId);
     const post = posts.find((post) => post.id === postId);
