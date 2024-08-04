@@ -79,9 +79,9 @@ export const newFollowing = async (req, res, next) => {
     const followingRelationship = new FollowingRelationship(followingRelationshipData);
 
     followingRelationship.save()
-        .then((val) => {
-            Page.findByIdAndUpdate(pageId, { $inc: { followingCount: 1 } }).exec();
-            Page.findByIdAndUpdate(followedPageId, { $inc: { followersCount: 1 } }).exec();
+        .then(async (val) => {
+            await Page.findByIdAndUpdate(pageId, { $inc: { followingCount: 1 } }).exec();
+            await Page.findByIdAndUpdate(followedPageId, { $inc: { followersCount: 1 } }).exec();
 
             res.status(200).json(val);
         })
