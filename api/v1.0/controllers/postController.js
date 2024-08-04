@@ -1,14 +1,24 @@
-import { posts, postMedia, postComments } from '../helpers/mockdata.js';
-import { tmpFiles } from '../helpers/mockfilemanager.js';
+import { isValidObjectId } from 'mongoose';
+import { Page } from '../mongoose/schemas/page.js';
+import { Post, PostComments, PostMedia, TmpFiles } from '../mongoose/schemas/post.js';
 import { isJson } from '../utils/checkIsJson.js';
 
 // @desc   Get signle post
 // @route  GET /api/v1.0/posts/:postId
 // Access
-export const getPostByPostId = (req, res, next) => {
+export const getPostByPostId = async (req, res, next) => {
     const data = req.validatedData;
-    const postId = parseInt(data.postId);
-    const post = posts.find((post) => post.id === postId);
+    const postId = data.postId;
+
+    const isValidId = isValidObjectId(postId);
+
+    if (!isValidId) {
+        const err = new Error(`postId is not valid!`);
+        err.status = 400;
+        return next(err);
+    }
+
+    const post = await Post.findById(postId).exec();
 
     if (!post) {
         const error = new Error(`A post with post id ${postId} was not found`);
@@ -16,65 +26,46 @@ export const getPostByPostId = (req, res, next) => {
         return next(error);
     }
 
-    let CurrentpostMedia;
+    let postMedias = await PostMedia.find({ postId }).select('slideNumber assetUrl ext').exec();
 
-    if (post.type === 'single') {
-        CurrentpostMedia = postMedia.find(postMedia => postMedia.postId === postId);
-        CurrentpostMedia = {
-            type: CurrentpostMedia.type,
-            assetUrl: CurrentpostMedia.assetUrl
-        }
-    } else if (post.type === 'multiple') {
-        CurrentpostMedia = postMedia.filter(postMedia => postMedia.postId === postId);
-        for (let i = 0; i < CurrentpostMedia.length; i++) {
-            CurrentpostMedia[i] = {
-                slideNumber: CurrentpostMedia[i].slideNumber,
-                type: CurrentpostMedia[i].type,
-                assetUrl: CurrentpostMedia[i].assetUrl
-            }
-        }
+    if (postMedias.length == 1) {
+        postMedias = postMedias[0]
     }
 
-    if (!CurrentpostMedia) {
-        const error = new Error(`A post with post id ${postId} does not have the media property!`);
-        error.status = 500;
-        return next(error);
-    }
+    // TODO: fetch comments
+    // const returnComments = Boolean(req.query.comments === 'true');
+    // if (!returnComments) {
+    //     post.comments = [];
+    //     return res.status(200).json(post);
+    // }
 
-    post.media = CurrentpostMedia;
+    // const currentPostComments = postComments.filter((comment) => comment.postId === postId);
+    // post.comments = currentPostComments;
 
-    const returnComments = Boolean(req.query.comments === 'true');
-    if (!returnComments) {
-        post.comments = [];
-        return res.status(200).json(post);
-    }
-
-    const currentPostComments = postComments.filter((comment) => comment.postId === postId);
-    post.comments = currentPostComments;
-
-    res.status(200).json(post);
+    res.status(200).json({
+        assetType: post.assetType,
+        type: post.type,
+        caption: post.caption,
+        createdAt: post.createdAt,
+        shareCount: post.shareCount,
+        likeCount: post.likeCount,
+        media: postMedias
+    });
 }
 
-export const newPost = (req, res, next) => {
-    // TODO: validate all inputs
+export const newPost = async (req, res, next) => {
     // single image post
 
     const data = req.validatedData;
-    console.log(data);
 
     const { pageId, type, assetType, caption, postmedia } = data;
 
-    const postId = posts[posts.length - 1].id + 1;
+    const isValidId = isValidObjectId(pageId);
 
-    const post = {
-        id: postId,
-        pageId: parseInt(pageId),
-        assetType: assetType,
-        type: type,
-        caption: caption,
-        createdAt: Date(),
-        shareCount: 0,
-        LikeCount: 0
+    if (!isValidId) {
+        const err = new Error(`pageId is not valid!`);
+        err.status = 400;
+        return next(err);
     }
 
     if (!isJson(postmedia)) {
@@ -92,7 +83,7 @@ export const newPost = (req, res, next) => {
         for (let i = 0; i < mediaAccessTokens.length; i++) {
             const mediaAccessToken = mediaAccessTokens[i];
 
-            const media = tmpFiles.find(media => media.fileAccesstoken === mediaAccessToken);
+            const media = await TmpFiles.findOne({ fileAccesstoken: mediaAccessToken, pageId: pageId }).exec();
 
             if (!media) {
                 const error = new Error(`A postmedia with token ${mediaAccessToken} was not found!`);
@@ -104,24 +95,64 @@ export const newPost = (req, res, next) => {
         }
 
 
-        for (let i = 0; i < medias.length; i++) {
-            const media = medias[i];
-
-            postMedia.push({
-                id: postMedia[postMedia.length - 1] + 1,
-                postId: postId,
-                slideNumber: i,
-                assetUrl: media.path,
-                ext: media.fileExt,
-                createdTimestamp: media.createdTimestamp
-            })
+        const post = {
+            pageId: pageId,
+            assetType: assetType,
+            type: type,
+            caption: caption,
+            createdAt: Date(),
+            shareCount: 0,
+            likeCount: 0
         }
 
-        posts.push(post);
+        const newPost = new Post(post);
 
-        console.log(postMedia);
-        res.status(200).json(post);
+        await newPost.save()
+            .then(async (savePost) => {
 
+                const postMediaDatas = [];
+
+                for (let i = 0; i < medias.length; i++) {
+                    const media = medias[i];
+
+                    const postMediaData = {
+                        postId: savePost._id,
+                        slideNumber: i,
+                        assetUrl: media.path,
+                        ext: media.fileExt,
+                        createdAt: media.createdAt
+                    };
+
+                    postMediaDatas.push(new PostMedia(postMediaData));
+                }
+
+                await PostMedia.bulkSave(postMediaDatas)
+                    .then(async () => {
+                        // TODO: remove tmp files
+                        await TmpFiles.deleteMany({ pageId: pageId })
+                            .exec()
+                            .then(async () => {
+                                await Page.findByIdAndUpdate(pageId, { $inc: { postsCount: 1 } }).exec()
+                                return res.status(200).json({ success: true });
+                            })
+                            .catch((reason) => {
+                                const error = new Error(reason);
+                                error.status = 404;
+                                return next(error);
+                            })
+                    })
+                    .catch((reason) => {
+                        // TODO: delete post
+                        const error = new Error(reason);
+                        error.status = 404;
+                        return next(error);
+                    })
+            })
+            .catch((reason) => {
+                const error = new Error(reason);
+                error.status = 404;
+                return next(error);
+            })
     } else if (assetType === 'video') {
         // TODO: upload video
     } else {
@@ -131,11 +162,20 @@ export const newPost = (req, res, next) => {
     }
 }
 
-export const deletePostByPostId = (req, res, next) => {
+export const deletePostByPostId = async (req, res, next) => {
     const data = req.validatedData;
 
-    const postId = parseInt(data.postId);
-    const post = posts.find((post) => post.id === postId);
+    const postId = data.postId;
+
+    const isValidId = isValidObjectId(postId);
+
+    if (!isValidId) {
+        const err = new Error(`postId is not valid!`);
+        err.status = 400;
+        return next(err);
+    }
+
+    const post = await Post.exists({ _id: postId }).exec()
 
     if (!post) {
         const error = new Error(`A post with post id ${postId} was not found`);
@@ -144,21 +184,42 @@ export const deletePostByPostId = (req, res, next) => {
     }
 
     // delete all post media
-    const CurrentpostMedias = postMedia.filter(postMedia => postMedia.postId === postId);
-    for (let i = 0; i < CurrentpostMedias.length; i++) {
-        const CurrentpostMedia = CurrentpostMedias[i];
-        postMedia.splice(postMedia.indexOf(CurrentpostMedia), 1);
-    }
-
-    // delete all post comments
-    const currentPostComments = postComments.filter((comment) => comment.postId === postId);
-    for (let i = 0; i < currentPostComments.length; i++) {
-        const currentPostComment = currentPostComments[i];
-        postComments.splice(postComments.indexOf(currentPostComment), 1);
-    }
-
-    // delete post
-    posts.splice(posts.indexOf(post), 1);
-
-    res.status(200).json({ msg: 'post deleted!' });
+    await PostMedia.deleteMany({ postId })
+        .exec()
+        .then(async () => {
+            // delete all post comments
+            await PostComments.deleteMany({ postId })
+                .exec()
+                .then(async () => {
+                    await PostComments.deleteMany({ postId })
+                        .exec()
+                        .then(async () => {
+                            await Post.deleteOne({ _id: postId })
+                                .exec()
+                                .then(() => {
+                                    return res.status(200).json({ success: true, msg: 'post deleted!' });
+                                })
+                                .catch((reason) => {
+                                    const error = new Error(reason);
+                                    error.status = 500;
+                                    return next(error);
+                                })
+                        })
+                        .catch((reason) => {
+                            const error = new Error(reason);
+                            error.status = 500;
+                            return next(error);
+                        })
+                })
+                .catch((reason) => {
+                    const error = new Error(reason);
+                    error.status = 500;
+                    return next(error);
+                })
+        })
+        .catch((reason) => {
+            const error = new Error(reason);
+            error.status = 500;
+            return next(error);
+        })
 }

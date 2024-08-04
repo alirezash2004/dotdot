@@ -1,8 +1,8 @@
 import multer from 'multer';
 import crypto from 'crypto';
 import path from 'path';
-import { tmpFiles } from '../helpers/mockfilemanager.js';
 import { __filename, __dirname } from '../../../currentPath.js';
+import { TmpFiles } from '../mongoose/schemas/post.js';
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
         cb(null, path.join(__dirname, 'uploads', 'tmpPostData'))
@@ -30,7 +30,7 @@ const uploadSingleImage = multer({
 }).single('postImage');
 
 export const singleImageUpload = (req, res, next) => {
-    uploadSingleImage(req, res, (err) => {
+    uploadSingleImage(req, res, async (err) => {
         // console.log(req.body);
         if (err instanceof multer.MulterError) {
             return res.status(500).json({ success: false, msg: 'Filesize must be under 15 MB' })
@@ -43,16 +43,24 @@ export const singleImageUpload = (req, res, next) => {
         let fileAccesstoken = crypto.randomBytes(36).toString('hex');
 
         const fileData = {
-            userId: 1, // TODO: get real userid
+            pageId: '66aa7a3dba80d3acb5851588', // TODO: get real userid
             fileAccesstoken: fileAccesstoken,
             filename: req.file.filename,
             path: req.file.path,
             fileExt: path.extname(req.file.originalname).toLowerCase().replace('.', ''),
-            createdTimestamp: Date.now(),
+            createdAt: Date.now(),
         }
 
-        tmpFiles.push(fileData);
+        const newTmpFile = new TmpFiles(fileData);
 
-        res.status(200).json({ success: true, fileAccesstoken: fileAccesstoken });
+        await newTmpFile.save()
+            .then((tmpfile) => {
+                return res.status(200).json({ success: true, fileAccesstoken: fileAccesstoken });
+            })
+            .catch((reason) => {
+                const error = new Error(reason);
+                error.status = 404;
+                return next(error);
+            })
     })
 }
