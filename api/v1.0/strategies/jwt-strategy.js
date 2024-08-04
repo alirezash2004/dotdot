@@ -4,6 +4,7 @@ import { samplePages } from "../helpers/mockuser.js";
 import fs from 'fs';
 import path from 'path';
 import { __dirname } from '../../../currentPath.js';
+import { Page } from "../mongoose/schemas/page.js";
 
 const pathToKey = path.join(__dirname, 'id_rsa_pub.pem');
 const PUB_KEY = fs.readFileSync(pathToKey, 'utf8');
@@ -15,9 +16,9 @@ const opts = {
     algorithms: ['RS256']
 }
 
-const strategy = new Strategy(opts, (payload, done) => {
+const strategy = new Strategy(opts, async (payload, done) => {
     try {
-        const findPage = samplePages.find(page => page.id === payload.sub);
+        const findPage = await Page.findById(payload.sub).exec()
         if (!findPage) throw new Error('Page not found');
         // TODO: handle token expiration
         done(null, findPage);
