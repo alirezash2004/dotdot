@@ -7,13 +7,13 @@ import pageIdSchema from '../validators/schemas/pageIdSchema.js';
 import pageUpdateSchema from '../validators/schemas/pageUpdateSchema.js';
 const router = Router();
 
-router.get('/pages/getPage/:pageId', checkSchema(pageIdSchema, ['params']), validationResultHandler, getPage);
+router.get('/pages/:pageId', checkSchema(pageIdSchema, ['params']), validationResultHandler, getPage);
 
-router.post('/pages/newPage', checkSchema(pageSchema), validationResultHandler, newPage);
+router.post('/pages', checkSchema(pageSchema), validationResultHandler, newPage);
 
-router.put('/pages/updatePageinfo/:pageId', checkSchema(pageIdSchema, ['params']), checkSchema(pageUpdateSchema), validationResultHandler, updatePageinfo);
+router.put('/pages/:pageId', checkSchema(pageIdSchema, ['params']), checkSchema(pageUpdateSchema), validationResultHandler, updatePageinfo);
 
-router.delete('/pages/delPage/:pageId', checkSchema(pageIdSchema, ['params']), validationResultHandler, deletePage);
+router.delete('/pages/:pageId', checkSchema(pageIdSchema, ['params']), validationResultHandler, deletePage);
 
 
 export default router;

@@ -10,8 +10,8 @@ const router = express.Router();
 // Get single post by postId
 router.get('/posts/:postId', checkSchema(pageIdSchema, ['params']), validationResultHandler, getPostByPostId);
 
-router.post('/posts/newPost', checkSchema(postsSchema), validationResultHandler, newPost);
+router.post('/posts', checkSchema(postsSchema), validationResultHandler, newPost);
 
-router.delete('/posts/delPost/:postId', checkSchema(pageIdSchema, ['params']), validationResultHandler, deletePostByPostId);
+router.delete('/posts/:postId', checkSchema(pageIdSchema, ['params']), validationResultHandler, deletePostByPostId);
 
 export default router;
