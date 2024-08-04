@@ -3,17 +3,17 @@ import { getPage, newPage, updatePageinfo, deletePage } from '../controllers/pag
 import { checkSchema } from 'express-validator';
 import pageSchema from '../validators/schemas/pageSchema.js';
 import validationResultHandler from '../middleware/validationResultHandler.js';
-import pageIdSchema from '../validators/schemas/pageIdSchema.js';
 import pageUpdateSchema from '../validators/schemas/pageUpdateSchema.js';
+import passport from 'passport';
+import usernameSchema from '../validators/schemas/usernameSchema.js';
 const router = Router();
 
-router.get('/pages/:pageId', checkSchema(pageIdSchema, ['params']), validationResultHandler, getPage);
+router.get('/pages/:username', passport.authenticate('jwt', { session: false }), checkSchema(usernameSchema, ['params']), validationResultHandler, getPage);
 
 router.post('/pages', checkSchema(pageSchema), validationResultHandler, newPage);
 
-router.put('/pages/:pageId', checkSchema(pageIdSchema, ['params']), checkSchema(pageUpdateSchema), validationResultHandler, updatePageinfo);
+router.put('/pages/:username', passport.authenticate('jwt', { session: false }), checkSchema(usernameSchema, ['params']), checkSchema(pageUpdateSchema), validationResultHandler, updatePageinfo);
 
-router.delete('/pages/:pageId', checkSchema(pageIdSchema, ['params']), validationResultHandler, deletePage);
-
+router.delete('/pages', passport.authenticate('jwt', { session: false }), deletePage);
 
 export default router;
