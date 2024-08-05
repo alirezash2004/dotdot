@@ -46,13 +46,13 @@ router.post('/auth/login',
         const findPage = await Page.findOne({ username }).select('password salt').exec()
         if (!findPage) {
             const error = new Error('Page not found');
-            error.status = 500;
+            error.status = 400;
             return next(error);
         }
 
         if (!validatePassword(password, findPage.password, findPage.salt)) {
             const error = new Error('invalid credentials');
-            error.status = 500;
+            error.status = 400;
             return next(error);
         }
 

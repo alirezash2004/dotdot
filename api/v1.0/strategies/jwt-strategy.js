@@ -19,7 +19,7 @@ const opts = {
 const strategy = new Strategy(opts, async (payload, done) => {
     try {
         const findPage = await Page.findById(payload.sub).exec()
-        if (!findPage) throw new Error('Page not found');
+        if (!findPage) throw new Error('Token is not valid!');
         // TODO: handle token expiration
         done(null, findPage);
     } catch (err) {
