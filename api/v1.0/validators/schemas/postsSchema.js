@@ -1,12 +1,4 @@
 const postsSchema = {
-    pageId: {
-        exists: {
-            errorMessage: 'pageId is required'
-        },
-        isEmpty: { negated: true },
-        trim: true,
-        escape: true,
-    },
     type: {
         matches: {
             errorMessage: 'type must be single OR multiple',

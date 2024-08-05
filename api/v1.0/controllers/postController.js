@@ -1,5 +1,5 @@
 import { isValidObjectId } from 'mongoose';
-import { Page } from '../mongoose/schemas/page.js';
+import { FollowingRelationship, Page } from '../mongoose/schemas/page.js';
 import { Post, PostComments, PostMedia, TmpFiles } from '../mongoose/schemas/post.js';
 import { isJson } from '../utils/checkIsJson.js';
 
@@ -23,6 +23,23 @@ export const getPostByPostId = async (req, res, next) => {
     if (!post) {
         const error = new Error(`A post with post id ${postId} was not found`);
         error.status = 404;
+        return next(error);
+    }
+
+    // check if page for the post is private then should be following else don't return post
+    // for public pages no restriction
+    // self posts also no restriction
+    const currentPageId = req.user._id.toString();
+    const targetPageId = post.pageId.toString();
+    const targetPageType = await Page.findById(targetPageId).select('pageType').exec();
+    console.log(`currentPageId: ${currentPageId}`);
+    console.log(`targetPageId: ${targetPageId}`);
+    console.log(`targetPageType: ${targetPageType.pageType}`);
+
+    const isFollowing = await FollowingRelationship.exists({ pageId: currentPageId, followedPageId: targetPageId }).exec();
+    if (targetPageId !== currentPageId && (targetPageType.pageType === 'private' && !isFollowing)) {
+        const error = new Error(`Page Is Private You have to follow it first`);
+        error.status = 401;
         return next(error);
     }
 
@@ -58,15 +75,9 @@ export const newPost = async (req, res, next) => {
 
     const data = req.validatedData;
 
-    const { pageId, type, assetType, caption, postmedia } = data;
+    const { type, assetType, caption, postmedia } = data;
 
-    const isValidId = isValidObjectId(pageId);
-
-    if (!isValidId) {
-        const err = new Error(`pageId is not valid!`);
-        err.status = 400;
-        return next(err);
-    }
+    const pageId = req.user._id.toString();
 
     if (!isJson(postmedia)) {
         const error = new Error(`PostMadia data is invalid!`);
@@ -163,6 +174,8 @@ export const newPost = async (req, res, next) => {
 }
 
 export const deletePostByPostId = async (req, res, next) => {
+    const pageId = req.user._id.toString();
+
     const data = req.validatedData;
 
     const postId = data.postId;
@@ -175,11 +188,17 @@ export const deletePostByPostId = async (req, res, next) => {
         return next(err);
     }
 
-    const post = await Post.exists({ _id: postId }).exec()
+    const post = await Post.findById(postId).select('pageId').exec()
 
     if (!post) {
         const error = new Error(`A post with post id ${postId} was not found`);
         error.status = 404;
+        return next(error);
+    }
+
+    if (post.pageId.toString() !== pageId) {
+        const error = new Error(`You can only delete your posts!`);
+        error.status = 401;
         return next(error);
     }
 
@@ -196,8 +215,17 @@ export const deletePostByPostId = async (req, res, next) => {
                         .then(async () => {
                             await Post.deleteOne({ _id: postId })
                                 .exec()
-                                .then(() => {
-                                    return res.status(200).json({ success: true, msg: 'post deleted!' });
+                                .then(async () => {
+                                    await Page.findByIdAndUpdate(pageId, { $inc: { postsCount: -1 } })
+                                        .exec()
+                                        .then(() => {
+                                            return res.status(200).json({ success: true, msg: 'post deleted!' });
+                                        })
+                                        .catch((reason) => {
+                                            const error = new Error(reason);
+                                            error.status = 500;
+                                            return next(error);
+                                        })
                                 })
                                 .catch((reason) => {
                                     const error = new Error(reason);

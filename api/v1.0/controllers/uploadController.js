@@ -30,6 +30,7 @@ const uploadSingleImage = multer({
 }).single('postImage');
 
 export const singleImageUpload = (req, res, next) => {
+    const pageId = req.user._id.toString();
     uploadSingleImage(req, res, async (err) => {
         // console.log(req.body);
         if (err instanceof multer.MulterError) {
@@ -43,7 +44,7 @@ export const singleImageUpload = (req, res, next) => {
         let fileAccesstoken = crypto.randomBytes(36).toString('hex');
 
         const fileData = {
-            pageId: '66aa7a3dba80d3acb5851588', // TODO: get real userid
+            pageId: pageId,
             fileAccesstoken: fileAccesstoken,
             filename: req.file.filename,
             path: req.file.path,
