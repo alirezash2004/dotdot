@@ -1,53 +1,48 @@
 import { Page, PageProfile } from "../mongoose/schemas/page.js";
-import { isValidObjectId } from 'mongoose';
 
 export const getPageProfile = async (req, res, next) => {
-    // TODO: check if page is public -> return bio 
-    // if not public -> check if is follower
-
     const data = req.validatedData;
 
-    const pageId = data.pageId;
+    const pageId = req.user._id;
 
-    const isValidId = isValidObjectId(pageId);
+    const targetPageUsername = data.username;
 
-    if (!isValidId) {
-        const err = new Error(`pageId is not valid!`);
-        err.status = 400;
-        return next(err);
+    // check if getting itself
+    if (targetPageUsername === req.user.username) {
+        const pageprofile = await Page.findById(pageId).select('pageProfile').populate('pageProfile').exec();
+        return res.status(200).json({
+            success: true,
+            data: {
+                bio: pageprofile.pageProfile.bio,
+                website: pageprofile.pageProfile.website,
+                birthdate: pageprofile.pageProfile.birthdate,
+            }
+        });
     }
 
-    const pageprofile = await Page.findById(pageId).select('pageProfile').populate('pageProfile').exec()
+    const pageprofile = await Page.findOne({ username: targetPageUsername }).select('pageProfile').populate('pageProfile').exec()
+
     if (!pageprofile) {
-        const err = new Error(`A pageprofile with pageid '${pageId}' was not found!`);
+        const err = new Error(`A pageprofile for page with username '${targetPageUsername}' was not found!`);
         err.status = 404;
         return next(err);
     }
 
-    res.status(200).json({ msg: 'success', pageProfile: pageprofile.pageProfile });
+    return res.status(200).json({
+        success: true,
+        data: {
+            bio: pageprofile.pageProfile.bio,
+            website: pageprofile.pageProfile.website,
+        }
+    });
 }
 
-export const updatePageProfile = async (req, res, next) => {
-    const data = req.validatedData;
-
-    const pageId = data.pageId;
-
-    const isValidId = isValidObjectId(pageId);
-
-    if (!isValidId) {
-        const err = new Error(`pageId is not valid!`);
-        err.status = 400;
-        return next(err);
-    }
+export const updatePageProfile = async (req, res, next) => {    
+    const pageId = req.user._id;
 
     const { bio, website, birthdate } = data;
 
     const page = await Page.findById(pageId).select('pageProfile').populate('pageProfile').exec();
-    if (!page) {
-        const err = new Error(`A pageprofile with pageid '${pageId}' was not found!`);
-        err.status = 404;
-        return next(err);
-    }
 
     const pageprofileId = page.pageProfile._id.toString();
 
