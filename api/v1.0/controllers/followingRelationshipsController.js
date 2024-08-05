@@ -1,7 +1,13 @@
 import { FollowingRelationship, Page } from '../mongoose/schemas/page.js';
 import { isValidObjectId } from 'mongoose';
 
-const validatePageIds = (pageIds) => {
+const validatePageIds = (pageIds, currentPageId) => {
+    if (pageIds[0].objectId !== currentPageId && pageIds[1].objectId !== currentPageId) {
+        const error = new Error(`One of pages must be you`);
+        error.status = 400;
+        return error;
+    }
+
     if (pageIds[0].objectId === pageIds[1].objectId) {
         const error = new Error(`A page cannot have a following relationship with itself!`);
         error.status = 400;
@@ -32,7 +38,7 @@ export const checkIsFollowing = async (req, res, next) => {
         [
             { objectId: pageId, title: 'pageId' },
             { objectId: followedPageId, title: 'followedPageId' }
-        ]);
+        ], req.user._id.toString());
 
     if (validate instanceof Error) {
         return next(validate);
@@ -48,6 +54,7 @@ export const checkIsFollowing = async (req, res, next) => {
 
 // makes pageId follow-> followedPageId
 export const newFollowing = async (req, res, next) => {
+    const authPageId = req.user._id.toString();
     const data = req.validatedData;
     const pageId = data.pageId;
     const followedPageId = data.followedPageId;
@@ -56,7 +63,7 @@ export const newFollowing = async (req, res, next) => {
         [
             { objectId: pageId, title: 'pageId' },
             { objectId: followedPageId, title: 'followedPageId' }
-        ]);
+        ], authPageId);
 
     if (validate instanceof Error) {
         return next(validate);
@@ -68,6 +75,23 @@ export const newFollowing = async (req, res, next) => {
         error.status = 409;
         return next(error);
     }
+
+    if (pageId === authPageId) {
+        const targetPageExists = await Page.exists({ _id: followedPageId }).exec();
+        if (!targetPageExists) {
+            const error = new Error(`Page with id ${followedPageId} does not exist!`);
+            error.status = 400;
+            return next(error);
+        }
+    } else if (followedPageId === authPageId) {
+        const targetPageExists = await Page.exists({ _id: pageId }).exec();
+        if (!targetPageExists) {
+            const error = new Error(`Page with id ${pageId} does not exist!`);
+            error.status = 400;
+            return next(error);
+        }
+    }
+
 
     const followingRelationshipData =
     {
@@ -83,7 +107,7 @@ export const newFollowing = async (req, res, next) => {
             await Page.findByIdAndUpdate(pageId, { $inc: { followingCount: 1 } }).exec();
             await Page.findByIdAndUpdate(followedPageId, { $inc: { followersCount: 1 } }).exec();
 
-            res.status(200).json(val);
+            res.status(200).json({ success: true });
         })
         .catch((err) => {
             const error = new Error(err);
@@ -102,7 +126,7 @@ export const removeFollowing = async (req, res, next) => {
         [
             { objectId: pageId, title: 'pageId' },
             { objectId: followedPageId, title: 'followedPageId' }
-        ]);
+        ], req.user._id.toString());
 
     if (validate instanceof Error) {
         return next(validate);
