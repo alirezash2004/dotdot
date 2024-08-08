@@ -30,125 +30,133 @@ const validatePageIds = (pageIds, currentPageId) => {
 
 // checks if pageId is following followedPageId
 export const checkIsFollowing = async (req, res, next) => {
-    const data = req.validatedData;
+    try {
+        const data = req.validatedData;
 
-    const pageId = data.pageId;
-    const followedPageId = data.followedPageId;
+        const pageId = data.pageId;
+        const followedPageId = data.followedPageId;
 
-    const validate = validatePageIds(
-        [
-            { objectId: pageId, title: 'pageId' },
-            { objectId: followedPageId, title: 'followedPageId' }
-        ], req.user._id.toString());
+        const validate = validatePageIds(
+            [
+                { objectId: pageId, title: 'pageId' },
+                { objectId: followedPageId, title: 'followedPageId' }
+            ], req.user._id.toString());
 
-    if (validate instanceof Error) {
-        return next(validate);
+        if (validate instanceof Error) {
+            return next(validate);
+        }
+
+        const isFollowing = await FollowingRelationship.exists({ pageId: pageId, followedPageId: followedPageId }).exec();
+        if (!isFollowing) {
+            return res.status(200).json({ isFollowing: false });
+        }
+
+        return res.status(200).json({ isFollowing: true });
+    } catch (err) {
+        console.log(`Error in checkIsFollowing : ${err}`);
+        const error = new Error(`Internal Server Error`)
+        error.status = 500;
+        return next(error);
     }
-
-    const isFollowing = await FollowingRelationship.exists({ pageId: pageId, followedPageId: followedPageId }).exec();
-    if (!isFollowing) {
-        return res.status(200).json({ isFollowing: false });
-    }
-
-    res.status(200).json({ isFollowing: true });
 }
 
 // makes pageId follow-> followedPageId
 export const newFollowing = async (req, res, next) => {
-    const authPageId = req.user._id.toString();
-    const data = req.validatedData;
-    const pageId = data.pageId;
-    const followedPageId = data.followedPageId;
+    try {
+        const authPageId = req.user._id.toString();
+        const data = req.validatedData;
+        const pageId = data.pageId;
+        const followedPageId = data.followedPageId;
 
-    const validate = validatePageIds(
-        [
-            { objectId: pageId, title: 'pageId' },
-            { objectId: followedPageId, title: 'followedPageId' }
-        ], authPageId);
+        const validate = validatePageIds(
+            [
+                { objectId: pageId, title: 'pageId' },
+                { objectId: followedPageId, title: 'followedPageId' }
+            ], authPageId);
 
-    if (validate instanceof Error) {
-        return next(validate);
-    }
+        if (validate instanceof Error) {
+            return next(validate);
+        }
 
-    const isCurrentyFollowing = await FollowingRelationship.exists({ pageId: pageId, followedPageId: followedPageId }).exec();
-    if (isCurrentyFollowing) {
-        const error = new Error(`Page with id ${pageId} is currently following ${followedPageId}`);
-        error.status = 409;
+        const isCurrentyFollowing = await FollowingRelationship.exists({ pageId: pageId, followedPageId: followedPageId }).exec();
+        if (isCurrentyFollowing) {
+            const error = new Error(`Page with id ${pageId} is currently following ${followedPageId}`);
+            error.status = 409;
+            return next(error);
+        }
+
+        if (pageId === authPageId) {
+            const targetPageExists = await Page.exists({ _id: followedPageId }).exec();
+            if (!targetPageExists) {
+                const error = new Error(`Page with id ${followedPageId} does not exist!`);
+                error.status = 400;
+                return next(error);
+            }
+        } else if (followedPageId === authPageId) {
+            const targetPageExists = await Page.exists({ _id: pageId }).exec();
+            if (!targetPageExists) {
+                const error = new Error(`Page with id ${pageId} does not exist!`);
+                error.status = 400;
+                return next(error);
+            }
+        }
+
+
+        const followingRelationshipData =
+        {
+            pageId: pageId,
+            followedPageId: followedPageId,
+            followedAt: Date.now()
+        };
+
+        const followingRelationship = new FollowingRelationship(followingRelationshipData);
+
+        await followingRelationship.save();
+        await Page.findByIdAndUpdate(pageId, { $inc: { followingCount: 1 } }).exec();
+        await Page.findByIdAndUpdate(followedPageId, { $inc: { followersCount: 1 } }).exec();
+
+        return res.status(200).json({ success: true });
+    } catch (err) {
+        console.log(`Error in newFollowing : ${err}`);
+        const error = new Error(`Internal Server Error`)
+        error.status = 500;
         return next(error);
     }
-
-    if (pageId === authPageId) {
-        const targetPageExists = await Page.exists({ _id: followedPageId }).exec();
-        if (!targetPageExists) {
-            const error = new Error(`Page with id ${followedPageId} does not exist!`);
-            error.status = 400;
-            return next(error);
-        }
-    } else if (followedPageId === authPageId) {
-        const targetPageExists = await Page.exists({ _id: pageId }).exec();
-        if (!targetPageExists) {
-            const error = new Error(`Page with id ${pageId} does not exist!`);
-            error.status = 400;
-            return next(error);
-        }
-    }
-
-
-    const followingRelationshipData =
-    {
-        pageId: pageId,
-        followedPageId: followedPageId,
-        followedAt: Date.now()
-    };
-
-    const followingRelationship = new FollowingRelationship(followingRelationshipData);
-
-    followingRelationship.save()
-        .then(async (val) => {
-            await Page.findByIdAndUpdate(pageId, { $inc: { followingCount: 1 } }).exec();
-            await Page.findByIdAndUpdate(followedPageId, { $inc: { followersCount: 1 } }).exec();
-
-            res.status(200).json({ success: true });
-        })
-        .catch((err) => {
-            const error = new Error(err);
-            error.status = 500;
-            return next(error);
-        })
 }
 
 // pageId unfollows followedPageId
 export const removeFollowing = async (req, res, next) => {
-    const data = req.validatedData;
-    const pageId = data.pageId;
-    const followedPageId = data.followedPageId;
+    try {
+        const data = req.validatedData;
+        const pageId = data.pageId;
+        const followedPageId = data.followedPageId;
 
-    const validate = validatePageIds(
-        [
-            { objectId: pageId, title: 'pageId' },
-            { objectId: followedPageId, title: 'followedPageId' }
-        ], req.user._id.toString());
+        const validate = validatePageIds(
+            [
+                { objectId: pageId, title: 'pageId' },
+                { objectId: followedPageId, title: 'followedPageId' }
+            ], req.user._id.toString());
 
-    if (validate instanceof Error) {
-        return next(validate);
-    }
+        if (validate instanceof Error) {
+            return next(validate);
+        }
 
-    const isCurrentyFollowing = await FollowingRelationship.exists({ pageId: pageId, followedPageId: followedPageId }).exec();
-    if (!isCurrentyFollowing) {
-        const error = new Error(`Page with id ${pageId} is not following ${followedPageId}`);
-        error.status = 409;
+        const isCurrentyFollowing = await FollowingRelationship.exists({ pageId: pageId, followedPageId: followedPageId }).exec();
+        if (!isCurrentyFollowing) {
+            const error = new Error(`Page with id ${pageId} is not following ${followedPageId}`);
+            error.status = 409;
+            return next(error);
+        }
+
+        await FollowingRelationship.findOneAndDelete({ pageId: pageId, followedPageId: followedPageId }).exec()
+        await Page.findByIdAndUpdate(pageId, { $inc: { followingCount: -1 } }).exec();
+        await Page.findByIdAndUpdate(followedPageId, { $inc: { followersCount: -1 } }).exec();
+
+        res.status(200).json({ success: true });
+    } catch (err) {
+        console.log(`Error in removeFollowing : ${err}`);
+        const error = new Error(`Internal Server Error`)
+        error.status = 500;
         return next(error);
     }
-
-    FollowingRelationship.findOneAndDelete({ pageId: pageId, followedPageId: followedPageId })
-        .exec()
-        .then(() => {
-            Page.findByIdAndUpdate(pageId, { $inc: { followingCount: -1 } }).exec();
-            Page.findByIdAndUpdate(followedPageId, { $inc: { followersCount: -1 } }).exec();
-
-            res.status(200).json({ success: true });
-        })
-        .catch((err) => {
-            res.status(500).json({ success: false, err });
-        })
 }
