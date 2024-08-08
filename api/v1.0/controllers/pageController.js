@@ -110,6 +110,8 @@ export const newPage = async (req, res, next) => {
 
         const hashedPass = genPassword(password);
 
+        const profilePic = `https://avatar.iran.liara.run/username?username=${username}`;
+
         const newPage = new Page({
             username,
             fullname,
@@ -120,7 +122,7 @@ export const newPage = async (req, res, next) => {
             userSince: Date(),
             lastLogin: Date(),
             active: 1,
-            profilePicture: '',
+            profilePicture: profilePic,
             pageProfile: savePageProfile._id,
             pageSetting: savePageSetting._id
         });
