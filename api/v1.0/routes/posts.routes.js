@@ -1,6 +1,6 @@
 // /api/v1.0/posts
 import express from 'express';
-import { deletePostByPostId, getPostByPostId, newPost } from '../controllers/postController.js';
+import { deletePostByPostId, getPostByPostId, newPost } from '../controllers/post.controller.js';
 import { checkSchema } from 'express-validator';
 import postsSchema from '../validators/posts.schema.js';
 import validationResultHandler from '../middleware/validationResultHandler.js';

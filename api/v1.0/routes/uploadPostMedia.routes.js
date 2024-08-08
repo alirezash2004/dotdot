@@ -1,5 +1,5 @@
 import Router from 'express';
-import { singleImageUpload } from '../controllers/uploadController.js';
+import { singleImageUpload } from '../controllers/upload.controller.js';
 import passport from 'passport';
 
 const router = Router();

@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { getPageProfile, updatePageProfile } from '../controllers/pageProfileController.js';
+import { getPageProfile, updatePageProfile } from '../controllers/pageProfile.controller.js';
 import { checkSchema } from 'express-validator';
 import { updateProfileSchema } from '../validators/pageProfile.schema.js';
 import validationResultHandler from '../middleware/validationResultHandler.js';

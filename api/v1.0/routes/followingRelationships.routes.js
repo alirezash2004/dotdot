@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { checkIsFollowing, newFollowing, removeFollowing } from '../controllers/followingRelationshipsController.js';
+import { checkIsFollowing, newFollowing, removeFollowing } from '../controllers/followingRelationships.controller.js';
 import { checkSchema } from 'express-validator';
 import followingRelationshipShcema from '../validators/followingRelationship.schema.js';
 import validationResultHandler from '../middleware/validationResultHandler.js';

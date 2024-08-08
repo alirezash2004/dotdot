@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { getpageSettings, updatepageSettings } from '../controllers/pageSettingsController.js';
+import { getpageSettings, updatepageSettings } from '../controllers/pageSettings.controller.js';
 import { checkSchema } from 'express-validator';
 import { updatePageSettingSchema } from '../validators/pageSetting.schema.js';
 import validationResultHandler from '../middleware/validationResultHandler.js';
