@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { getpageSettings, updatepageSettings } from '../controllers/pageSettingsController.js';
 import { checkSchema } from 'express-validator';
-import { updatePageSettingSchema } from '../validators/schemas/pageSettingSchema.js';
+import { updatePageSettingSchema } from '../validators/pageSetting.schema.js';
 import validationResultHandler from '../middleware/validationResultHandler.js';
 import passport from 'passport';
 const router = Router();

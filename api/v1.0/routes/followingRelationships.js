@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { checkIsFollowing, newFollowing, removeFollowing } from '../controllers/followingRelationshipsController.js';
 import { checkSchema } from 'express-validator';
-import followingRelationshipShcema from '../validators/schemas/followingRelationshipSchema.js';
+import followingRelationshipShcema from '../validators/followingRelationship.schema.js';
 import validationResultHandler from '../middleware/validationResultHandler.js';
 import passport from 'passport';
 const router = Router();

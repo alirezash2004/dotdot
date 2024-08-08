@@ -2,9 +2,9 @@
 import express from 'express';
 import { deletePostByPostId, getPostByPostId, newPost } from '../controllers/postController.js';
 import { checkSchema } from 'express-validator';
-import postsSchema from '../validators/schemas/postsSchema.js';
+import postsSchema from '../validators/posts.schema.js';
 import validationResultHandler from '../middleware/validationResultHandler.js';
-import postIdSchema from '../validators/schemas/postIdSchema.js';
+import postIdSchema from '../validators/postId.schema.js';
 import passport from 'passport';
 const router = express.Router();
 
