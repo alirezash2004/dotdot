@@ -3,11 +3,11 @@ import { getpageSettings, updatepageSettings } from '../controllers/pageSettings
 import { checkSchema } from 'express-validator';
 import { updatePageSettingSchema } from '../validators/pageSetting.schema.js';
 import validationResultHandler from '../middleware/validationResultHandler.js';
-import passport from 'passport';
+import protectRoute from '../middleware/protectRoute.js';
 const router = Router();
 
-router.get('/pageSettings', passport.authenticate('jwt', { session: false }), getpageSettings);
+router.get('/pageSettings', protectRoute, getpageSettings);
 
-router.post('/pageSettings', passport.authenticate('jwt', { session: false }), checkSchema(updatePageSettingSchema), validationResultHandler, updatepageSettings);
+router.post('/pageSettings', protectRoute, checkSchema(updatePageSettingSchema), validationResultHandler, updatepageSettings);
 
 export default router;

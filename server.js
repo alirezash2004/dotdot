@@ -5,7 +5,6 @@ import v1_0 from './api/v1.0/versionRouter.js';
 import { fileURLToPath } from 'url';
 import cookieParser from "cookie-parser";
 import session from "express-session";
-import passport from "passport";
 import connectToMongoDB from "./api/v1.0/db/connectToMongoDb.js";
 // import { __filename, __dirname } from './currentPath.js';
 
@@ -30,10 +29,6 @@ app.use(session({
         maxAge: 60000 * 60, // 1 hour
     }
 })) // request.session
-
-// passport init
-app.use(passport.initialize());
-app.use(passport.session());
 
 app.use(logger); // Logger middleware
 

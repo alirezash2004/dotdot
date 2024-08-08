@@ -3,12 +3,12 @@ import { getPageProfile, updatePageProfile } from '../controllers/pageProfile.co
 import { checkSchema } from 'express-validator';
 import { updateProfileSchema } from '../validators/pageProfile.schema.js';
 import validationResultHandler from '../middleware/validationResultHandler.js';
-import passport from 'passport';
 import usernameSchema from '../validators/username.schema.js';
+import protectRoute from '../middleware/protectRoute.js';
 const router = Router();
 
-router.get('/pageProfile/:username', passport.authenticate('jwt', { session: false }), checkSchema(usernameSchema, ['params']), validationResultHandler, getPageProfile);
+router.get('/pageProfile/:username', protectRoute, checkSchema(usernameSchema, ['params']), validationResultHandler, getPageProfile);
 
-router.post('/pageProfile', passport.authenticate('jwt', { session: false }), checkSchema(updateProfileSchema), validationResultHandler, updatePageProfile);
+router.post('/pageProfile', protectRoute, checkSchema(updateProfileSchema), validationResultHandler, updatePageProfile);
 
 export default router;

@@ -1,9 +1,9 @@
 import Router from 'express';
 import { singleImageUpload } from '../controllers/upload.controller.js';
-import passport from 'passport';
+import protectRoute from '../middleware/protectRoute.js';
 
 const router = Router();
 
-router.post('/postMedia/uploadPostMedia/singleImage', passport.authenticate('jwt', { session: false }), singleImageUpload);
+router.post('/postMedia/uploadPostMedia/singleImage', protectRoute, singleImageUpload);
 
 export default router;

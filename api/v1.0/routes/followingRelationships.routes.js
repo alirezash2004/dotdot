@@ -3,14 +3,14 @@ import { checkIsFollowing, newFollowing, removeFollowing } from '../controllers/
 import { checkSchema } from 'express-validator';
 import followingRelationshipShcema from '../validators/followingRelationship.schema.js';
 import validationResultHandler from '../middleware/validationResultHandler.js';
-import passport from 'passport';
+import protectRoute from '../middleware/protectRoute.js';
 const router = Router();
 
-router.get('/followingRelationships', passport.authenticate('jwt', { session: false }), checkSchema(followingRelationshipShcema), validationResultHandler, checkIsFollowing);
+router.get('/followingRelationships', protectRoute, checkSchema(followingRelationshipShcema), validationResultHandler, checkIsFollowing);
 
-router.post('/followingRelationships', passport.authenticate('jwt', { session: false }), checkSchema(followingRelationshipShcema), validationResultHandler, newFollowing);
+router.post('/followingRelationships', protectRoute, checkSchema(followingRelationshipShcema), validationResultHandler, newFollowing);
 
-router.delete('/followingRelationships', passport.authenticate('jwt', { session: false }), checkSchema(followingRelationshipShcema), validationResultHandler, removeFollowing);
+router.delete('/followingRelationships', protectRoute, checkSchema(followingRelationshipShcema), validationResultHandler, removeFollowing);
 
 // TODO: add get followings and get followers
 
