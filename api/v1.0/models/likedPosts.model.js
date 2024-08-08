@@ -9,13 +9,9 @@ const LikedPostsSchema = new mongoose.Schema({
     pageId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Page'
-    },
-    likedAt: {
-        type: mongoose.Schema.Types.Date,
-        default: Date.now(),
-        required: true,
-    },
-});
+    }
+    // createdAt, updatedAt
+}, { timestamps: true });
 
 const LikedPosts = new mongoose.model('LikedPosts', LikedPostsSchema);
 

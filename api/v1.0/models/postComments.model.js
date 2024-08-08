@@ -14,12 +14,8 @@ const PostCommentsSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Page'
     },
-    commentAt: {
-        type: mongoose.Schema.Types.Date,
-        default: Date.now(),
-        required: true,
-    },
-})
+    // createdAt, updatedAt
+}, { timestamps: true })
 
 const PostComments = mongoose.model('PostComments', PostCommentsSchema);
 

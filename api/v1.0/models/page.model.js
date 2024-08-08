@@ -7,7 +7,6 @@ const PageSchema = new mongoose.Schema({
     password: { type: mongoose.Schema.Types.String, required: true },
     salt: { type: mongoose.Schema.Types.String, required: true },
     pageType: { type: mongoose.Schema.Types.String, required: true },
-    userSince: { type: mongoose.Schema.Types.Date, default: Date.now() },
     lastLogin: { type: mongoose.Schema.Types.Date, default: Date.now() },
     active: { type: mongoose.Schema.Types.Number },
     profilePicture: { type: mongoose.Schema.Types.String },
@@ -16,7 +15,8 @@ const PageSchema = new mongoose.Schema({
     postsCount: { type: mongoose.Schema.Types.Number, default: 0 },
     followingCount: { type: mongoose.Schema.Types.Number, default: 0 },
     followersCount: { type: mongoose.Schema.Types.Number, default: 0 },
-});
+    // createdAt, updatedAt
+}, { timestamps: true });
 
 const Page = mongoose.model('Page', PageSchema);
 

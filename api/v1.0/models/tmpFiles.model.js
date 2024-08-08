@@ -22,12 +22,8 @@ const TmpFilesSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.String,
         required: true,
     },
-    createdAt: {
-        type: mongoose.Schema.Types.Date,
-        default: Date.now(),
-        required: true,
-    },
-});
+    // createdAt, updatedAt
+}, { timestamps: true });
 
 const TmpFiles = mongoose.model('TmpFiles', TmpFilesSchema);
 
