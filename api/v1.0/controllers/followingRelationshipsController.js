@@ -1,4 +1,5 @@
-import { FollowingRelationship, Page } from '../mongoose/schemas/page.js';
+import Page from '../models/page.model.js';
+import FollowingRelationship from '../models/followingRelationship.model.js';
 import { isValidObjectId } from 'mongoose';
 
 const validatePageIds = (pageIds, currentPageId) => {

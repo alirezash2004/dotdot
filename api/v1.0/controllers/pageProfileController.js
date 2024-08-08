@@ -1,4 +1,5 @@
-import { Page, PageProfile } from "../mongoose/schemas/page.js";
+import Page from "../models/page.model.js";
+import PageProfile from "../models/pageProfile.model.js";
 
 export const getPageProfile = async (req, res, next) => {
     const data = req.validatedData;

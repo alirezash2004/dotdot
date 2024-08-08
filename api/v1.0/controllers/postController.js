@@ -1,7 +1,11 @@
 import { isValidObjectId } from 'mongoose';
-import { FollowingRelationship, Page } from '../mongoose/schemas/page.js';
-import { Post, PostComments, PostMedia, TmpFiles } from '../mongoose/schemas/post.js';
+import Page from '../models/page.model.js';
+import FollowingRelationship from '../models/followingRelationship.model.js';
 import { isJson } from '../utils/checkIsJson.js';
+import Post from '../models/post.model.js';
+import PostComments from '../models/postComments.model.js';
+import PostMedia from '../models/postMedia.model.js';
+import TmpFiles from '../models/tmpFiles.model.js';
 
 // @desc   Get signle post
 // @route  GET /api/v1.0/posts/:postId
@@ -32,9 +36,9 @@ export const getPostByPostId = async (req, res, next) => {
     const currentPageId = req.user._id.toString();
     const targetPageId = post.pageId.toString();
     const targetPageType = await Page.findById(targetPageId).select('pageType').exec();
-    console.log(`currentPageId: ${currentPageId}`);
-    console.log(`targetPageId: ${targetPageId}`);
-    console.log(`targetPageType: ${targetPageType.pageType}`);
+    // console.log(`currentPageId: ${currentPageId}`);
+    // console.log(`targetPageId: ${targetPageId}`);
+    // console.log(`targetPageType: ${targetPageType.pageType}`);
 
     const isFollowing = await FollowingRelationship.exists({ pageId: currentPageId, followedPageId: targetPageId }).exec();
     if (targetPageId !== currentPageId && (targetPageType.pageType === 'private' && !isFollowing)) {

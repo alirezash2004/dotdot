@@ -6,7 +6,7 @@ import { fileURLToPath } from 'url';
 import cookieParser from "cookie-parser";
 import session from "express-session";
 import passport from "passport";
-import mongoose from 'mongoose';
+import connectToMongoDB from "./api/v1.0/db/connectToMongoDb.js";
 // import { __filename, __dirname } from './currentPath.js';
 
 // server port
@@ -18,10 +18,6 @@ const __dirname = path.dirname(__filename);
 
 // create app
 const app = express();
-
-mongoose.connect('mongodb://localhost:27017/dotdot')
-    .then(() => console.log('Connected to database'['bgCyan']))
-    .catch(err => console.log(`Error: ${err}`)['bgRed']);
 
 app.use(express.json()) // for parsing application/json
 app.use(express.urlencoded({ extended: true })) // for parsing application/x-www-form-urlencoded
@@ -43,8 +39,12 @@ app.use(logger); // Logger middleware
 
 // setup static folder ::to_review
 app.use(express.static('public'));
+app.use(express.static('uploads'));
 
 // Routes
 app.use('/api/v1.0', v1_0);
 
-app.listen(PORT, () => console.log(`\nServer is running on port ${PORT}\n`['blue']));
+app.listen(PORT, () => {
+    connectToMongoDB();
+    console.log(`\nServer is running on port ${PORT}\n`['blue'])
+});

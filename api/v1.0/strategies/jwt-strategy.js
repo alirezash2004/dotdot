@@ -1,10 +1,9 @@
 import passport from "passport";
 import { Strategy, ExtractJwt } from 'passport-jwt';
-import { samplePages } from "../helpers/mockuser.js";
 import fs from 'fs';
 import path from 'path';
 import { __dirname } from '../../../currentPath.js';
-import { Page } from "../mongoose/schemas/page.js";
+import Page from "../models/page.model.js";
 
 const pathToKey = path.join(__dirname, 'id_rsa_pub.pem');
 const PUB_KEY = fs.readFileSync(pathToKey, 'utf8');

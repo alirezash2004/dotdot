@@ -2,7 +2,7 @@ import multer from 'multer';
 import crypto from 'crypto';
 import path from 'path';
 import { __filename, __dirname } from '../../../currentPath.js';
-import { TmpFiles } from '../mongoose/schemas/post.js';
+import TmpFiles from '../models/tmpFiles.model.js';
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
         cb(null, path.join(__dirname, 'uploads', 'tmpPostData'))
@@ -51,6 +51,8 @@ export const singleImageUpload = (req, res, next) => {
             fileExt: path.extname(req.file.originalname).toLowerCase().replace('.', ''),
             createdAt: Date.now(),
         }
+
+        // console.log(req.file);
 
         const newTmpFile = new TmpFiles(fileData);
 

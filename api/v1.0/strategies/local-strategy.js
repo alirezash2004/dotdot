@@ -1,8 +1,7 @@
 import passport from "passport";
 import { Strategy } from "passport-local";
-import { samplePages } from "../helpers/mockuser.js";
 import { validatePassword } from "../utils/passwordsUtil.js";
-import { Page } from "../mongoose/schemas/page.js";
+import Page from "../models/page.model.js";
 
 passport.serializeUser((user, done) => {
     // console.log('serializeUser');

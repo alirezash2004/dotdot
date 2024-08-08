@@ -6,7 +6,7 @@ import { checkSchema, matchedData, validationResult } from 'express-validator';
 import { samplePages } from '../helpers/mockuser.js';
 import { issueJWT } from '../utils/jwtUtil.js';
 import { validatePassword } from '../utils/passwordsUtil.js';
-import { Page } from '../mongoose/schemas/page.js';
+import Page from '../models/page.model.js';
 const router = Router();
 
 const loginInputsSchema = {

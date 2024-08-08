@@ -1,4 +1,6 @@
-import { Page, PageProfile, PageSetting } from '../mongoose/schemas/page.js';
+import Page from '../models/page.model.js';
+import PageProfile from '../models/pageProfile.model.js';
+import PageSetting from '../models/pageSetting.model.js';
 import { genPassword } from '../utils/passwordsUtil.js';
 import { isValidObjectId } from 'mongoose';
 

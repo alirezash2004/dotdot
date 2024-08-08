@@ -1,5 +1,5 @@
-import { Page, PageSetting } from "../mongoose/schemas/page.js";
-import { isValidObjectId } from 'mongoose';
+import Page from "../models/page.model.js";
+import PageSetting from "../models/pageSetting.model.js";
 
 export const getpageSettings = async (req, res, next) => {
     const pageId = req.user._id;

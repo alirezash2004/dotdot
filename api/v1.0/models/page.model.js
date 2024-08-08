@@ -18,34 +18,6 @@ const PageSchema = new mongoose.Schema({
     followersCount: { type: mongoose.Schema.Types.Number, default: 0 },
 });
 
-export const Page = mongoose.model('Page', PageSchema);
+const Page = mongoose.model('Page', PageSchema);
 
-
-
-const PageProfileSchema = new mongoose.Schema({
-    bio: { type: mongoose.Schema.Types.String },
-    website: { type: mongoose.Schema.Types.String },
-    birthdate: { type: mongoose.Schema.Types.Date, default: '' },
-})
-
-export const PageProfile = mongoose.model('PageProfile', PageProfileSchema);
-
-
-
-const PageSettingSchema = new mongoose.Schema({
-    theme: { type: mongoose.Schema.Types.String, default: 'dark' },
-    language: { type: mongoose.Schema.Types.String, default: 'en' },
-    country: { type: mongoose.Schema.Types.String, default: '' },
-})
-
-export const PageSetting = mongoose.model('PageSetting', PageSettingSchema);
-
-
-
-const FollowingRelationshipSchema = new mongoose.Schema({
-    pageId: { type: mongoose.Schema.Types.ObjectId, ref: 'Page' },
-    followedPageId: { type: mongoose.Schema.Types.ObjectId, ref: 'Page' },
-    followedAt: { type: mongoose.Schema.Types.Date, default: Date.now() },
-})
-
-export const FollowingRelationship = mongoose.model('FollowingRelationship', FollowingRelationshipSchema);
+export default Page;
