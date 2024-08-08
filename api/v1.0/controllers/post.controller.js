@@ -36,12 +36,12 @@ export const getPostByPostId = async (req, res, next) => {
         // self posts also no restriction
         const currentPageId = req.user._id.toString();
         const targetPageId = post.pageId.toString();
-        const targetPageType = await Page.findById(targetPageId).select('pageType').exec();
-        // console.log(`currentPageId: ${currentPageId}`);
-        // console.log(`targetPageId: ${targetPageId}`);
-        // console.log(`targetPageType: ${targetPageType.pageType}`);
 
-        const isFollowing = await FollowingRelationship.exists({ pageId: currentPageId, followedPageId: targetPageId }).exec();
+        const [targetPageType, isFollowing] = await Promise.all([
+            Page.findById(targetPageId).select('pageType').exec(),
+            FollowingRelationship.exists({ pageId: currentPageId, followedPageId: targetPageId }).exec(),
+        ])
+
         if (targetPageId !== currentPageId && (targetPageType.pageType === 'private' && !isFollowing)) {
             const error = new Error(`Page Is Private You have to follow it first`);
             error.status = 401;
@@ -130,15 +130,13 @@ export const newPost = async (req, res, next) => {
 
             const newPost = new Post(post);
 
-            const savePost = await newPost.save()
-
             const postMediaDatas = [];
 
             for (let i = 0; i < medias.length; i++) {
                 const media = medias[i];
 
                 const postMediaData = {
-                    postId: savePost._id,
+                    postId: newPost._id,
                     slideNumber: i,
                     assetUrl: media.path,
                     ext: media.fileExt,
@@ -148,12 +146,14 @@ export const newPost = async (req, res, next) => {
                 postMediaDatas.push(new PostMedia(postMediaData));
             }
 
-            await PostMedia.bulkSave(postMediaDatas)
-            // TODO: remove tmp files
-            await TmpFiles.deleteMany({ pageId: pageId }).exec()
-            await Page.findByIdAndUpdate(pageId, { $inc: { postsCount: 1 } }).exec()
+            await Promise.all([
+                newPost.save(),
+                PostMedia.bulkSave(postMediaDatas),
+                TmpFiles.deleteMany({ pageId: pageId }).exec(),
+                Page.findByIdAndUpdate(pageId, { $inc: { postsCount: 1 } }).exec(),
+            ])
 
-            return res.status(200).json({ success: true, postId: savePost._id });
+            return res.status(200).json({ success: true, postId: newPost._id });
         } else if (assetType === 'video') {
             // TODO: upload video
         } else {
@@ -171,80 +171,49 @@ export const newPost = async (req, res, next) => {
 }
 
 export const deletePostByPostId = async (req, res, next) => {
-    const pageId = req.user._id.toString();
+    try {
 
-    const data = req.validatedData;
+        const pageId = req.user._id.toString();
 
-    const postId = data.postId;
+        const data = req.validatedData;
 
-    const isValidId = isValidObjectId(postId);
+        const postId = data.postId;
 
-    if (!isValidId) {
-        const err = new Error(`postId is not valid!`);
-        err.status = 400;
-        return next(err);
-    }
+        const isValidId = isValidObjectId(postId);
 
-    const post = await Post.findById(postId).select('pageId').exec()
+        if (!isValidId) {
+            const err = new Error(`postId is not valid!`);
+            err.status = 400;
+            return next(err);
+        }
 
-    if (!post) {
-        const error = new Error(`A post with post id ${postId} was not found`);
-        error.status = 404;
-        return next(error);
-    }
+        const post = await Post.findById(postId).select('pageId').exec()
 
-    if (post.pageId.toString() !== pageId) {
-        const error = new Error(`You can only delete your posts!`);
-        error.status = 401;
-        return next(error);
-    }
-
-    // delete all post media
-    await PostMedia.deleteMany({ postId })
-        .exec()
-        .then(async () => {
-            // delete all post comments
-            await PostComments.deleteMany({ postId })
-                .exec()
-                .then(async () => {
-                    await PostComments.deleteMany({ postId })
-                        .exec()
-                        .then(async () => {
-                            await Post.deleteOne({ _id: postId })
-                                .exec()
-                                .then(async () => {
-                                    await Page.findByIdAndUpdate(pageId, { $inc: { postsCount: -1 } })
-                                        .exec()
-                                        .then(() => {
-                                            return res.status(200).json({ success: true, msg: 'post deleted!' });
-                                        })
-                                        .catch((reason) => {
-                                            const error = new Error(reason);
-                                            error.status = 500;
-                                            return next(error);
-                                        })
-                                })
-                                .catch((reason) => {
-                                    const error = new Error(reason);
-                                    error.status = 500;
-                                    return next(error);
-                                })
-                        })
-                        .catch((reason) => {
-                            const error = new Error(reason);
-                            error.status = 500;
-                            return next(error);
-                        })
-                })
-                .catch((reason) => {
-                    const error = new Error(reason);
-                    error.status = 500;
-                    return next(error);
-                })
-        })
-        .catch((reason) => {
-            const error = new Error(reason);
-            error.status = 500;
+        if (!post) {
+            const error = new Error(`A post with post id ${postId} was not found`);
+            error.status = 404;
             return next(error);
-        })
+        }
+
+        if (post.pageId.toString() !== pageId) {
+            const error = new Error(`You can only delete your posts!`);
+            error.status = 401;
+            return next(error);
+        }
+
+        await Promise.all([
+            PostMedia.deleteMany({ postId }).exec(), // delete all post media
+            PostComments.deleteMany({ postId }).exec(), // delete all post comments
+            Post.deleteOne({ _id: postId }).exec(),
+            Page.findByIdAndUpdate(pageId, { $inc: { postsCount: -1 } }).exec(),
+        ])
+
+        return res.status(200).json({ success: true, msg: 'post deleted!' });
+
+    } catch (err) {
+        console.log(`Error in deletePostByPostId : ${err}`);
+        const error = new Error(`Internal Server Error`)
+        error.status = 500;
+        return next(error);
+    }
 }

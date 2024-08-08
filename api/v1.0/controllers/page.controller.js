@@ -95,7 +95,7 @@ export const newPage = async (req, res, next) => {
 
         const newPageProfile = new PageProfile(pageprofile)
 
-        const savePageProfile = await newPageProfile.save();
+
 
         // make new pagesetting
         const pageSetting = {
@@ -106,8 +106,6 @@ export const newPage = async (req, res, next) => {
         }
 
         const newPageSetting = new PageSetting(pageSetting);
-
-        const savePageSetting = await newPageSetting.save();
 
         const hashedPass = genPassword(password);
 
@@ -121,14 +119,18 @@ export const newPage = async (req, res, next) => {
                 password: hashedPass.hash,
                 salt: hashedPass.salt,
                 pageType: pagetype,
-                userSince: Date(),
                 lastLogin: Date(),
                 active: 1,
                 profilePicture: profilePic,
-                pageProfile: savePageProfile._id,
-                pageSetting: savePageSetting._id
+                pageProfile: newPageProfile._id,
+                pageSetting: newPageSetting._id
             });
-            const savePage = await newPage.save();
+
+            const [, , savePage] = await Promise.all([
+                newPageProfile.save(),
+                newPageSetting.save(),
+                newPage.save(),
+            ])
 
             return res.status(200).json(savePage);
         } catch (err) {
@@ -200,9 +202,11 @@ export const deletePage = async (req, res, next) => {
         const page = await Page.findById(pageId).exec();
 
         // TODO: delete posts
-        await PageProfile.findByIdAndDelete(page.pageProfile).exec();
-        await PageSetting.findByIdAndDelete(page.pageSetting).exec();
-        await Page.findByIdAndDelete(pageId).exec();
+        await Promise.all([
+            PageProfile.findByIdAndDelete(page.pageProfile).exec(),
+            PageSetting.findByIdAndDelete(page.pageSetting).exec(),
+            Page.findByIdAndDelete(pageId).exec(),
+        ])
 
         return res.status(200).json({ success: true });
     } catch (err) {

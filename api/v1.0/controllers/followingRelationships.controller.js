@@ -31,10 +31,7 @@ const validatePageIds = (pageIds, currentPageId) => {
 // checks if pageId is following followedPageId
 export const checkIsFollowing = async (req, res, next) => {
     try {
-        const data = req.validatedData;
-
-        const pageId = data.pageId;
-        const followedPageId = data.followedPageId;
+        const { pageId, followedPageId } = req.validatedData;
 
         const validate = validatePageIds(
             [
@@ -62,11 +59,11 @@ export const checkIsFollowing = async (req, res, next) => {
 
 // makes pageId follow-> followedPageId
 export const newFollowing = async (req, res, next) => {
+    // TODO: add following requests
+    // currently pages can make other pages follow themself which is not good
     try {
         const authPageId = req.user._id.toString();
-        const data = req.validatedData;
-        const pageId = data.pageId;
-        const followedPageId = data.followedPageId;
+        const { pageId, followedPageId } = req.validatedData;
 
         const validate = validatePageIds(
             [
@@ -111,9 +108,11 @@ export const newFollowing = async (req, res, next) => {
 
         const followingRelationship = new FollowingRelationship(followingRelationshipData);
 
-        await followingRelationship.save();
-        await Page.findByIdAndUpdate(pageId, { $inc: { followingCount: 1 } }).exec();
-        await Page.findByIdAndUpdate(followedPageId, { $inc: { followersCount: 1 } }).exec();
+        await Promise.all([
+            followingRelationship.save(),
+            Page.findByIdAndUpdate(pageId, { $inc: { followingCount: 1 } }).exec(),
+            Page.findByIdAndUpdate(followedPageId, { $inc: { followersCount: 1 } }).exec()
+        ])
 
         return res.status(200).json({ success: true });
     } catch (err) {
@@ -127,9 +126,7 @@ export const newFollowing = async (req, res, next) => {
 // pageId unfollows followedPageId
 export const removeFollowing = async (req, res, next) => {
     try {
-        const data = req.validatedData;
-        const pageId = data.pageId;
-        const followedPageId = data.followedPageId;
+        const { pageId, followedPageId } = req.validatedData;
 
         const validate = validatePageIds(
             [
@@ -148,9 +145,11 @@ export const removeFollowing = async (req, res, next) => {
             return next(error);
         }
 
-        await FollowingRelationship.findOneAndDelete({ pageId: pageId, followedPageId: followedPageId }).exec()
-        await Page.findByIdAndUpdate(pageId, { $inc: { followingCount: -1 } }).exec();
-        await Page.findByIdAndUpdate(followedPageId, { $inc: { followersCount: -1 } }).exec();
+        await Promise.all([
+            FollowingRelationship.findOneAndDelete({ pageId: pageId, followedPageId: followedPageId }).exec(),
+            Page.findByIdAndUpdate(pageId, { $inc: { followingCount: -1 } }).exec(),
+            Page.findByIdAndUpdate(followedPageId, { $inc: { followersCount: -1 } }).exec(),
+        ])
 
         res.status(200).json({ success: true });
     } catch (err) {
