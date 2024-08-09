@@ -7,8 +7,8 @@ import usernameSchema from '../validators/username.schema.js';
 import protectRoute from '../middleware/protectRoute.js';
 const router = Router();
 
-router.get('/pageProfile/:username', protectRoute, checkSchema(usernameSchema, ['params']), validationResultHandler, getPageProfile);
+router.get('/:username', protectRoute, checkSchema(usernameSchema, ['params']), validationResultHandler, getPageProfile);
 
-router.post('/pageProfile', protectRoute, checkSchema(updateProfileSchema), validationResultHandler, updatePageProfile);
+router.post('/', protectRoute, checkSchema(updateProfileSchema), validationResultHandler, updatePageProfile);
 
 export default router;

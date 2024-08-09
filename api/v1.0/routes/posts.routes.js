@@ -9,10 +9,10 @@ import protectRoute from '../middleware/protectRoute.js';
 const router = express.Router();
 
 // Get single post by postId
-router.get('/posts/:postId', protectRoute, checkSchema(postIdSchema, ['params']), validationResultHandler, getPostByPostId);
+router.get('/:postId', protectRoute, checkSchema(postIdSchema, ['params']), validationResultHandler, getPostByPostId);
 
-router.post('/posts', protectRoute, checkSchema(postsSchema), validationResultHandler, newPost);
+router.post('/', protectRoute, checkSchema(postsSchema), validationResultHandler, newPost);
 
-router.delete('/posts/:postId', protectRoute, checkSchema(postIdSchema, ['params']), validationResultHandler, deletePostByPostId);
+router.delete('/:postId', protectRoute, checkSchema(postIdSchema, ['params']), validationResultHandler, deletePostByPostId);
 
 export default router;

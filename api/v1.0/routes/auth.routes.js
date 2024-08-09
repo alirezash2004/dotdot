@@ -6,10 +6,10 @@ import pageSchema from '../validators/page.schema.js';
 import loginInputsSchema from '../validators/loginInputs.schema.js';
 const router = Router();
 
-router.post('/auth/signup', checkSchema(pageSchema), validationResultHandler, signup);
+router.post('/signup', checkSchema(pageSchema), validationResultHandler, signup);
 
-router.post('/auth/login', checkSchema(loginInputsSchema), validationResultHandler, login);
+router.post('/login', checkSchema(loginInputsSchema), validationResultHandler, login);
 
-router.post('/auth/logout', logout);
+router.post('/logout', logout);
 
 export default router;

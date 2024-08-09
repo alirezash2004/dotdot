@@ -1,30 +1,33 @@
 import express from 'express';
-import auth from './routes/auth.routes.js';
-import posts from './routes/posts.routes.js';
-import pageProfiles from './routes/pageProfiles.routes.js';
-import pageSettings from './routes/pageSettings.routes.js';
-import pagesRouter from './routes/pages.routes.js';
-import followingRelationships from './routes/followingRelationships.routes.js';
-import uploadPostMedia from './routes/uploadPostMedia.routes.js';
+
+import authRoutes from './routes/auth.routes.js';
+import postsRoutes from './routes/posts.routes.js';
+import pageProfilesRoutes from './routes/pageProfiles.routes.js';
+import pageSettingsRoutes from './routes/pageSettings.routes.js';
+import pagesRoutes from './routes/pages.routes.js';
+import followingRelationshipsRoutes from './routes/followingRelationships.routes.js';
+import uploadPostMediaRoutes from './routes/uploadPostMedia.routes.js';
+
 import notFound from './middleware/notFound.js';
 import errorHandler from './middleware/errorHandler.js';
+
 import { __filename, __dirname } from '../../currentPath.js';
 
 const router = express.Router();
 
-router.use(auth);
+router.use('/auth', authRoutes);
 
-router.use(posts);
+router.use('/posts', postsRoutes);
 
-router.use(pageProfiles);
+router.use('/pageProfile', pageProfilesRoutes);
 
-router.use(pageSettings);
+router.use('/pageSettings', pageSettingsRoutes);
 
-router.use(pagesRouter);
+router.use('/pages', pagesRoutes);
 
-router.use(followingRelationships);
+router.use('/followingRelationships', followingRelationshipsRoutes);
 
-router.use(uploadPostMedia);
+router.use('/postMedia', uploadPostMediaRoutes);
 
 // router.use(express.static(path.join(__dirname, 'public')));
 
