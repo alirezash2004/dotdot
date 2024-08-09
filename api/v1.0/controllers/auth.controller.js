@@ -63,7 +63,14 @@ export const signup = async (req, res, next) => {
                 newPage.save(),
             ])
 
-            return res.status(200).json(savePage);
+            return res.status(200).json({
+                success: true,
+                msg: 'Signup Success!',
+                data: {
+                    pageId: savePage._id,
+                    pageProfile: savePage.pageProfile
+                }
+            });
         } catch (err) {
             console.log(`Error in newPage: ${err}`);
             const error = new Error(`Bad Request!`);
@@ -94,7 +101,13 @@ export const login = async (req, res, next) => {
 
         generateTokenAndSetCookie(findPage._id, res);
 
-        return res.status(200).json({ success: true, msg: 'logged in successfully' });
+        return res.status(200).json({
+            success: true,
+            msg: 'Logged In Successfully',
+            data: {
+                pageId: findPage._id,
+            }
+        });
     } catch (err) {
         console.log(`Error in login : ${err}`);
         const error = new Error(`Internal Server Error`);
@@ -106,7 +119,10 @@ export const login = async (req, res, next) => {
 export const logout = async (req, res, next) => {
     try {
         res.cookie('jwt', '', { maxAge: 0 })
-        res.status(200).json({ success: true, msg: 'logged out successfully' });
+        res.status(200).json({
+            success: true,
+            msg: 'logged out successfully'
+        });
     } catch (err) {
         console.log(`Error in logout : ${err}`);
         const error = new Error(`Internal Server Error`);
