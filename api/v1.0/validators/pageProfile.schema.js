@@ -1,4 +1,4 @@
-export const updateProfileSchema = {
+const updateProfileSchema = {
     bio: {
         exists: {
             errorMessage: 'Bio is required'
@@ -31,3 +31,5 @@ export const updateProfileSchema = {
         trim: true,
     }
 }
+
+export default updateProfileSchema;

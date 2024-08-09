@@ -1,7 +1,9 @@
 import jsonwebtoken from "jsonwebtoken";
 import fs from 'fs';
 import path from 'path';
+
 import { __dirname } from '../../../currentPath.js';
+
 import Page from "../models/page.model.js";
 
 const protectRoute = async (req, res, next) => {

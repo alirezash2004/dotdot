@@ -1,19 +1,14 @@
 import express from "express";
-import path from 'path';
-import logger from "./api/v1.0/middleware/logger.js";
-import v1_0 from './api/v1.0/versionRouter.js';
-import { fileURLToPath } from 'url';
 import cookieParser from "cookie-parser";
 import session from "express-session";
 import connectToMongoDB from "./api/v1.0/db/connectToMongoDb.js";
-// import { __filename, __dirname } from './currentPath.js';
+
+import v1_0 from './api/v1.0/versionRouter.js';
+
+import logger from "./api/v1.0/middleware/logger.js";
 
 // server port
 const PORT = process.env.PORT || 8000;
-
-// Get current directory
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 
 // create app
 const app = express();
@@ -27,6 +22,8 @@ app.use(session({
     resave: false,
     cookie: {
         maxAge: 60000 * 60, // 1 hour
+        httpOnly: true,
+        sameSite: 'strict'
     }
 })) // request.session
 

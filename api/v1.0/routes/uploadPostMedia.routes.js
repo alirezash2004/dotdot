@@ -1,6 +1,8 @@
 import Router from 'express';
-import { singleImageUpload } from '../controllers/upload.controller.js';
+
 import protectRoute from '../middleware/protectRoute.js';
+
+import { singleImageUpload } from '../controllers/upload.controller.js';
 
 const router = Router();
 

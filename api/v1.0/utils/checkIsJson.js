@@ -1,4 +1,4 @@
-export const isJson = (str) => {
+const isJson = (str) => {
     try {
         JSON.parse(str);
     } catch (e) {
@@ -6,3 +6,5 @@ export const isJson = (str) => {
     }
     return true;
 } 
+
+export default isJson;

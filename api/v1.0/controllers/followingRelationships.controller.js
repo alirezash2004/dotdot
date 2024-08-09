@@ -1,6 +1,7 @@
+import { isValidObjectId } from 'mongoose';
+
 import Page from '../models/page.model.js';
 import FollowingRelationship from '../models/followingRelationship.model.js';
-import { isValidObjectId } from 'mongoose';
 
 const validatePageIds = (pageIds, currentPageId) => {
     if (pageIds[0].objectId !== currentPageId && pageIds[1].objectId !== currentPageId) {

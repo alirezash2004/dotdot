@@ -1,11 +1,15 @@
 // /api/v1.0/posts
 import express from 'express';
-import { deletePostByPostId, getPostByPostId, newPost } from '../controllers/post.controller.js';
 import { checkSchema } from 'express-validator';
-import postsSchema from '../validators/posts.schema.js';
-import validationResultHandler from '../middleware/validationResultHandler.js';
-import postIdSchema from '../validators/postId.schema.js';
+
 import protectRoute from '../middleware/protectRoute.js';
+import validationResultHandler from '../middleware/validationResultHandler.js';
+
+import { deletePostByPostId, getPostByPostId, newPost } from '../controllers/post.controller.js';
+
+import postsSchema from '../validators/posts.schema.js';
+import postIdSchema from '../validators/postId.schema.js';
+
 const router = express.Router();
 
 // Get single post by postId

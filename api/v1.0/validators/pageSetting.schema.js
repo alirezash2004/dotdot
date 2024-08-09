@@ -1,4 +1,4 @@
-export const updatePageSettingSchema = {
+const updatePageSettingSchema = {
     theme: {
         exists: {
             errorMessage: 'Theme is required'
@@ -33,3 +33,5 @@ export const updatePageSettingSchema = {
         escape: true,
     }
 }
+
+export default updatePageSettingSchema;

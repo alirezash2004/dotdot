@@ -1,9 +1,13 @@
 import { Router } from 'express';
-import { checkIsFollowing, newFollowing, removeFollowing } from '../controllers/followingRelationships.controller.js';
 import { checkSchema } from 'express-validator';
-import followingRelationshipShcema from '../validators/followingRelationship.schema.js';
-import validationResultHandler from '../middleware/validationResultHandler.js';
+
 import protectRoute from '../middleware/protectRoute.js';
+import validationResultHandler from '../middleware/validationResultHandler.js';
+
+import { checkIsFollowing, newFollowing, removeFollowing } from '../controllers/followingRelationships.controller.js';
+
+import followingRelationshipShcema from '../validators/followingRelationship.schema.js';
+
 const router = Router();
 
 router.get('/', protectRoute, checkSchema(followingRelationshipShcema), validationResultHandler, checkIsFollowing);

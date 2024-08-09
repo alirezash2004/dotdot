@@ -1,7 +1,9 @@
 import { isValidObjectId } from 'mongoose';
+
+import isJson from '../utils/checkIsJson.js';
+
 import Page from '../models/page.model.js';
 import FollowingRelationship from '../models/followingRelationship.model.js';
-import { isJson } from '../utils/checkIsJson.js';
 import Post from '../models/post.model.js';
 import PostComments from '../models/postComments.model.js';
 import PostMedia from '../models/postMedia.model.js';
