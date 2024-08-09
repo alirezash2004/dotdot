@@ -49,7 +49,7 @@ export const updatePageProfile = async (req, res, next) => {
     try {
         const pageId = req.user._id;
 
-        const { bio, website, birthdate } = data;
+        const { bio, website, birthdate } = req.validatedData;
 
         const page = await Page.findById(pageId).select('pageProfile').populate('pageProfile').exec();
 

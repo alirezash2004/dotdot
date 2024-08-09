@@ -68,7 +68,7 @@ export const signup = async (req, res, next) => {
                 msg: 'Signup Success!',
                 data: {
                     pageId: savePage._id,
-                    pageProfile: savePage.pageProfile
+                    profilePicture: savePage.profilePicture
                 }
             });
         } catch (err) {
@@ -91,7 +91,7 @@ export const login = async (req, res, next) => {
 
         const { username, password } = data;
 
-        const findPage = await Page.findOne({ username }).select('password salt')
+        const findPage = await Page.findOne({ username }).select('password salt profilePicture')
 
         if (!findPage || !validatePassword(password, findPage.password || "", findPage.salt || "")) {
             const error = new Error('invalid credentials');
@@ -106,6 +106,7 @@ export const login = async (req, res, next) => {
             msg: 'Logged In Successfully',
             data: {
                 pageId: findPage._id,
+                profilePicture: findPage.profilePicture,
             }
         });
     } catch (err) {

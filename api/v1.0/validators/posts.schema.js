@@ -25,7 +25,7 @@ const postsSchema = {
     },
     postmedia: {
         matches: {
-            errorMessage: 'caption has invalid charachter',
+            errorMessage: 'postmedia has invalid charachter',
             options: /(?:\"|\')(?<key>[\w\d]+)(?:\"|\')(?:\:\s*)(?:\"|\')?(?<value>[\w\s-]*)(?:\"|\')?/gm,
         },
         trim: true,
