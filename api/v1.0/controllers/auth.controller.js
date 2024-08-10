@@ -63,6 +63,8 @@ export const signup = async (req, res, next) => {
                 newPage.save(),
             ])
 
+            generateTokenAndSetCookie(savePage._id, res);
+
             return res.status(200).json({
                 success: true,
                 msg: 'Signup Success!',
