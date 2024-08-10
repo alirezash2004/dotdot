@@ -15,6 +15,13 @@ const PageSchema = new mongoose.Schema({
     postsCount: { type: mongoose.Schema.Types.Number, default: 0 },
     followingCount: { type: mongoose.Schema.Types.Number, default: 0 },
     followersCount: { type: mongoose.Schema.Types.Number, default: 0 },
+    likedPosts: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Post',
+            default: [],
+        }
+    ]
     // createdAt, updatedAt
 }, { timestamps: true });
 

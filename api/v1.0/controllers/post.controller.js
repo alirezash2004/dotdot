@@ -132,6 +132,61 @@ export const getPostByPostId = async (req, res, next) => {
     }
 }
 
+export const getLikedPosts = async (req, res, next) => {
+    try {
+        const page = req.user;
+
+        // TODO: add thumbnail and return thumbnail and id of posts
+        const likedPosts = await Post.find({ _id: { $in: page.likedPosts } })
+            .select('assetType type caption assets')
+
+        res.status(200).json({ success: true, posts: likedPosts });
+    } catch (err) {
+        console.log(`Error in getLikedPosts : ${err}`);
+        const error = new Error(`Internal Server Error`);
+        error.status = 500;
+        return next(error);
+    }
+}
+
+export const getPagePosts = async (req, res, next) => {
+    try {
+        const pageId = req.user._id.toString();
+        const data = req.validatedData;
+        const username = data.username;
+        const skip = parseInt(data.skip) || 0;
+
+        const targetPage = await Page.findOne({ username }).select('pageType').exec();
+        if (!targetPage) {
+            const error = new Error(`A page with username ${username} was not found`);
+            error.status = 404;
+            return next(error);
+        }
+
+        const isFollowing = await FollowingRelationship.exists({ pageId: pageId, followedPageId: targetPage._id }).exec();
+        if (targetPage._id.toString() !== pageId && (targetPage.pageType === 'private' && !isFollowing)) {
+            const error = new Error(`Page Is Private You have to follow it first`);
+            error.status = 401;
+            return next(error);
+        }
+
+        const posts = await Post
+            .find({ page: targetPage._id })
+            .select('assetType type caption assets')
+            .skip(skip)
+            .limit(10)
+            .sort({ createdAt: -1 })
+            .exec();
+
+        res.status(200).json({ success: true, posts: posts });
+    } catch (err) {
+        console.log(`Error in getPagePosts : ${err}`);
+        const error = new Error(`Internal Server Error`);
+        error.status = 500;
+        return next(error);
+    }
+}
+
 export const newPost = async (req, res, next) => {
     try {
         // single image post
@@ -238,10 +293,12 @@ export const likeUnlikePost = async (req, res, next) => {
         if (userLikedPost) {
             // unlike post
             await Post.updateOne({ _id: postId }, { $pull: { likes: pageId } });
+            await Page.updateOne({ _id: pageId }, { $pull: { likedPosts: postId } });
             res.status(200).json({ success: true, msg: 'Post Unliked Successfully' });
         } else {
             // like post
             post.likes.push(pageId);
+            await Page.updateOne({ _id: pageId }, { $push: { likedPosts: postId } });
             await post.save();
 
             const notification = new Notification({

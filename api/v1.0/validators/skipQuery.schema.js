@@ -1,4 +1,4 @@
-const postSkipQuery = {
+const skipQuerySchema = {
     skip: {
         exists: {
             errorMessage: 'Skip is required'
@@ -10,4 +10,4 @@ const postSkipQuery = {
     },
 };
 
-export default postSkipQuery;
+export default skipQuerySchema;
