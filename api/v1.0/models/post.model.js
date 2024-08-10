@@ -1,8 +1,9 @@
 import mongoose from "mongoose";
 
 const PostSchema = new mongoose.Schema({
-    pageId: {
+    page: {
         type: mongoose.Schema.Types.ObjectId,
+        ref: 'Page',
         required: true,
     },
     assetType: {
@@ -17,16 +18,38 @@ const PostSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.String,
         required: true,
     },
-    shareCount: {
-        type: mongoose.Schema.Types.Number,
-        default: 0,
-        required: true,
-    },
-    likeCount: {
-        type: mongoose.Schema.Types.Number,
-        default: 0,
-        required: true,
-    },
+    assets: [
+        {
+            url: {
+                type: mongoose.Schema.Types.String,
+            }
+        }
+    ],
+    shares: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Page',
+        }
+    ],
+    likes: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Page',
+        }
+    ],
+    comments: [
+        {
+            page: {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: 'Page',
+                required: true
+            },
+            text: {
+                type: mongoose.Schema.Types.String,
+                required: true
+            }
+        }
+    ],
     // createdAt, updatedAt
 }, { timestamps: true });
 

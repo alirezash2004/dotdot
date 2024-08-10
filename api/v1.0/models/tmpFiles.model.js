@@ -18,6 +18,10 @@ const TmpFilesSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.String,
         required: true,
     },
+    url: {
+        type: mongoose.Schema.Types.String,
+        required: true,
+    },
     fileExt: {
         type: mongoose.Schema.Types.String,
         required: true,

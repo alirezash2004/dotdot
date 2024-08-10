@@ -24,11 +24,10 @@ const postsSchema = {
         escape: true,
     },
     postmedia: {
-        matches: {
-            errorMessage: 'postmedia has invalid charachter',
-            options: /(?:\"|\')(?<key>[\w\d]+)(?:\"|\')(?:\:\s*)(?:\"|\')?(?<value>[\w\s-]*)(?:\"|\')?/gm,
+        isObject: {
+            errorMessage: 'postmedia must be an object',
+            options: { strict: true },
         },
-        trim: true,
     }
 }
 

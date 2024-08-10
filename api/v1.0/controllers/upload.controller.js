@@ -55,6 +55,7 @@ export const singleImageUpload = (req, res, next) => {
             fileAccesstoken: fileAccesstoken,
             filename: req.file.filename,
             path: req.file.path,
+            url: req.protocol + "://" + req.get("host") + "/tmpPostData/" + req.file.filename,
             fileExt: path.extname(req.file.originalname).toLowerCase().replace('.', ''),
             createdAt: Date.now(),
         }
