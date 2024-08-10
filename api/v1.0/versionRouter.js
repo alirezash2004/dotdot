@@ -7,6 +7,7 @@ import pageSettingsRoutes from './routes/pageSettings.routes.js';
 import pagesRoutes from './routes/pages.routes.js';
 import followingRelationshipsRoutes from './routes/followingRelationships.routes.js';
 import uploadPostMediaRoutes from './routes/uploadPostMedia.routes.js';
+import notificationsRoutes from './routes/notifications.routes.js';
 
 import notFound from './middleware/notFound.js';
 import errorHandler from './middleware/errorHandler.js';
@@ -28,6 +29,8 @@ router.use('/pages', pagesRoutes);
 router.use('/followingRelationships', followingRelationshipsRoutes);
 
 router.use('/postMedia', uploadPostMediaRoutes);
+
+router.use('/notifications', notificationsRoutes);
 
 // router.use(express.static(path.join(__dirname, 'public')));
 
