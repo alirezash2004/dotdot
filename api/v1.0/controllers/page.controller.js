@@ -1,7 +1,6 @@
 import { genPassword } from '../utils/passwordsUtil.js';
 
 import Page from '../models/page.model.js';
-import PageProfile from '../models/pageProfile.model.js';
 
 // @desc   Get page
 // @route  POST /api/v1.0/@:pageId
@@ -16,7 +15,7 @@ export const getPage = async (req, res, next) => {
 
         // check if getting itself
         if (targetPageUsername === req.user.username) {
-            const page = await Page.findById(pageId).populate('pageProfile').exec();
+            const page = await Page.findById(pageId).exec();
             return res.status(200).json({
                 success: true,
                 data: {
@@ -47,7 +46,7 @@ export const getPage = async (req, res, next) => {
 
         const targetPageId = page._id;
 
-        const doc = await Page.findById(targetPageId).populate('pageProfile').exec()
+        const doc = await Page.findById(targetPageId).exec()
 
         return res.status(200).json({
             success: true,
@@ -76,7 +75,7 @@ export const updatePageinfo = async (req, res, next) => {
         const pageId = req.user._id.toString();
         const data = req.validatedData;
 
-        const { username, fullname, email, password, pageType, pageSetting } = data;
+        const { username, fullname, email, password, pageType, pageSetting, pageProfile } = data;
 
         const [page, usernameExist] = await Promise.all([
             await Page.findById(pageId).exec(),
@@ -99,9 +98,14 @@ export const updatePageinfo = async (req, res, next) => {
         page.password = hashedPass.hash || page.password;
         page.salt = hashedPass.salt || page.salt;
         page.pageType = pageType || page.pageType;
+
         page.pageSetting.theme = pageSetting.theme || page.pageSetting.theme;
         page.pageSetting.language = pageSetting.language || page.pageSetting.language;
         page.pageSetting.country = pageSetting.country || page.pageSetting.country;
+        
+        page.pageProfile.bio = pageProfile.bio || page.pageProfile.bio;
+        page.pageProfile.website = pageProfile.website || page.pageProfile.website;
+        page.pageProfile.birthdate = pageProfile.birthdate || page.pageProfile.birthdate;
 
         const savePage = await page.save();
 
@@ -118,13 +122,9 @@ export const deletePage = async (req, res, next) => {
     try {
 
         const pageId = req.user._id;
-        const page = await Page.findById(pageId).exec();
 
         // TODO: delete posts
-        await Promise.all([
-            PageProfile.findByIdAndDelete(page.pageProfile).exec(),
-            Page.findByIdAndDelete(pageId).exec(),
-        ])
+        await Page.findByIdAndDelete(pageId).exec();
 
         return res.status(200).json({ success: true });
     } catch (err) {

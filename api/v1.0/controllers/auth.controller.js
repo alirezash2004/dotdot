@@ -2,7 +2,6 @@ import generateTokenAndSetCookie from '../utils/jwtUtil.js';
 import { genPassword, validatePassword } from '../utils/passwordsUtil.js';
 
 import Page from '../models/page.model.js';
-import PageProfile from '../models/pageProfile.model.js';
 
 export const signup = async (req, res, next) => {
     try {
@@ -22,10 +21,7 @@ export const signup = async (req, res, next) => {
             bio: '',
             website: '',
             birthdate: '',
-            // pageId: savePage._id
         }
-
-        const newPageProfile = new PageProfile(pageprofile)
 
         // make new pagesetting
         const pageSetting = {
@@ -49,14 +45,11 @@ export const signup = async (req, res, next) => {
                 lastLogin: Date(),
                 active: 1,
                 profilePicture: profilePic,
-                pageProfile: newPageProfile._id,
+                pageProfile: pageprofile,
                 pageSetting: pageSetting
             });
 
-            const [, savePage] = await Promise.all([
-                newPageProfile.save(),
-                newPage.save(),
-            ])
+            const savePage = newPage.save();
 
             generateTokenAndSetCookie(savePage._id, res);
 

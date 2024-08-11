@@ -10,7 +10,11 @@ const PageSchema = new mongoose.Schema({
     lastLogin: { type: mongoose.Schema.Types.Date, default: Date.now() },
     active: { type: mongoose.Schema.Types.Number },
     profilePicture: { type: mongoose.Schema.Types.String },
-    pageProfile: { type: mongoose.Schema.Types.ObjectId, ref: 'PageProfile' },
+    pageProfile: {
+        bio: { type: mongoose.Schema.Types.String, default: '' },
+        website: { type: mongoose.Schema.Types.String, default: '' },
+        birthdate: { type: mongoose.Schema.Types.Date, default: '' },
+    },
     pageSetting: {
         theme: { type: mongoose.Schema.Types.String, default: 'dark' },
         language: { type: mongoose.Schema.Types.String, default: 'en' },
