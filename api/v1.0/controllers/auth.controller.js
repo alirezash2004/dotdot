@@ -49,7 +49,7 @@ export const signup = async (req, res, next) => {
                 pageSetting: pageSetting
             });
 
-            const savePage = newPage.save();
+            const savePage = await newPage.save();            
 
             generateTokenAndSetCookie(savePage._id, res);
 
