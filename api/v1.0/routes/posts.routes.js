@@ -7,11 +7,8 @@ import validationResultHandler from '../middleware/validationResultHandler.js';
 
 import { commentOnPost, deletePostByPostId, getLikedPosts, getPagePosts, getPostByPostId, getRecentPosts, likeUnlikePost, newPost } from '../controllers/post.controller.js';
 
-import postsSchema from '../validators/posts.schema.js';
-import postIdSchema from '../validators/postId.schema.js';
-import postCommentSchema from '../validators/postComment.schema.js';
-import skipQuerySchema from '../validators/skipQuery.schema.js';
-import usernameSchema from '../validators/username.schema.js';
+import { skipQuerySchema, usernameSchema } from '../validators/global.schema.js';
+import { postCommentSchema, postIdSchema, postsSchema } from '../validators/post.schema.js';
 
 const router = express.Router();
 

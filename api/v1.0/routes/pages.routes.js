@@ -6,8 +6,8 @@ import validationResultHandler from '../middleware/validationResultHandler.js';
 
 import { getPage, updatePageinfo, deletePage } from '../controllers/page.controller.js';
 
-import pageUpdateSchema from '../validators/pageUpdate.schema.js';
-import usernameSchema from '../validators/username.schema.js';
+import { usernameSchema } from '../validators/global.schema.js';
+import { pageUpdateSchema } from '../validators/page.schema.js';
 
 const router = Router();
 

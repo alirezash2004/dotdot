@@ -1,4 +1,4 @@
-const loginInputsSchema = {
+export const loginInputsSchema = {
     username: {
         exists: {
             errorMessage: 'Username is required'
@@ -18,5 +18,3 @@ const loginInputsSchema = {
         escape: true,
     },
 };
-
-export default loginInputsSchema;

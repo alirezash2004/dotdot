@@ -1,4 +1,4 @@
-const postsSchema = {
+export const postsSchema = {
     type: {
         matches: {
             errorMessage: 'type must be single OR multiple',
@@ -29,6 +29,25 @@ const postsSchema = {
             options: { strict: true },
         },
     }
-}
+};
 
-export default postsSchema;
+export const postIdSchema = {
+    postId: {
+        exists: {
+            errorMessage: 'postId is required'
+        },
+        isEmpty: { negated: true },
+        trim: true
+    }
+};
+
+export const postCommentSchema = {
+    text: {
+        exists: {
+            errorMessage: 'pageId is required'
+        },
+        isEmpty: { negated: true },
+        trim: true,
+        escape: true
+    }
+};

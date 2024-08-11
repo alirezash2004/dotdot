@@ -1,4 +1,4 @@
-const notificationIdSchema = {
+export const notificationIdSchema = {
     notificationId: {
         exists: {
             errorMessage: 'notificationId is required'
@@ -7,5 +7,3 @@ const notificationIdSchema = {
         trim: true
     }
 };
-
-export default notificationIdSchema;
