@@ -42,9 +42,39 @@ const pageUpdateSchema = {
         trim: true,
         escape: true,
     },
-    pagetype: {
+    pageType: {
         errorMessage: 'pagetype can only be private or public',
         matches: { options: /\b(private|public)\b/ }
+    },
+    pageSetting: {
+        isObject: {
+            errorMessage: 'pageSetting must be an object',
+            options: { strict: true },
+        },
+    },
+    'pageSetting.theme': {
+        matches: {
+            errorMessage: 'Unexpected theme format',
+            options: /\b(dark|light)\b/,
+        },
+        trim: true,
+        escape: true,
+    },
+    'pageSetting.language': {
+        matches: {
+            errorMessage: 'Unexpected language format',
+            options: /^[A-Za-z\s]+$/,
+        },
+        trim: true,
+        escape: true,
+    },
+    'pageSetting.country': {
+        matches: {
+            errorMessage: 'Unexpected country format',
+            options: /^[A-Za-z\s]+$/,
+        },
+        trim: true,
+        escape: true,
     }
 };
 

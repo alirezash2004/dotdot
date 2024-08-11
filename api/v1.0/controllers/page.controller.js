@@ -1,10 +1,7 @@
-import { isValidObjectId } from 'mongoose';
-
 import { genPassword } from '../utils/passwordsUtil.js';
 
 import Page from '../models/page.model.js';
 import PageProfile from '../models/pageProfile.model.js';
-import PageSetting from '../models/pageSetting.model.js';
 
 // @desc   Get page
 // @route  POST /api/v1.0/@:pageId
@@ -19,7 +16,7 @@ export const getPage = async (req, res, next) => {
 
         // check if getting itself
         if (targetPageUsername === req.user.username) {
-            const page = await Page.findById(pageId).populate('pageProfile').populate('pageSetting').exec();
+            const page = await Page.findById(pageId).populate('pageProfile').exec();
             return res.status(200).json({
                 success: true,
                 data: {
@@ -76,40 +73,35 @@ export const getPage = async (req, res, next) => {
 
 export const updatePageinfo = async (req, res, next) => {
     try {
+        const pageId = req.user._id.toString();
         const data = req.validatedData;
 
-        const { username, fullname, email, password, pagetype, pageId } = data;
+        const { username, fullname, email, password, pageType, pageSetting } = data;
 
-        const isValidId = isValidObjectId(pageId);
+        const [page, usernameExist] = await Promise.all([
+            await Page.findById(pageId).exec(),
+            await Page.exists({ username: username }).exec(),
+        ]);
 
-        if (!isValidId) {
-            const err = new Error(`pageId is not valid!`);
-            err.status = 400;
-            return next(err);
-        }
-
-        const page = await Page.findById(pageId).exec();
-        if (!page) {
-            const err = new Error(`A page with id '${pageId}' was not found!`);
-            err.status = 404;
-            return next(err);
-        }
-
-        const usernameExist = await Page.exists({ username: username }).exec();
         if (usernameExist) {
             const err = new Error(`Username ${username} already exists!`);
             err.status = 400;
             return next(err);
         }
 
+        // TODO: add old password and check if it's valid | add confirm password
+
         const hashedPass = genPassword(password);
 
-        page.username = username;
-        page.fullname = fullname;
-        page.email = email;
-        page.password = hashedPass.hash;
-        page.salt = hashedPass.salt;
-        page.pageType = pagetype;
+        page.username = username || page.username;
+        page.fullname = fullname || page.fullname;
+        page.email = email || page.email;
+        page.password = hashedPass.hash || page.password;
+        page.salt = hashedPass.salt || page.salt;
+        page.pageType = pageType || page.pageType;
+        page.pageSetting.theme = pageSetting.theme || page.pageSetting.theme;
+        page.pageSetting.language = pageSetting.language || page.pageSetting.language;
+        page.pageSetting.country = pageSetting.country || page.pageSetting.country;
 
         const savePage = await page.save();
 
@@ -131,7 +123,6 @@ export const deletePage = async (req, res, next) => {
         // TODO: delete posts
         await Promise.all([
             PageProfile.findByIdAndDelete(page.pageProfile).exec(),
-            PageSetting.findByIdAndDelete(page.pageSetting).exec(),
             Page.findByIdAndDelete(pageId).exec(),
         ])
 

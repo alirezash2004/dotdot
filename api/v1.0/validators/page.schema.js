@@ -54,7 +54,7 @@ const pageSchema = {
         trim: true,
         escape: true,
     },
-    pagetype: {
+    pageType: {
         exists: {
             errorMessage: 'Pagetype is required'
         },

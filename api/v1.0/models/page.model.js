@@ -11,7 +11,11 @@ const PageSchema = new mongoose.Schema({
     active: { type: mongoose.Schema.Types.Number },
     profilePicture: { type: mongoose.Schema.Types.String },
     pageProfile: { type: mongoose.Schema.Types.ObjectId, ref: 'PageProfile' },
-    pageSetting: { type: mongoose.Schema.Types.ObjectId, ref: 'PageSetting' },
+    pageSetting: {
+        theme: { type: mongoose.Schema.Types.String, default: 'dark' },
+        language: { type: mongoose.Schema.Types.String, default: 'en' },
+        country: { type: mongoose.Schema.Types.String, default: '' },
+    },
     postsCount: { type: mongoose.Schema.Types.Number, default: 0 },
     followingCount: { type: mongoose.Schema.Types.Number, default: 0 },
     followersCount: { type: mongoose.Schema.Types.Number, default: 0 },

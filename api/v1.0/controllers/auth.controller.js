@@ -3,13 +3,12 @@ import { genPassword, validatePassword } from '../utils/passwordsUtil.js';
 
 import Page from '../models/page.model.js';
 import PageProfile from '../models/pageProfile.model.js';
-import PageSetting from '../models/pageSetting.model.js';
 
 export const signup = async (req, res, next) => {
     try {
         const data = req.validatedData;
 
-        const { username, fullname, email, password, pagetype } = data;
+        const { username, fullname, email, password, pageType } = data;
 
         const usernameExist = await Page.exists({ username: username }).exec();
         if (usernameExist) {
@@ -33,10 +32,7 @@ export const signup = async (req, res, next) => {
             theme: 'dark',
             language: 'en',
             country: '',
-            // pageId: savePage._id
         }
-
-        const newPageSetting = new PageSetting(pageSetting);
 
         const hashedPass = genPassword(password);
 
@@ -49,17 +45,16 @@ export const signup = async (req, res, next) => {
                 email,
                 password: hashedPass.hash,
                 salt: hashedPass.salt,
-                pageType: pagetype,
+                pageType: pageType,
                 lastLogin: Date(),
                 active: 1,
                 profilePicture: profilePic,
                 pageProfile: newPageProfile._id,
-                pageSetting: newPageSetting._id
+                pageSetting: pageSetting
             });
 
-            const [, , savePage] = await Promise.all([
+            const [, savePage] = await Promise.all([
                 newPageProfile.save(),
-                newPageSetting.save(),
                 newPage.save(),
             ])
 

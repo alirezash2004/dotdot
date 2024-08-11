@@ -3,7 +3,6 @@ import express from 'express';
 import authRoutes from './routes/auth.routes.js';
 import postsRoutes from './routes/posts.routes.js';
 import pageProfilesRoutes from './routes/pageProfiles.routes.js';
-import pageSettingsRoutes from './routes/pageSettings.routes.js';
 import pagesRoutes from './routes/pages.routes.js';
 import followingRelationshipsRoutes from './routes/followingRelationships.routes.js';
 import uploadPostMediaRoutes from './routes/uploadPostMedia.routes.js';
@@ -21,8 +20,6 @@ router.use('/auth', authRoutes);
 router.use('/posts', postsRoutes);
 
 router.use('/pageProfile', pageProfilesRoutes);
-
-router.use('/pageSettings', pageSettingsRoutes);
 
 router.use('/pages', pagesRoutes);
 

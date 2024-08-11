@@ -13,7 +13,7 @@ const router = Router();
 
 router.get('/:username', protectRoute, checkSchema(usernameSchema, ['params']), validationResultHandler, getPage);
 
-router.put('/:username', protectRoute, checkSchema(usernameSchema, ['params']), checkSchema(pageUpdateSchema), validationResultHandler, updatePageinfo);
+router.put('/update', protectRoute, checkSchema(pageUpdateSchema), validationResultHandler, updatePageinfo);
 
 router.delete('/', protectRoute, deletePage);
 
