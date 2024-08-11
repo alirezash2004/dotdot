@@ -2,11 +2,12 @@
   "name": "dotdot",
   "version": "1.0.0",
   "description": "DotDot Social App",
-  "main": "server.js",
+  "main": "backend/server.js",
   "type": "module",
   "scripts": {
-    "start": "node server",
-    "dev": "node --watch server"
+    "start": "node backend/server.js",
+    "dev": "node --watch backend/server.js",
+    "build": "npm install && npm install --prefix frontend && npm run build --prefix frontend"
   },
   "author": "Alireza Shabany",
   "license": "MIT",
