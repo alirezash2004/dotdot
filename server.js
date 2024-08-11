@@ -2,6 +2,8 @@ import express from "express";
 import cookieParser from "cookie-parser";
 import session from "express-session";
 import connectToMongoDB from "./api/v1.0/db/connectToMongoDb.js";
+import { configDotenv } from "dotenv";
+configDotenv();
 
 import v1_0 from './api/v1.0/versionRouter.js';
 
