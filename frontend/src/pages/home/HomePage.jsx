@@ -1,7 +1,11 @@
-const HomePage = () => {
-  return (
-    <div>HomePage</div>
-  )
-}
+import Posts from "../../components/common/Posts";
 
-export default HomePage
+const HomePage = () => {
+	return (
+		<>
+			<Posts />
+		</>
+	);
+};
+
+export default HomePage;
