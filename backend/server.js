@@ -36,7 +36,7 @@ app.use(logger); // Logger middleware
 
 // setup static folder ::to_review
 app.use(express.static('public'));
-app.use(express.static('uploads'));
+app.use(express.static(path.join(__dirname, 'backend', 'uploads')));
 
 // Routes
 app.use('/api/v1.0', v1_0);
