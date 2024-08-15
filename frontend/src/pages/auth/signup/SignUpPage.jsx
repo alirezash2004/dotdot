@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { useState } from "react";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "react-hot-toast";
 
 import Input from "../../../components/common/Input";
@@ -15,6 +15,8 @@ const SignUpPage = () => {
 		fullName: "",
 		password: "",
 	});
+
+	const queryClient = useQueryClient();
 
 	const {
 		mutate: signUpMutation,
@@ -43,6 +45,7 @@ const SignUpPage = () => {
 		},
 		onSuccess: () => {
 			toast.success("Account created successfully");
+			queryClient.invalidateQueries({ queryKey: ["authPage"] });
 		},
 	});
 

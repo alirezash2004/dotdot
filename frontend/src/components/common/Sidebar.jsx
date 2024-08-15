@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 
 import DotDotLogo from "../../components/imgs/DotDot";
@@ -14,12 +14,6 @@ import {
 } from "react-icons/ci";
 
 const Sidebar = () => {
-	const data = {
-		fullName: "Alireza Sh",
-		username: "AlirezaSh",
-		// profileImg: "",
-	};
-
 	const queryClient = useQueryClient();
 
 	const { mutate: logoutMutation } = useMutation({
@@ -46,6 +40,8 @@ const Sidebar = () => {
 			toast.error("Logout Failed!");
 		},
 	});
+
+	const { data: authPage } = useQuery({ queryKey: ["authPage"] });
 
 	return (
 		<div className="md:flex-[2_2_0] w-18 max-w-52">
@@ -74,7 +70,7 @@ const Sidebar = () => {
 					</li>
 					<li className="flex justify-center md:justify-start md:hidden">
 						<Link
-							to={`/profile/${data.username}`}
+							to={`/profile/${authPage.username}`}
 							className="flex items-center gap-3 hover:bg-stone-600 transition-all rounded-full duration-300 py-2 px-2 max-w-fit cursor-pointer justify-center md:pr-4"
 						>
 							<CiUser className="w-8 h-8" />
@@ -100,17 +96,17 @@ const Sidebar = () => {
 						</Link>
 					</li>
 				</ul>
-				{data && (
+				{authPage && (
 					<Link
-						to={`/profile/${data.username}`}
+						to={`/profile/${authPage.username}`}
 						className="mt-auto mb-10 flex gap-2 items-start transition-all duration-300 hover:bg-slate-700 py-2 rounded-full px-3"
 					>
 						<div className="avatar hidden md:inline-flex">
 							<div className="w-8 rounded-full">
 								<img
 									src={
-										data?.profileImg ||
-										`https://avatar.iran.liara.run/username?username=${data?.username}`
+										authPage?.profileImg ||
+										`https://avatar.iran.liara.run/username?username=${authPage?.username}`
 									}
 								/>
 							</div>
@@ -118,9 +114,9 @@ const Sidebar = () => {
 						<div className="flex justify-between flex-1">
 							<div className="hidden md:block">
 								<p className="text-white font-bold text-sm w-20 truncate">
-									{data?.fullName}
+									{authPage?.fullName}
 								</p>
-								<p className="text-slate-500 text-sm">@{data?.username}</p>
+								<p className="text-slate-500 text-sm">@{authPage?.username}</p>
 							</div>
 							<CiLogout
 								className="w-9 h-9 p-1 cursor-pointer md:mr-2 md:ml-6 mx-auto mt-auto mb-auto border border-spacing-16 rounded-full border-slate-50 hover:bg-slate-50 hover:fill-black transition-all duration-300"
