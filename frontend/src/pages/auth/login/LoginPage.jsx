@@ -1,6 +1,9 @@
 import { Link } from "react-router-dom";
 import { useState } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import toast from "react-hot-toast";
 
+import Input from "../../../components/common/Input";
 import DotDotLogo from "../../../components/imgs/DotDot";
 
 import { CiHashtag, CiKeyboard, CiWarning } from "react-icons/ci";
@@ -11,9 +14,44 @@ const LoginPage = () => {
 		password: "",
 	});
 
+	const queryClient = useQueryClient();
+
+	const {
+		mutate: loginMutation,
+		isError,
+		isPending,
+		error,
+	} = useMutation({
+		mutationFn: async ({ username, password }) => {
+			try {
+				const res = await fetch("/api/v1.0/auth/login", {
+					method: "POST",
+					headers: {
+						"Content-Type": "application/json",
+					},
+					body: JSON.stringify({ username, password }),
+				});
+
+				const data = await res.json();
+
+				if (!res.ok || data.success === false)
+					throw new Error(data.msg || "Failed To Login");
+			} catch (error) {
+				toast.error(error.message, { duration: 6000 });
+				throw error;
+			}
+		},
+		onSuccess: () => {
+			toast.success("Logged in successfully");
+			queryClient.invalidateQueries({
+				queryKey: ["authPage"],
+			});
+		},
+	});
+
 	const handleSubmit = (e) => {
 		e.preventDefault();
-		console.log(formData);
+		loginMutation(formData);
 	};
 
 	const handleInputChange = (e) => {
@@ -22,8 +60,6 @@ const LoginPage = () => {
 			[e.target.name]: e.target.value,
 		}));
 	};
-
-	const isError = false;
 
 	return (
 		<div className="max-w-screen-xl mx-auto flex h-screen px-11">
@@ -39,34 +75,36 @@ const LoginPage = () => {
 					<h1 className="text-2xl input-bordered mb-4">
 						{"Let's"} Jump Right In ..
 					</h1>
-					<label className="input input-bordered flex items-center gap-2">
-						<CiHashtag />
-						<input
-							type="text"
-							className="grow"
-							placeholder="Username"
-							name="username"
-							autoComplete="true"
-							onChange={handleInputChange}
-							value={formData.username}
-						/>
-					</label>
-					<label className="input input-bordered flex items-center gap-2">
-						<CiKeyboard />
-						<input
-							type="password"
-							className="grow"
-							placeholder="Password"
-							name="password"
-							autoComplete="true"
-							onChange={handleInputChange}
-							value={formData.password}
-						/>
-					</label>
-					<button className="btn btn-secondary rounded-full">Login</button>
+					<Input
+						Icon={<CiHashtag />}
+						type="text"
+						className="grow"
+						placeholder="Username"
+						name="username"
+						autoComplete="true"
+						onChange={handleInputChange}
+						value={formData.username}
+					/>
+					<Input
+						Icon={<CiKeyboard />}
+						type="password"
+						className="grow"
+						placeholder="Password"
+						name="password"
+						autoComplete="true"
+						onChange={handleInputChange}
+						value={formData.password}
+					/>
+					<button
+						className={`btn btn-secondary rounded-full ${
+							isPending ? "btn-disabled" : ""
+						}`}
+					>
+						{isPending ? "Loading ..." : "Login"}
+					</button>
 					{isError && (
 						<p className="text-red-500">
-							<CiWarning className="inline text-2xl" /> Something went wrong
+							<CiWarning className="inline text-2xl" /> {error.message}
 						</p>
 					)}
 				</form>

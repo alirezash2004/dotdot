@@ -1,4 +1,6 @@
 import { Link } from "react-router-dom";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import toast from "react-hot-toast";
 
 import DotDotLogo from "../../components/imgs/DotDot";
 
@@ -17,6 +19,33 @@ const Sidebar = () => {
 		username: "AlirezaSh",
 		// profileImg: "",
 	};
+
+	const queryClient = useQueryClient();
+
+	const { mutate: logoutMutation } = useMutation({
+		mutationFn: async () => {
+			try {
+				const res = await fetch("/api/v1.0/auth/logout", {
+					method: "POST",
+				});
+
+				const data = await res.json();
+
+				if (!res.ok || data.success === false)
+					throw new Error(data.msg || "Failed To Logout");
+			} catch (error) {
+				toast.error(error.message, { duration: 6000 });
+				throw error;
+			}
+		},
+		onSuccess: () => {
+			toast.success("Logout Successfully");
+			queryClient.invalidateQueries({ queryKey: ["authPage"] });
+		},
+		onError: () => {
+			toast.error("Logout Failed!");
+		},
+	});
 
 	return (
 		<div className="md:flex-[2_2_0] w-18 max-w-52">
@@ -93,7 +122,13 @@ const Sidebar = () => {
 								</p>
 								<p className="text-slate-500 text-sm">@{data?.username}</p>
 							</div>
-							<CiLogout className="w-9 h-9 p-1 cursor-pointer md:mr-2 md:ml-6 mx-auto mt-auto mb-auto border border-spacing-16 rounded-full border-slate-50 hover:bg-slate-50 hover:fill-black transition-all duration-300" />
+							<CiLogout
+								className="w-9 h-9 p-1 cursor-pointer md:mr-2 md:ml-6 mx-auto mt-auto mb-auto border border-spacing-16 rounded-full border-slate-50 hover:bg-slate-50 hover:fill-black transition-all duration-300"
+								onClick={(e) => {
+									e.preventDefault();
+									logoutMutation();
+								}}
+							/>
 						</div>
 					</Link>
 				)}

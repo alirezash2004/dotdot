@@ -4,7 +4,7 @@ export const POSTS = [
         "page": {
             "_id": "66b8b1dc2bf6a562831d33c4",
             "username": "alirezash202",
-            "fullname": "alirezam",
+            "fullName": "alirezam",
             "pageType": "public",
             "profilePicture": "https://avatar.iran.liara.run/username?username=alirezash20"
         },
@@ -21,7 +21,7 @@ export const POSTS = [
                 page: {
                     "_id": "66b8b1dc2bf6a562831d33c4",
                     "username": "alirezash202",
-                    "fullname": "alirezam",
+                    "fullName": "alirezam",
                     "pageType": "public",
                     "profilePicture": "https://avatar.iran.liara.run/username?username=alirezash20"
                 },
@@ -32,7 +32,7 @@ export const POSTS = [
                 page: {
                     "_id": "66b8b1dc2bf6a562831d33c4",
                     "username": "alirezash202",
-                    "fullname": "alirezam",
+                    "fullName": "alirezam",
                     "pageType": "public",
                     "profilePicture": "https://avatar.iran.liara.run/username?username=alirezash20"
                 },
