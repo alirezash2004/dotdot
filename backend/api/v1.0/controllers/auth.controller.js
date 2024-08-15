@@ -3,11 +3,25 @@ import { genPassword, validatePassword } from '../utils/passwordsUtil.js';
 
 import Page from '../models/page.model.js';
 
+export const getMe = async (req, res, next) => {
+    try {
+        const page = await Page.findById(req.user._id).select('-password -salt');
+        res.status(200).json(page);
+    } catch (err) {
+        console.log(`Error in getMe : ${err}`);
+        const error = new Error(`Internal Server Error`)
+        error.status = 500;
+        return next(error);
+    }
+}
+
 export const signup = async (req, res, next) => {
     try {
         const data = req.validatedData;
 
-        const { username, fullname, email, password, pageType } = data;
+        const { username, fullName, email, password } = data;
+
+        const pageType = "public";
 
         const usernameExist = await Page.exists({ username: username }).exec();
         if (usernameExist) {
@@ -37,7 +51,7 @@ export const signup = async (req, res, next) => {
         try {
             const newPage = new Page({
                 username,
-                fullname,
+                fullName,
                 email,
                 password: hashedPass.hash,
                 salt: hashedPass.salt,
@@ -49,7 +63,7 @@ export const signup = async (req, res, next) => {
                 pageSetting: pageSetting
             });
 
-            const savePage = await newPage.save();            
+            const savePage = await newPage.save();
 
             generateTokenAndSetCookie(savePage._id, res);
 

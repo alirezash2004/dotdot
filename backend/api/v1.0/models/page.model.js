@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 
 const PageSchema = new mongoose.Schema({
     username: { type: mongoose.Schema.Types.String, required: true, unique: true },
-    fullname: { type: mongoose.Schema.Types.String, required: true },
+    fullName: { type: mongoose.Schema.Types.String, required: true },
     email: { type: mongoose.Schema.Types.String, required: true },
     password: { type: mongoose.Schema.Types.String, required: true },
     salt: { type: mongoose.Schema.Types.String, required: true },

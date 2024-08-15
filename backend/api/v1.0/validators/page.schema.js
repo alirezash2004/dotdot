@@ -27,7 +27,7 @@ export const pageSchema = {
         trim: true,
         escape: true,
     },
-    fullname: {
+    fullName: {
         exists: {
             errorMessage: 'Fullname is required'
         },
@@ -132,6 +132,10 @@ export const pageSchema = {
 
 export const newpageSchema = {
     username: {
+        isEmpty: {
+            errorMessage: 'Username can\'t be empty',
+            negated: true
+        },
         exists: {
             errorMessage: 'Username is required'
         },
@@ -143,6 +147,10 @@ export const newpageSchema = {
         escape: true,
     },
     password: {
+        isEmpty: {
+            errorMessage: 'Password can\'t be empty',
+            negated: true
+        },
         exists: {
             errorMessage: 'Password is required'
         },
@@ -159,7 +167,11 @@ export const newpageSchema = {
         trim: true,
         escape: true,
     },
-    fullname: {
+    fullName: {
+        isEmpty: {
+            errorMessage: 'Fullname can\'t be empty',
+            negated: true
+        },
         exists: {
             errorMessage: 'Fullname is required'
         },
@@ -169,6 +181,10 @@ export const newpageSchema = {
         escape: true,
     },
     email: {
+        isEmpty: {
+            errorMessage: 'Email can\'t be empty',
+            negated: true
+        },
         exists: {
             errorMessage: 'Email is required'
         },
@@ -185,13 +201,6 @@ export const newpageSchema = {
         },
         trim: true,
         escape: true,
-    },
-    pageType: {
-        exists: {
-            errorMessage: 'Pagetype is required'
-        },
-        errorMessage: 'pagetype can only be private or public',
-        matches: { options: /\b(private|public)\b/ }
     },
 }
 
@@ -218,7 +227,7 @@ export const pageUpdateSchema = {
         trim: true,
         escape: true,
     },
-    fullname: {
+    fullName: {
         errorMessage: 'Fullname can only contain alphabet characters & must be 6-20 characters & can have 2 spaces in total',
         matches: { options: /^(?=.{6,20}$)[A-Za-z]+(?: [A-Za-z]+){0,2}$/ },
         trim: true,

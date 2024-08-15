@@ -42,13 +42,13 @@ export const getRecentPosts = async (req, res, next) => {
             })
             .populate({
                 path: 'page',
-                select: 'username fullname profilePicture pageType',
+                select: 'username fullName profilePicture pageType',
             })
             .populate({
                 path: 'comments',
                 populate: {
                     path: 'page',
-                    select: 'username fullname profilePicture',
+                    select: 'username fullName profilePicture',
                 },
                 options: {
                     limit: 2,

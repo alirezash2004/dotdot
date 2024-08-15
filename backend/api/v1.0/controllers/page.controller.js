@@ -20,7 +20,7 @@ export const getPage = async (req, res, next) => {
                 success: true,
                 data: {
                     username: page.username,
-                    fullname: page.fullname,
+                    fullName: page.fullName,
                     email: page.email,
                     pageType: page.pageType,
                     pageProfile: page.pageProfile,
@@ -50,7 +50,7 @@ export const getPage = async (req, res, next) => {
             success: true,
             data: {
                 username: doc.username,
-                fullname: doc.fullname,
+                fullName: doc.fullName,
                 pageType: doc.pageType,
                 pageProfile: doc.pageProfile,
                 profilePicture: doc.profilePicture,
@@ -72,7 +72,7 @@ export const updatePageinfo = async (req, res, next) => {
         const pageId = req.user._id.toString();
         const data = req.validatedData;
 
-        const { username, fullname, email, password, pageType, pageSetting, pageProfile } = data;
+        const { username, fullName, email, password, pageType, pageSetting, pageProfile } = data;
 
         const [page, usernameExist] = await Promise.all([
             await Page.findById(pageId).exec(),
@@ -90,7 +90,7 @@ export const updatePageinfo = async (req, res, next) => {
         const hashedPass = genPassword(password);
 
         page.username = username || page.username;
-        page.fullname = fullname || page.fullname;
+        page.fullName = fullName || page.fullName;
         page.email = email || page.email;
         page.password = hashedPass.hash || page.password;
         page.salt = hashedPass.salt || page.salt;
