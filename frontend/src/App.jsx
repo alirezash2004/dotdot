@@ -4,6 +4,7 @@ import HomePage from "./pages/home/HomePage";
 import LoginPage from "./pages/auth/login/LoginPage";
 import SignUpPage from "./pages/auth/signup/SignUpPage";
 import Sidebar from "./components/common/Sidebar";
+import NotificationPage from "./pages/notification/NotificationPage";
 
 function App() {
 	return (
@@ -13,6 +14,7 @@ function App() {
 				<Route path="/" element={<HomePage />} />
 				<Route path="/login" element={<LoginPage />} />
 				<Route path="/signup" element={<SignUpPage />} />
+				<Route path="/notifications" element={<NotificationPage />} />
 			</Routes>
 		</div>
 	);
