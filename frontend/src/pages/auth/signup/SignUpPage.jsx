@@ -126,8 +126,12 @@ const SignUpPage = () => {
 				</form>
 				<div className="flex flex-col w-full lg:w-2/3 gap-2 mt-5">
 					<p className="text-white text-md">Already have an account?</p>
-					<Link to="/login">
-						<button className="btn rounded-full btn-primary btn-outline text-white w-full">
+					<Link to="/login" onClick={isPending && ((e) => e.preventDefault())}>
+						<button
+							className={`btn rounded-full btn-primary btn-outline text-white w-full ${
+								isPending ? "btn-disabled" : ""
+							}`}
+						>
 							Sign in
 						</button>
 					</Link>
