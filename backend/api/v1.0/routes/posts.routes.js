@@ -29,4 +29,6 @@ router.post('/comment/:postId', protectRoute, checkSchema(postIdSchema, ['params
 
 router.delete('/:postId', protectRoute, checkSchema(postIdSchema, ['params']), validationResultHandler, deletePostByPostId);
 
+// TODO: add /save for save/unsave a post
+
 export default router;

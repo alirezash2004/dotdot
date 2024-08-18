@@ -38,7 +38,9 @@ export const getRecentPosts = async (req, res, next) => {
                 comments: { $slice: ['$comments', commentStart, commentStart + commentCount] },
                 numberOfLikes: { $size: '$likes' },
                 numberOfShares: { $size: '$shares' },
-                assets: 1
+                isLiked: { $in: [req.user._id, '$likes'] },
+                assets: 1,
+                caption: 1,
             })
             .populate({
                 path: 'page',
@@ -401,7 +403,6 @@ export const deletePostByPostId = async (req, res, next) => {
 
         await Promise.all([
             // PostMedia.deleteMany({ postId }).exec(), // delete all post media
-            PostComments.deleteMany({ postId }).exec(), // delete all post comments
             Post.deleteOne({ _id: postId }).exec(),
             Page.findByIdAndUpdate(pageId, { $inc: { postsCount: -1 } }).exec(),
         ])
