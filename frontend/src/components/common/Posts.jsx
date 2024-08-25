@@ -17,7 +17,7 @@ const Posts = () => {
 		data: posts,
 		isLoading,
 		refetch,
-		isRefetching,
+		isFetching,
 	} = useQuery({
 		queryKey: ["posts"],
 		queryFn: async () => {
@@ -25,8 +25,8 @@ const Posts = () => {
 				if (isLoadingNewPosts) {
 					return [];
 				}
-
 				setIsLoadingNewPosts(true);
+
 				const res = await fetch(`/api/v1.0/posts/recent?skip=${skip}`);
 				const data = await res.json();
 
@@ -35,14 +35,15 @@ const Posts = () => {
 
 				setTotalPosts((prevData) => [...prevData, ...data.posts]);
 				setSkip((prevData) => prevData + 10);
-				setIsLoadingNewPosts(false);
 
 				if (data.posts.length === 0) {
 					setDisabledLoading(true);
 				}
 
+				setIsLoadingNewPosts(false);
 				return data.posts;
 			} catch (error) {
+				// toast.error(error.message);
 				throw new Error(error);
 			}
 		},
@@ -56,11 +57,14 @@ const Posts = () => {
 		const observer = new IntersectionObserver(
 			(entries) => {
 				if (entries[0].isIntersecting) {
-					// fetchData();
 					refetch();
+					// queryClinet.invalidateQueries(
+					// 	{ queryKey: ["posts"] },
+					// 	{ cancelRefetch: false }
+					// );
 				}
 			},
-			{ threshold: 1 }
+			{ rootMargin: "50px", threshold: 1.0 }
 		);
 
 		if (observerTarget.current) {
@@ -75,37 +79,39 @@ const Posts = () => {
 	}, [observerTarget, refetch, disabledLoading]);
 
 	return (
-		<div className="flex flex-[4_4_0] flex-col pt-10">
-			{!isLoading &&
-				!isRefetching &&
-				!isLoadingNewPosts &&
-				totalPosts?.length === 0 && (
-					<p className="text-center my-4">OOPS! No Posts Found!</p>
-				)}
-			{!isLoading && posts && (
-				<>
-					{totalPosts.map((post) => (
-						<Post key={post._id} post={post} />
-					))}
-				</>
-			)}
-
-			{(isLoading || (isLoadingNewPosts && totalPosts.length === 0)) && (
-				<div className="flex flex-col gap-16 mx-auto">
-					<PostSkeleton />
-					<PostSkeleton />
-					<PostSkeleton />
-				</div>
-			)}
-			{!disabledLoading && (
-				<div ref={observerTarget} className="flex mx-auto pt-20 pb-20">
-					{(isLoading || isRefetching) && <Loading size="lg" />}
-					{!(isLoading || isRefetching || isLoadingNewPosts) && (
-						<CiCirclePlus className="text-6xl" />
+		<>
+			<div className="flex flex-[4_4_0] flex-col pt-10">
+				{!isLoading &&
+					!isFetching &&
+					!isLoadingNewPosts &&
+					totalPosts?.length === 0 && (
+						<p className="text-center my-4">OOPS! No Posts Found!</p>
 					)}
-				</div>
-			)}
-		</div>
+				{!isLoading && posts && (
+					<>
+						{totalPosts.map((post) => (
+							<Post key={post._id} post={post} />
+						))}
+					</>
+				)}
+
+				{(isLoading || isFetching || isLoadingNewPosts) && (
+					<div className="flex flex-col gap-16 mx-auto">
+						<PostSkeleton />
+						<PostSkeleton />
+						<PostSkeleton />
+					</div>
+				)}
+				{!disabledLoading && (
+					<div ref={observerTarget} className="flex mx-auto pt-20 pb-20">
+						{(isLoading || isFetching) && <Loading size="lg" />}
+						{!(isLoading || isFetching || isLoadingNewPosts) && (
+							<CiCirclePlus className="text-6xl" />
+						)}
+					</div>
+				)}
+			</div>
+		</>
 	);
 };
 

@@ -15,7 +15,7 @@ import {
 	CiTrash,
 } from "react-icons/ci";
 
-const Post = ({ post }) => {
+const Post = ({ post, postType = "" }) => {
 	const { data: authPage } = useQuery({ queryKey: ["authPage"] });
 	const queryClient = useQueryClient();
 	const { mutate: deletePost, isPending: isDeletePending } = useMutation({
@@ -88,7 +88,7 @@ const Post = ({ post }) => {
 			},
 		});
 
-	const isMyPost = authPage._id === post.page._id;
+	const isMyPost = authPage._id === post.page?._id;
 
 	const formattedDate = "1h";
 
@@ -108,7 +108,7 @@ const Post = ({ post }) => {
 	};
 
 	const handleSavePost = () => {
-		console.log('save/unsave post');
+		console.log("save/unsave post");
 		// saveUnsavePost();
 	};
 
@@ -120,7 +120,17 @@ const Post = ({ post }) => {
 	// TODO: fix localhost addressing on postmedia urls on backend
 	const postUrl = post.assets[0].url.replace("localhost", "10.61.18.11");
 
-	return (
+	return postType === "pageProfile" ? (
+		<>
+			<Link to={`/post/${post?._id}`} className="flex w-full aspect-square border border-slate-800 group/post">
+				<img
+					src={postUrl}
+					alt=""
+					className="w-full object-cover opacity-60 group-hover/post:opacity-100 transition-all duration-200"
+				/>
+			</Link>
+		</>
+	) : (
 		<>
 			<div className="flex flex-[6_6_0] mb-16 mx-4 md:mx-auto gap-2 flex-col items-start pb-4 border rounded-lg p-5 border-gray-700 ">
 				<div className="flex w-full">
@@ -212,7 +222,7 @@ const Post = ({ post }) => {
 						>
 							<CiChat1 className="w-6 h-6  text-slate-500 group-hover:text-sky-400" />
 							<span className="text-sm text-slate-500 group-hover:text-sky-400">
-								{post?.comments.length}
+								{post?.comments.length || 0}
 							</span>
 						</div>
 						<div className="flex gap-1 items-center cursor-pointer group">
@@ -232,7 +242,7 @@ const Post = ({ post }) => {
 						<div className="modal-box rounded border border-gray-600">
 							<h3 className="font-bold text-lg mb-4">COMMENTS</h3>
 							<div className="flex flex-col gap-3 max-h-60 overflow-auto">
-								{post.comments.length === 0 && (
+								{post?.comments.length === 0 && (
 									<p className="text-sm text-slate-500">
 										No comments yet! Write First Comment
 									</p>

@@ -9,12 +9,15 @@ import Sidebar from "./components/common/Sidebar";
 import NotificationPage from "./pages/notification/NotificationPage";
 import Loading from "./components/common/Loading";
 import { useEffect, useState } from "react";
+import ProfilePage from "./pages/profile/ProfilePage";
 
 function App() {
 	const [isdark, setIsdark] = useState(
-		JSON.parse(localStorage.getItem("isdark")) || true
+		JSON.parse(localStorage.getItem("isdark"))
 	);
 	useEffect(() => {
+		console.log("localstrg:",localStorage.getItem("isdark"));
+		
 		localStorage.setItem("isdark", JSON.stringify(isdark));
 		if (isdark) {
 			document.documentElement.setAttribute("data-theme", "black");
@@ -53,8 +56,8 @@ function App() {
 
 	return (
 		<>
-			<div className="fixed top-4 right-4 btn rounded-full w-14 h-14 z-50">
-				<label className="swap swap-rotate">
+			<div className="fixed top-4 right-4 z-50">
+				<label className="swap swap-rotate btn rounded-full w-14 h-14">
 					{/* this hidden checkbox controls the state */}
 					<input
 						type="checkbox"
@@ -99,6 +102,10 @@ function App() {
 					<Route
 						path="/notifications"
 						element={authPage ? <NotificationPage /> : <Navigate to="/login" />}
+					/>
+					<Route
+						path="/profile/:username"
+						element={authPage ? <ProfilePage /> : <Navigate to="/login" />}
 					/>
 				</Routes>
 				<Toaster />
