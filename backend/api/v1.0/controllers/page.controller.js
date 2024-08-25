@@ -52,11 +52,15 @@ export const getPage = async (req, res, next) => {
                 username: doc.username,
                 fullName: doc.fullName,
                 pageType: doc.pageType,
-                pageProfile: doc.pageProfile,
+                pageProfile: {
+                    bio: doc.pageProfile.bio,
+                    website: doc.pageProfile.website,
+                },
                 profilePicture: doc.profilePicture,
                 postsCount: doc.postsCount,
                 followersCount: doc.followersCount,
                 followingCount: doc.followingCount,
+                _id: doc._id
             }
         });
     } catch (err) {
@@ -99,7 +103,7 @@ export const updatePageinfo = async (req, res, next) => {
         page.pageSetting.theme = pageSetting.theme || page.pageSetting.theme;
         page.pageSetting.language = pageSetting.language || page.pageSetting.language;
         page.pageSetting.country = pageSetting.country || page.pageSetting.country;
-        
+
         page.pageProfile.bio = pageProfile.bio || page.pageProfile.bio;
         page.pageProfile.website = pageProfile.website || page.pageProfile.website;
         page.pageProfile.birthdate = pageProfile.birthdate || page.pageProfile.birthdate;
