@@ -82,6 +82,9 @@ export const getPostByPostId = async (req, res, next) => {
         const data = req.validatedData;
         const postId = data.postId;
 
+        const commentStart = 0;
+        const commentCount = 2;
+
         const isValidId = isValidObjectId(postId);
 
         if (!isValidId) {
@@ -91,7 +94,30 @@ export const getPostByPostId = async (req, res, next) => {
         }
 
         // TODO: make select more optimized (count likes, ... in query , ...)
-        const post = await Post.findById(postId).exec();
+        const post = await Post.findOne({ _id: postId }, {
+            comments: { $slice: ['$comments', commentStart, commentStart + commentCount] },
+            numberOfLikes: { $size: '$likes' },
+            numberOfShares: { $size: '$shares' },
+            isLiked: { $in: [req.user._id, '$likes'] },
+            assets: 1,
+            caption: 1,
+        })
+            .populate({
+                path: 'page',
+                select: 'username fullName profilePicture pageType',
+            })
+            .populate({
+                path: 'comments',
+                populate: {
+                    path: 'page',
+                    select: 'username fullName profilePicture',
+                },
+                options: {
+                    limit: 2,
+                },
+            })
+            .exec();
+
 
         if (!post) {
             const error = new Error(`A post with post id ${postId} was not found`);
@@ -99,11 +125,12 @@ export const getPostByPostId = async (req, res, next) => {
             return next(error);
         }
 
+
         // check if page for the post is private then should be following else don't return post
         // for public pages no restriction
         // self posts also no restriction
         const currentPageId = req.user._id.toString();
-        const targetPageId = post.page.toString();
+        const targetPageId = post.page._id.toString();
 
         const [targetPageType, isFollowing] = await Promise.all([
             Page.findById(targetPageId).select('pageType').exec(),
@@ -116,16 +143,7 @@ export const getPostByPostId = async (req, res, next) => {
             return next(error);
         }
 
-        return res.status(200).json({
-            assetType: post.assetType,
-            type: post.type,
-            caption: post.caption,
-            assets: post.assets,
-            createdAt: post.createdAt,
-            shareCount: post.shares.length,
-            likeCount: post.likes.length,
-            commentCount: post.comments.length,
-        });
+        return res.status(200).json(post);
     } catch (err) {
         console.log(`Error in getPostByPostId : ${err}`);
         const error = new Error(`Internal Server Error`)
@@ -270,7 +288,12 @@ export const likeUnlikePost = async (req, res, next) => {
         const pageId = req.user._id.toString();
         const postId = data.postId;
 
-        const post = await Post.findById(postId).exec();
+        const post = await Post.findById(postId, {
+            page: 1,
+            numberOfLikes: { $size: '$likes' },
+            isLiked: { $in: [req.user._id, '$likes'] },
+        }).exec();
+
         if (!post) {
             const error = new Error(`A post with post id ${postId} was not found`);
             error.status = 404;
@@ -290,18 +313,19 @@ export const likeUnlikePost = async (req, res, next) => {
             return next(error);
         }
 
-        const userLikedPost = post.likes.includes(pageId);
+        const postObj = post.toObject();
+
+        const userLikedPost = postObj.isLiked;
 
         if (userLikedPost) {
             // unlike post
             await Post.updateOne({ _id: postId }, { $pull: { likes: pageId } });
             await Page.updateOne({ _id: pageId }, { $pull: { likedPosts: postId } });
-            res.status(200).json({ success: true, msg: 'Post Unliked Successfully' });
+            res.status(200).json({ success: true, data: { numberOfLikes: postObj.numberOfLikes - 1 }, msg: 'Post Unliked Successfully' });
         } else {
             // like post
-            post.likes.push(pageId);
+            await Post.updateOne({ _id: postId }, { $push: { likes: pageId } });
             await Page.updateOne({ _id: pageId }, { $push: { likedPosts: postId } });
-            await post.save();
 
             const notification = new Notification({
                 from: pageId,
@@ -311,7 +335,7 @@ export const likeUnlikePost = async (req, res, next) => {
 
             await notification.save();
 
-            res.status(200).json({ success: true, msg: 'Post Liked Successfully' });
+            res.status(200).json({ success: true, data: { numberOfLikes: postObj.numberOfLikes + 1 }, msg: 'Post Liked Successfully' });
         }
     } catch (err) {
         console.log(`Error in likeUnlikePost : ${err}`);
