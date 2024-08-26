@@ -10,14 +10,13 @@ import NotificationPage from "./pages/notification/NotificationPage";
 import Loading from "./components/common/Loading";
 import { useEffect, useState } from "react";
 import ProfilePage from "./pages/profile/ProfilePage";
+import PostPage from "./pages/post/PostPage";
 
 function App() {
 	const [isdark, setIsdark] = useState(
 		JSON.parse(localStorage.getItem("isdark"))
 	);
 	useEffect(() => {
-		console.log("localstrg:",localStorage.getItem("isdark"));
-		
 		localStorage.setItem("isdark", JSON.stringify(isdark));
 		if (isdark) {
 			document.documentElement.setAttribute("data-theme", "black");
@@ -106,6 +105,10 @@ function App() {
 					<Route
 						path="/profile/:username"
 						element={authPage ? <ProfilePage /> : <Navigate to="/login" />}
+					/>
+					<Route
+						path="/post/:id"
+						element={authPage ? <PostPage /> : <Navigate to="/login" />}
 					/>
 				</Routes>
 				<Toaster />

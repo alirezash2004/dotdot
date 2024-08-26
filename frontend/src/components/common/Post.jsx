@@ -79,12 +79,23 @@ const Post = ({ post, postType = "" }) => {
 					throw new Error(error);
 				}
 			},
-			onSuccess: () => {
-				queryClient.invalidateQueries({ queryKey: ["posts"] });
+			onSuccess: (returnData) => {
+				// queryClient.invalidateQueries({ queryKey: ["posts"] });
+				queryClient.setQueryData(["posts"], (oldData) => {
+					return oldData.map((p) => {
+						if (p._id === post._id) {
+							return {
+								...oldData,
+								isLiked: !p.isLiked,
+								numberOfLikes: returnData.data.numberOfLikes,
+							};
+						}
+						return p;
+					});
+				});
 			},
 			onError: (error) => {
 				toast.error(error.message || "Failed To Like/Unlike Post!");
-				queryClient.invalidateQueries({ queryKey: ["posts"] });
 			},
 		});
 
@@ -122,7 +133,10 @@ const Post = ({ post, postType = "" }) => {
 
 	return postType === "pageProfile" ? (
 		<>
-			<Link to={`/post/${post?._id}`} className="flex w-full aspect-square border border-slate-800 group/post">
+			<Link
+				to={`/post/${post?._id}`}
+				className="flex w-full aspect-square border border-slate-800 group/post"
+			>
 				<img
 					src={postUrl}
 					alt=""
@@ -132,7 +146,7 @@ const Post = ({ post, postType = "" }) => {
 		</>
 	) : (
 		<>
-			<div className="flex flex-[6_6_0] mb-16 mx-4 md:mx-auto gap-2 flex-col items-start pb-4 border rounded-lg p-5 border-gray-700 ">
+			<div className="flex mb-16 mx-4 md:mx-auto gap-2 flex-col items-start pb-4 border rounded-lg p-5 border-gray-700 ">
 				<div className="flex w-full">
 					<div className="avatar">
 						<Link
@@ -192,7 +206,7 @@ const Post = ({ post, postType = "" }) => {
 						{caption}
 					</p>
 				</div>
-				<div className="flex justify-between w-full">
+				<div className="flex justify-between w-full mt-auto">
 					<div className="flex">
 						<div
 							className="flex gap-1 items-center cursor-pointer group"

@@ -51,16 +51,16 @@ const Posts = ({ pageUsername = "" }) => {
 		},
 	});
 
-	const queryClient = useQueryClient();
-	useEffect(() => {
-		setDisabledLoading(false);
-		setSkip(0);
-		setTotalPosts([]);
-		// refetch();
-		queryClient.invalidateQueries({ queryKey: ["posts"] });
-		// setIsLoadingNewPosts(true);
-		// }, [pageUsername, refetch]);
-	}, [pageUsername, queryClient]);
+	// const queryClient = useQueryClient();
+	// useEffect(() => {
+	// 	setDisabledLoading(false);
+	// 	setSkip(0);
+	// 	setTotalPosts([]);
+	// 	// refetch();
+	// 	queryClient.invalidateQueries({ queryKey: ["posts"] });
+	// 	// setIsLoadingNewPosts(true);
+	// 	// }, [pageUsername, refetch]);
+	// }, [pageUsername, queryClient]);
 
 	useEffect(() => {
 		if (disabledLoading) {

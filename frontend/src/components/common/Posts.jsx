@@ -41,7 +41,7 @@ const Posts = () => {
 				}
 
 				setIsLoadingNewPosts(false);
-				return data.posts;
+				return [...totalPosts, ...data.posts];
 			} catch (error) {
 				// toast.error(error.message);
 				throw new Error(error);
@@ -87,7 +87,7 @@ const Posts = () => {
 					totalPosts?.length === 0 && (
 						<p className="text-center my-4">OOPS! No Posts Found!</p>
 					)}
-				{!isLoading && posts && (
+				{!isLoading && totalPosts && (
 					<>
 						{totalPosts.map((post) => (
 							<Post key={post._id} post={post} />
