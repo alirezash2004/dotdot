@@ -12,7 +12,7 @@ export const getRecentPosts = async (req, res, next) => {
         const skip = parseInt(req.validatedData.skip) || 0;
 
         const commentStart = 0;
-        const commentCount = 2;
+        const commentCount = 100;
 
         const posts = await Post
             .find({
@@ -41,6 +41,7 @@ export const getRecentPosts = async (req, res, next) => {
                 isLiked: { $in: [req.user._id, '$likes'] },
                 assets: 1,
                 caption: 1,
+                createdAt: 1,
             })
             .populate({
                 path: 'page',
@@ -83,7 +84,7 @@ export const getPostByPostId = async (req, res, next) => {
         const postId = data.postId;
 
         const commentStart = 0;
-        const commentCount = 2;
+        const commentCount = 100;
 
         const isValidId = isValidObjectId(postId);
 
@@ -101,6 +102,7 @@ export const getPostByPostId = async (req, res, next) => {
             isLiked: { $in: [req.user._id, '$likes'] },
             assets: 1,
             caption: 1,
+            createdAt: 1,
         })
             .populate({
                 path: 'page',
@@ -372,7 +374,7 @@ export const commentOnPost = async (req, res, next) => {
             return next(error);
         }
 
-        const comment = { page: pageId, text };
+        const comment = { page: pageId, text, createdAt: Date.now() };
 
         post.comments.push(comment);
         await post.save();
@@ -385,7 +387,23 @@ export const commentOnPost = async (req, res, next) => {
 
         await notification.save();
 
-        return res.status(200).json({ success: true, postId: post._id });
+        return res.status(200).json({
+            success: true,
+            data: {
+                comment: {
+                    page: {
+                        _id: pageId,
+                        fullName: req.user.fullName,
+                        profilePicture: req.user.profilePicture,
+                        username: req.user.username
+                    },
+                    text: text,
+                    _id: post.comments[post.comments.length - 1].id,
+                    createdAt: comment.createdAt,
+                }
+            },
+            postId: post._id,
+        });
     } catch (err) {
         console.log(`Error in CommentOnPost : ${err}`);
         const error = new Error(`Internal Server Error`)

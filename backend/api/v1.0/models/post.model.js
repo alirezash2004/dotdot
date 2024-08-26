@@ -47,6 +47,10 @@ const PostSchema = new mongoose.Schema({
             text: {
                 type: mongoose.Schema.Types.String,
                 required: true
+            },
+            createdAt: {
+                type: mongoose.Schema.Types.Date,
+                required: true,
             }
         }
     ],
