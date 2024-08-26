@@ -13,17 +13,17 @@ import ProfilePage from "./pages/profile/ProfilePage";
 import PostPage from "./pages/post/PostPage";
 
 function App() {
-	const [isdark, setIsdark] = useState(
-		JSON.parse(localStorage.getItem("isdark"))
+	const [islight, setIslight] = useState(
+		JSON.parse(localStorage.getItem("islight"))
 	);
 	useEffect(() => {
-		localStorage.setItem("isdark", JSON.stringify(isdark));
-		if (isdark) {
-			document.documentElement.setAttribute("data-theme", "black");
-		} else {
+		localStorage.setItem("islight", JSON.stringify(islight));
+		if (islight) {
 			document.documentElement.setAttribute("data-theme", "light");
+		} else {
+			document.documentElement.setAttribute("data-theme", "black");
 		}
-	}, [isdark]);
+	}, [islight]);
 
 	const { data: authPage, isLoading } = useQuery({
 		queryKey: ["authPage"],
@@ -61,7 +61,7 @@ function App() {
 					<input
 						type="checkbox"
 						className="theme-controller"
-						onChange={() => setIsdark((prevData) => !prevData)}
+						onChange={() => setIslight((prevData) => !prevData)}
 					/>
 
 					{/* sun icon */}
