@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import Loading from "../../components/common/Loading";
 
@@ -10,44 +11,83 @@ import {
 	CiTrash,
 	CiUser,
 } from "react-icons/ci";
+import toast from "react-hot-toast";
 
 const NotificationPage = () => {
 	//  TODO: add go to post for comments
-	const isLoading = false;
 
-	// tmp mock data:
-	const notifications = [
-		{
-			_id: "1",
-			from: {
-				_id: "1",
-				username: "johndoesssssssssss",
-				profileImg: "https://avatar.iran.liara.run/public/boy",
-			},
-			type: "follow",
+	const queryClient = useQueryClient();
+
+	const { data: notifications, isPending: isNotificationsPending } = useQuery({
+		queryKey: ["notifications"],
+		queryFn: async () => {
+			try {
+				const res = await fetch("/api/v1.0/notifications");
+				const data = await res.json();
+
+				if (!res.ok || data.success === false)
+					throw new Error(data.msg || "Failed To Fetch Notifs");
+
+				return data.notifications;
+			} catch (error) {
+				throw new Error(error);
+			}
 		},
-		{
-			_id: "2",
-			from: {
-				_id: "2",
-				username: "janedoe",
-				profileImg: "https://avatar.iran.liara.run/public/girl",
-			},
-			type: "like",
+	});
+
+	const {
+		mutate: deleteAllNotifications,
+		isPending: isDeleteAllNotifsPending,
+	} = useMutation({
+		mutationFn: async () => {
+			const res = await fetch(`/api/v1.0/notifications/`, {
+				method: "DELETE",
+			});
+			const data = await res.json();
+
+			if (!res.ok || data.success === false)
+				throw new Error(data.msg || "Failed To Fetch Notifs");
+
+			return data;
 		},
-		{
-			_id: "3",
-			from: {
-				_id: "3",
-				username: "janedoe",
-				profileImg: "https://avatar.iran.liara.run/public",
-			},
-			type: "comment",
+		onSuccess: () => {
+			toast.success("all notifications deleted successfully");
+			queryClient.invalidateQueries({ queryKey: ["notifications"] });
 		},
-	];
+		onError: (error) => {
+			toast.error(error.message);
+		},
+	});
+
+	const { mutate: deleteNotification, isPending: isDeleteNotifPending } =
+		useMutation({
+			mutationFn: async (notifId) => {
+				const res = await fetch(`/api/v1.0/notifications/${notifId}`, {
+					method: "DELETE",
+				});
+				const data = await res.json();
+
+				if (!res.ok || data.success === false)
+					throw new Error(data.msg || "Failed To Fetch Notifs");
+
+				return notifId;
+			},
+			onSuccess: (notifId) => {
+				toast.success("notification deleted successfully");
+				queryClient.setQueryData(["notifications"], (oldData) => {
+					return oldData.filter((notif) => {
+						return notif._id !== notifId;
+					});
+				});
+			},
+			onError: (error) => {
+				toast.error(error.message);
+			},
+		});
 
 	const deleteNotifications = () => {
-		alert("All notifs deleted");
+		if (isDeleteAllNotifsPending) return;
+		deleteAllNotifications();
 	};
 
 	return (
@@ -68,12 +108,14 @@ const NotificationPage = () => {
 							className="dropdown-content menu bg-base-100 rounded-box z-[1] w-52 p-2 shadow"
 						>
 							<li>
-								<a onClick={deleteNotifications}>Delete all notifications</a>
+								<a onClick={() => deleteNotifications()}>
+									Delete all notifications
+								</a>
 							</li>
 						</ul>
 					</div>
 				</div>
-				{isLoading && (
+				{isNotificationsPending && (
 					<div className="flex justify-center h-full items-center">
 						<Loading size="lg" />
 					</div>
@@ -120,9 +162,23 @@ const NotificationPage = () => {
 								</div>
 							</Link>
 							{/* TODO: handle signle notification delete */}
-							<button className="btn ml-auto text-2xl flex">
-								<CiTrash />
-								<span className="hidden md:block text-sm">Delete</span>
+							<button
+								className={`btn ml-auto text-2xl flex ${
+									isDeleteNotifPending || isDeleteAllNotifsPending
+										? "btn-disabled"
+										: ""
+								}`}
+								onClick={() => deleteNotification(notification._id)}
+							>
+								{(isDeleteNotifPending || isDeleteAllNotifsPending) && (
+									<Loading size="sm" />
+								)}
+								{!(isDeleteNotifPending || isDeleteAllNotifsPending) && (
+									<>
+										<CiTrash />
+										<span className="hidden md:block text-sm">Delete</span>
+									</>
+								)}
 							</button>
 						</div>
 					</div>
