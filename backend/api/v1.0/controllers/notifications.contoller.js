@@ -39,7 +39,7 @@ export const deleteNotifications = async (req, res, next) => {
 export const deleteNotification = async (req, res, next) => {
     try {
         const pageId = req.user._id.toString();
-        const notificationId = req.validatedData;
+        const notificationId = req.validatedData.notificationId;
 
         const notification = await Notification.findById(notificationId);
 
