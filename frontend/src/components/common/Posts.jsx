@@ -87,9 +87,9 @@ const Posts = () => {
 					totalPosts?.length === 0 && (
 						<p className="text-center my-4">OOPS! No Posts Found!</p>
 					)}
-				{!isLoading && totalPosts && (
+				{!isLoading && posts && (
 					<>
-						{totalPosts.map((post) => (
+						{posts.map((post) => (
 							<Post key={post._id} post={post} />
 						))}
 					</>

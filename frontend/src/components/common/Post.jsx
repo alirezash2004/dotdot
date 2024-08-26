@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import toast from "react-hot-toast";
 import { LazyLoadImage } from "react-lazy-load-image-component";
@@ -14,10 +14,20 @@ import {
 	CiLocationArrow1,
 	CiTrash,
 } from "react-icons/ci";
+import { formatDate } from "../../utils/date";
 
 const Post = ({ post, postType = "" }) => {
+	const commentBox = useRef(null);
+	const [showFullCaption, setShowFullCaption] = useState(false);
+	const [comment, setComment] = useState("");
+	const postSender = post.page;
+	const [isLiked, setIsLiked] = useState(post.isLiked);
+	const [numberOfLikes, setNumberOfLikes] = useState(post.numberOfLikes);
+
 	const { data: authPage } = useQuery({ queryKey: ["authPage"] });
+
 	const queryClient = useQueryClient();
+
 	const { mutate: deletePost, isPending: isDeletePending } = useMutation({
 		mutationFn: async () => {
 			try {
@@ -43,15 +53,6 @@ const Post = ({ post, postType = "" }) => {
 			queryClient.invalidateQueries({ queryKey: ["posts"] });
 		},
 	});
-
-	const [showFullCaption, setShowFullCaption] = useState(false);
-
-	const [comment, setComment] = useState("");
-
-	const postSender = post.page;
-
-	const [isLiked, setIsLiked] = useState(post.isLiked);
-	const [numberOfLikes, setNumberOfLikes] = useState(post.numberOfLikes);
 
 	const { mutate: likeUnlikePost, isPending: isLikeUnlikePending } =
 		useMutation({
@@ -85,7 +86,7 @@ const Post = ({ post, postType = "" }) => {
 					return oldData.map((p) => {
 						if (p._id === post._id) {
 							return {
-								...oldData,
+								...p,
 								isLiked: !p.isLiked,
 								numberOfLikes: returnData.data.numberOfLikes,
 							};
@@ -99,27 +100,93 @@ const Post = ({ post, postType = "" }) => {
 			},
 		});
 
+	const { mutate: commentOnPost, isPending: isCommentPending } = useMutation({
+		mutationFn: async () => {
+			try {
+				const res = await fetch(`/api/v1.0/posts/comment/${post._id}`, {
+					method: "POST",
+					headers: {
+						"Content-Type": "application/json",
+					},
+					body: JSON.stringify({ text: comment }),
+				});
+				const data = await res.json();
+
+				if (!res.ok || data.success === false)
+					throw new Error(data.msg || "Failed To Comment On This Post");
+
+				return data.data.comment;
+			} catch (error) {
+				throw new Error(error);
+			}
+		},
+		onSuccess: (returnData) => {
+			// console.log(returnData);
+			toast.success("Commented On Post Successfully");
+			setComment("");
+			document.querySelector("#commentInp").value = "";
+
+			if (postType !== "single") {
+				queryClient.setQueryData(["posts"], (oldData) => {
+					return oldData.map((p) => {
+						if (p._id === post._id) {
+							// console.log(p);
+
+							return {
+								...p,
+								comments: [...p.comments, returnData],
+							};
+						}
+						return p;
+					});
+				});
+			} else {
+				post.comments.push(returnData);
+			}
+
+			setTimeout(() => {
+				let comments = commentBox.current.children;
+
+				comments[comments.length - 1].scrollIntoView({
+					behavior: "smooth",
+					block: "end",
+				});
+			}, 100);
+		},
+		onError: (error) => {
+			toast.error(error.message);
+		},
+	});
+
 	const isMyPost = authPage._id === post.page?._id;
 
-	const formattedDate = "1h";
-
-	const isCommenting = false;
+	const formattedDate = formatDate(post.createdAt);
 
 	const handleDeletePost = () => {
 		deletePost();
 	};
 
-	// TODO: add functionality to comments
+	// TODO: add ability to delete self comments
 	const handlePostComment = (e) => {
 		e.preventDefault();
+		if (isCommentPending) return;
+		commentOnPost();
 	};
 
 	const handleLikePost = () => {
+		if (isLikeUnlikePending) return;
 		likeUnlikePost();
 	};
 
+	// TODO: add share post
+	const handleSharePost = () => {
+		toast.error("Sorry, sharing posts are not available yet");
+		// sharePost();
+	};
+
+	// TODO: add save post
 	const handleSavePost = () => {
-		console.log("save/unsave post");
+		toast.error("Sorry, saving posts are not available yet");
 		// saveUnsavePost();
 	};
 
@@ -240,7 +307,10 @@ const Post = ({ post, postType = "" }) => {
 							</span>
 						</div>
 						<div className="flex gap-1 items-center cursor-pointer group">
-							<CiLocationArrow1 className="w-6 h-6  text-slate-500 group-hover:text-red-400" />
+							<CiLocationArrow1
+								onClick={handleSharePost}
+								className="w-6 h-6  text-slate-500 group-hover:text-red-400"
+							/>
 						</div>
 					</div>
 					<div className="flex gap-1 items-center cursor-pointer group">
@@ -255,7 +325,10 @@ const Post = ({ post, postType = "" }) => {
 					>
 						<div className="modal-box rounded border border-gray-600">
 							<h3 className="font-bold text-lg mb-4">COMMENTS</h3>
-							<div className="flex flex-col gap-3 max-h-60 overflow-auto">
+							<div
+								ref={commentBox}
+								className="flex flex-col gap-3 max-h-60 overflow-auto"
+							>
 								{post?.comments.length === 0 && (
 									<p className="text-sm text-slate-500">
 										No comments yet! Write First Comment
@@ -267,7 +340,7 @@ const Post = ({ post, postType = "" }) => {
 											<div className="w-8 rounded-full">
 												<img
 													src={
-														comment.user.profilePicture ||
+														comment.page.profilePicture ||
 														"/avatar-placeholder.png"
 													}
 												/>
@@ -276,10 +349,13 @@ const Post = ({ post, postType = "" }) => {
 										<div className="flex flex-col">
 											<div className="flex items-center gap-1">
 												<span className="font-bold">
-													{comment.user.fullName}
+													{comment.page.fullName}
 												</span>
 												<span className="text-gray-700 text-sm">
-													@{comment.user.username}
+													@{comment.page.username}
+												</span>
+												<span className="text-gray-700 text-sm">
+													· {formatDate(comment.createdAt)}
 												</span>
 											</div>
 											<div className="text-sm">{comment.text}</div>
@@ -295,11 +371,17 @@ const Post = ({ post, postType = "" }) => {
 									className="textarea w-full p-2 rounded text-md resize-none border focus:outline-none  border-gray-800"
 									placeholder="Add a comment..."
 									value={comment}
+									id="commentInp"
+									name="commentInp"
 									onChange={(e) => setComment(e.target.value)}
 								/>
-								<button className="btn btn-secondary rounded btn-sm text-white min-h-20">
-									{isCommenting ? (
-										<span className="loading loading-spinner loading-md"></span>
+								<button
+									className={`btn btn-secondary rounded btn-sm text-white min-h-20 ${
+										isCommentPending ? "btn-disabled" : ""
+									}`}
+								>
+									{isCommentPending ? (
+										<Loading size="sm" />
 									) : (
 										<CiLocationArrow1 className="text-2xl" />
 									)}
