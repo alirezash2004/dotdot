@@ -1,10 +1,12 @@
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useEffect, useRef, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+
+import { CiCirclePlus } from "react-icons/ci";
+
+import ProfilePostsSkeleton from "../../components/skeletons/ProfilePostsSkeleton";
+import Loading from "../../components/common/Loading";
 
 import Post from "../../components/common/Post";
-import { CiCirclePlus } from "react-icons/ci";
-import { useEffect, useRef, useState } from "react";
-import Loading from "../../components/common/Loading";
-import ProfilePostsSkeleton from "../../components/skeletons/ProfilePostsSkeleton";
 
 const Posts = ({ pageUsername = "" }) => {
 	const [skip, setSkip] = useState(0);

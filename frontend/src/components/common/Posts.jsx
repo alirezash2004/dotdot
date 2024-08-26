@@ -1,9 +1,9 @@
+import { useEffect, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 
 import Post from "./Post";
 import PostSkeleton from "../skeletons/PostSkeleton";
 import { CiCirclePlus } from "react-icons/ci";
-import { useEffect, useRef, useState } from "react";
 import Loading from "./Loading";
 
 const Posts = () => {

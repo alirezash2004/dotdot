@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import toast from "react-hot-toast";
 
 import Loading from "../../components/common/Loading";
 
@@ -11,7 +12,6 @@ import {
 	CiTrash,
 	CiUser,
 } from "react-icons/ci";
-import toast from "react-hot-toast";
 
 const NotificationPage = () => {
 	//  TODO: add go to post for comments

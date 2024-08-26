@@ -1,11 +1,16 @@
 import { useParams } from "react-router-dom";
-import { CiEdit, CiLock } from "react-icons/ci";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import Loading from "../../components/common/Loading";
 import toast from "react-hot-toast";
-import ProfileTopSkeleton from "../../components/skeletons/ProfileTopSkeleton";
+
 import { useUsername } from "../../components/Hooks/useUsername";
 import { usePageProfile } from "../../components/Hooks/usePageProfile";
+
+import { CiEdit, CiLock } from "react-icons/ci";
+
+import ProfileTopSkeleton from "../../components/skeletons/ProfileTopSkeleton";
+
+import Loading from "../../components/common/Loading";
+
 import Posts from "./ProfilePosts";
 
 const ProfilePage = () => {

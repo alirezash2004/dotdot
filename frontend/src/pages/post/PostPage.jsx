@@ -1,9 +1,10 @@
-import { useQuery } from "@tanstack/react-query";
-import { useParams } from "react-router-dom";
-import Post from "../../components/common/Post";
 import { useState } from "react";
-import PostSkeleton from "../../components/skeletons/PostSkeleton";
+import { useParams } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
 import toast from "react-hot-toast";
+
+import Post from "../../components/common/Post";
+import PostSkeleton from "../../components/skeletons/PostSkeleton";
 
 const PostPage = () => {
 	let { id: postId } = useParams();
