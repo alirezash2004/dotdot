@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import toast from "react-hot-toast";
+import { useQuery } from "@tanstack/react-query";
 
 import DotDotLogo from "../../components/imgs/DotDot";
 
@@ -12,6 +11,8 @@ import {
 	CiLogout,
 	CiUser,
 } from "react-icons/ci";
+import { useLogout } from "../Hooks/useLogout";
+import Loading from "./Loading";
 
 const Sidebar = () => {
 	const [islight, setIslight] = useState(
@@ -26,42 +27,17 @@ const Sidebar = () => {
 		}
 	}, [islight]);
 
-	const queryClient = useQueryClient();
-
-	const { mutate: logoutMutation } = useMutation({
-		mutationFn: async () => {
-			try {
-				const res = await fetch("/api/v1.0/auth/logout", {
-					method: "POST",
-				});
-
-				const data = await res.json();
-
-				if (!res.ok || data.success === false)
-					throw new Error(data.msg || "Failed To Logout");
-			} catch (error) {
-				toast.error(error.message, { duration: 6000 });
-				throw error;
-			}
-		},
-		onSuccess: () => {
-			toast.success("Logout Successfully");
-			queryClient.invalidateQueries({ queryKey: ["authPage"] });
-		},
-		onError: () => {
-			toast.error("Logout Failed!");
-		},
-	});
+	const { logout, isLoggingOut, loggedOut } = useLogout();
 
 	const { data: authPage } = useQuery({ queryKey: ["authPage"] });
 
 	return (
-		<div className="md:flex-[2_2_0] w-18 max-w-52">
-			<div className="sticky top-0 left-0 h-screen flex flex-col border-r border-gray-700 w-20 md:w-full">
-				<Link to="/" className="flex justify-center md:justify-start mt-2">
+		<div className="md:flex-[2_2_0] md:w-18 md:max-w-52">
+			<div className="fixed backdrop-blur-md backdrop-hue-rotate-30 mt-auto w-full bottom-0 left-0 flex flex-row border-t border-gray-700 z-50 justify-between px-2 md:w-full md:sticky md:top-0 md:bottom-auto md:h-screen md:flex-col md:border-r md:border-t-0 md:backdrop-filter-none">
+				<Link to="/" className="hidden md:flex justify-start md:mt-2">
 					<DotDotLogo className="px-2 w-16 hover:bg-stone-600 rounded" />
 				</Link>
-				<ul className="flex flex-col gap-6 mt-10">
+				<ul className="flex flex-row gap-6 w-full justify-around my-3 md:flex-col md:mt-10 md:mb-0 md:justify-start">
 					<li className="flex justify-center md:justify-start">
 						<Link
 							to="/"
@@ -139,7 +115,7 @@ const Sidebar = () => {
 				{authPage && (
 					<Link
 						to={`/profile/${authPage.username}`}
-						className="mt-auto mb-10 flex gap-2 items-start transition-all duration-300 hover:bg-slate-700 py-2 rounded-full px-3"
+						className="md:flex gap-2 items-center transition-all duration-300 hover:bg-slate-700 py-2 rounded-full px-3 justify-center hidden md:mt-auto"
 					>
 						<div className="avatar hidden md:inline-flex">
 							<div className="w-8 rounded-full">
@@ -158,13 +134,19 @@ const Sidebar = () => {
 								</p>
 								<p className="text-slate-500 text-sm">@{authPage?.username}</p>
 							</div>
-							<CiLogout
-								className="w-9 h-9 p-1 cursor-pointer md:mr-2 md:ml-6 mx-auto mt-auto mb-auto border border-spacing-16 rounded-full border-slate-50 hover:bg-slate-50 hover:fill-black transition-all duration-300"
-								onClick={(e) => {
-									e.preventDefault();
-									logoutMutation();
-								}}
-							/>
+							{/* TODO: add a dialog for sign out */}
+							{(isLoggingOut || loggedOut) && (
+								<Loading className="w-9 h-9 p-1 cursor-pointer md:mr-2 md:ml-6 mx-auto mt-auto mb-auto border border-spacing-16 rounded-full border-slate-50 hover:bg-slate-50 hover:fill-black transition-all duration-300" />
+							)}
+							{!isLoggingOut && !loggedOut && (
+								<CiLogout
+									className="w-9 h-9 p-1 cursor-pointer md:mr-2 md:ml-6 mx-auto mt-auto mb-auto border border-spacing-16 rounded-full border-slate-50 hover:bg-slate-50 hover:fill-black transition-all duration-300"
+									onClick={(e) => {
+										e.preventDefault();
+										logout();
+									}}
+								/>
+							)}
 						</div>
 					</Link>
 				)}

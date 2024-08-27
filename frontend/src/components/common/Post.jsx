@@ -253,21 +253,12 @@ const Post = ({ post, postType = "" }) => {
 					{post.assets.length > 0 && (
 						<LazyLoadImage
 							effect="blur"
-							wrapperProps={{
-								style: { transitionDelay: "1s" },
-							}}
 							src={postUrl}
-							className="w-60 h-60 md:w-96 md:h-96 rounded-lg mx-auto object-cover"
-							visibleByDefault={postUrl === "/dotdot-colored.png"}
+							className="md:w-96 rounded-lg mx-auto object-cover"
 						/>
-						// 	<img
-						// 		src={postUrl}
-						// 		className="w-60 h-60 md:w-96 md:h-96 rounded-lg mx-auto object-cover"
-						// 		alt=""
-						// 	/>
 					)}
 					<p
-						className="my-3 cursor-pointer px-2 w-60 md:w-96"
+						className="my-3 cursor-pointer px-2 md:w-96"
 						onClick={() => setShowFullCaption((prevState) => !prevState)}
 					>
 						{caption}
@@ -323,7 +314,7 @@ const Post = ({ post, postType = "" }) => {
 						id={`comments_modal_${post._id}`}
 						className="modal border-none outline-none"
 					>
-						<div className="modal-box rounded border border-gray-600">
+						<div className="modal-box rounded border border-gray-700">
 							<h3 className="font-bold text-lg mb-4">COMMENTS</h3>
 							<div
 								ref={commentBox}

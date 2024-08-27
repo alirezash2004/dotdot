@@ -4,8 +4,9 @@ import toast from "react-hot-toast";
 
 import { useUsername } from "../../components/Hooks/useUsername";
 import { usePageProfile } from "../../components/Hooks/usePageProfile";
+import { useLogout } from "../../components/Hooks/useLogout";
 
-import { CiEdit, CiLock } from "react-icons/ci";
+import { CiEdit, CiLock, CiLogout } from "react-icons/ci";
 
 import ProfileTopSkeleton from "../../components/skeletons/ProfileTopSkeleton";
 
@@ -15,6 +16,8 @@ import Posts from "./ProfilePosts";
 
 const ProfilePage = () => {
 	let { username: paramUsername } = useParams();
+
+	const { logout, isLoggingOut, loggedOut } = useLogout();
 
 	const { data: authPage } = useQuery({ queryKey: ["authPage"] });
 
@@ -96,7 +99,26 @@ const ProfilePage = () => {
 	// console.log(authPage);
 
 	return (
-		<div className="flex-[4_4_0] border-r border-gray-700 min-h-screen">
+		<div className="flex-[4_4_0] border-r border-gray-700 min-h-screen relative">
+			{isMyProfile && (
+				<div
+					className={`absolute h-fit top-0 right-0 md:hidden p-1 cursor-pointer md:mr-2 md:ml-6 border border-spacing-16 rounded-none border-l-slate-600 border-b-slate-600 hover:bg-slate-600 hover:fill-black transition-all duration-300 flex items-center justify-center btn ${
+						isLoggingOut || loggedOut ? "btn-disabled" : ""
+					}`}
+					onClick={(e) => {
+						e.preventDefault();
+						logout();
+					}}
+				>
+					{(isLoggingOut || loggedOut) && <Loading className="w-full h-full" />}
+					{!isLoggingOut && !loggedOut && (
+						<div className="flex items-center gap-2 px-3">
+							<CiLogout className="text-2xl" />
+							<span>Logout</span>
+						</div>
+					)}
+				</div>
+			)}
 			<div className="pb-7 border-b border-gray-700">
 				{isPageProfileFetching && !isMyProfile && <ProfileTopSkeleton />}
 
@@ -218,7 +240,8 @@ const ProfilePage = () => {
 					</>
 				)}
 			</div>
-			{isMyProfile && <Posts pageUsername={paramUsername} />} {/* Fucking 3 days for this */}
+			{isMyProfile && <Posts pageUsername={paramUsername} />}{" "}
+			{/* Fucking 3 days for this */}
 			{!isMyProfile && (
 				<>
 					{targetPage?.pageType === "private" &&

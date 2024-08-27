@@ -87,6 +87,10 @@ const NotificationPage = () => {
 
 	const deleteNotifications = () => {
 		if (isDeleteAllNotifsPending) return;
+		if (!notifications || notifications?.length === 0) {
+			toast.error("notification list is empty");
+			return;
+		}
 		deleteAllNotifications();
 	};
 

@@ -73,7 +73,6 @@ const Posts = ({ pageUsername = "" }) => {
 			(entries) => {
 				if (entries[0].isIntersecting) {
 					// fetchData();
-					console.log("b");
 
 					refetch();
 				}
