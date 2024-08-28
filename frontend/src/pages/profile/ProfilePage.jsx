@@ -99,7 +99,7 @@ const ProfilePage = () => {
 	// console.log(authPage);
 
 	return (
-		<div className="flex-[4_4_0] border-r border-gray-700 min-h-screen relative">
+		<div className="flex-[4_4_0] border-r border-gray-700 min-h-screen relative mb-20">
 			{isMyProfile && (
 				<div
 					className={`absolute h-fit top-0 right-0 md:hidden p-1 cursor-pointer md:mr-2 md:ml-6 border border-spacing-16 rounded-none border-l-slate-600 border-b-slate-600 hover:bg-slate-600 hover:fill-black transition-all duration-300 flex items-center justify-center btn ${

@@ -82,18 +82,21 @@ const Post = ({ post, postType = "" }) => {
 			},
 			onSuccess: (returnData) => {
 				// queryClient.invalidateQueries({ queryKey: ["posts"] });
-				queryClient.setQueryData(["posts"], (oldData) => {
-					return oldData.map((p) => {
-						if (p._id === post._id) {
-							return {
-								...p,
-								isLiked: !p.isLiked,
-								numberOfLikes: returnData.data.numberOfLikes,
-							};
-						}
-						return p;
+
+				if (postType !== "single") {
+					queryClient.setQueryData(["posts"], (oldData) => {
+						return oldData.map((p) => {
+							if (p._id === post._id) {
+								return {
+									...p,
+									isLiked: !p.isLiked,
+									numberOfLikes: returnData.data.numberOfLikes,
+								};
+							}
+							return p;
+						});
 					});
-				});
+				}
 			},
 			onError: (error) => {
 				toast.error(error.message || "Failed To Like/Unlike Post!");
@@ -190,10 +193,15 @@ const Post = ({ post, postType = "" }) => {
 		// saveUnsavePost();
 	};
 
-	let caption =
-		!showFullCaption && post.caption.length > 90
-			? post.caption.substring(0, 90) + "..."
-			: post.caption;
+	let caption;
+	if (post.caption) {
+		caption =
+			!showFullCaption && post.caption.length > 90
+				? post.caption.substring(0, 90) + "..."
+				: post.caption;
+	} else {
+		caption = "";
+	}
 
 	// TODO: fix localhost addressing on postmedia urls on backend
 	const postUrl = post.assets[0].url.replace("localhost", "10.61.18.11");
@@ -207,7 +215,7 @@ const Post = ({ post, postType = "" }) => {
 				<img
 					src={postUrl}
 					alt=""
-					className="w-full object-cover opacity-60 group-hover/post:opacity-100 transition-all duration-200"
+					className="w-full object-cover opacity-80 group-hover/post:opacity-100 transition-all duration-200"
 				/>
 			</Link>
 		</>

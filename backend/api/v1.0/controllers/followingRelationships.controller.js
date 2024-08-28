@@ -2,6 +2,7 @@ import { isValidObjectId } from 'mongoose';
 
 import Page from '../models/page.model.js';
 import FollowingRelationship from '../models/followingRelationship.model.js';
+import Notification from '../models/notification.model.js';
 
 const validatePageIds = (pageIds, currentPageId) => {
     if (pageIds[0].objectId !== currentPageId && pageIds[1].objectId !== currentPageId) {
@@ -109,10 +110,18 @@ export const newFollowing = async (req, res, next) => {
 
         const followingRelationship = new FollowingRelationship(followingRelationshipData);
 
+        await followingRelationship.save();
+
+        const notification = new Notification({
+            from: pageId,
+            to: followedPageId,
+            type: 'follow',
+        });
+
         await Promise.all([
-            followingRelationship.save(),
             Page.findByIdAndUpdate(pageId, { $inc: { followingCount: 1 } }).exec(),
-            Page.findByIdAndUpdate(followedPageId, { $inc: { followersCount: 1 } }).exec()
+            Page.findByIdAndUpdate(followedPageId, { $inc: { followersCount: 1 } }).exec(),
+            notification.save(),
         ])
 
         return res.status(200).json({ success: true });

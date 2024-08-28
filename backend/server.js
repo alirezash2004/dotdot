@@ -18,8 +18,8 @@ const PORT = process.env.PORT || 8000;
 // create app
 const app = express();
 
-app.use(express.json()) // for parsing application/json
-app.use(express.urlencoded({ extended: true })) // for parsing application/x-www-form-urlencoded
+app.use(express.json({ limit: '14mb' })) // for parsing application/json
+app.use(express.urlencoded({ extended: true, limit: '14mb' })) // for parsing application/x-www-form-urlencoded
 app.use(cookieParser(process.env.COOKIE_SECRET)) // request.cookies
 app.use(session({
     secret: process.env.SESSION_SECRET,

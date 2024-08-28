@@ -38,7 +38,7 @@ const Posts = ({ pageUsername = "" }) => {
 					throw new Error(data.msg || "Failed To Fetch Posts!");
 
 				setTotalPosts((prevData) => [...prevData, ...data.posts]);
-				setSkip((prevData) => prevData + 10);
+				setSkip((prevData) => prevData + 6);
 
 				if (data.posts.length === 0) {
 					setDisabledLoading(true);

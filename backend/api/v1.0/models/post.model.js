@@ -16,7 +16,7 @@ const PostSchema = new mongoose.Schema({
     },
     caption: {
         type: mongoose.Schema.Types.String,
-        required: true,
+        default: ""
     },
     assets: [
         {

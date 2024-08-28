@@ -12,6 +12,7 @@ import HomePage from "./pages/home/HomePage";
 import NotificationPage from "./pages/notification/NotificationPage";
 import ProfilePage from "./pages/profile/ProfilePage";
 import PostPage from "./pages/post/PostPage";
+import NewpostPage from "./pages/newpost/NewpostPage";
 
 function App() {
 	if (JSON.parse(localStorage.getItem("islight"))) {
@@ -76,6 +77,10 @@ function App() {
 					<Route
 						path="/post/:id"
 						element={authPage ? <PostPage /> : <Navigate to="/login" />}
+					/>
+					<Route
+						path="/newpost"
+						element={authPage ? <NewpostPage /> : <Navigate to="/login" />}
 					/>
 				</Routes>
 				<Toaster />

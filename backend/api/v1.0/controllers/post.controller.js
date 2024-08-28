@@ -196,7 +196,7 @@ export const getPagePosts = async (req, res, next) => {
             .find({ page: targetPage._id })
             .select('assetType type caption assets')
             .skip(skip)
-            .limit(10)
+            .limit(6)
             .sort({ createdAt: -1 })
             .exec();
 
@@ -261,8 +261,9 @@ export const newPost = async (req, res, next) => {
                 newPost.assets.push({ url: media.url });
             }
 
+            await newPost.save();
+
             await Promise.all([
-                newPost.save(),
                 TmpFiles.deleteMany({ pageId: pageId }).exec(),
                 Page.findByIdAndUpdate(pageId, { $inc: { postsCount: 1 } }).exec(),
             ])

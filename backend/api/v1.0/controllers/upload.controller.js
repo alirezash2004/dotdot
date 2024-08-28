@@ -32,8 +32,13 @@ const uploadSingleImage = multer({
     },
 }).single('postImage');
 
-export const singleImageUpload = (req, res, next) => {
+export const singleImageUpload = async (req, res, next) => {
     const pageId = req.user._id.toString();
+    const tmpfilesCount = await TmpFiles.countDocuments({ pageId: pageId });
+    if (tmpfilesCount >= 3) {
+        await TmpFiles.deleteOne({ pageId }).sort({ createdAt: -1 })
+    }
+
     uploadSingleImage(req, res, async (err) => {
         // console.log(req.body);
         if (err instanceof multer.MulterError) {
