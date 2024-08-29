@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRef, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import { LazyLoadImage } from "react-lazy-load-image-component";
 import "react-lazy-load-image-component/src/effects/blur.css";
@@ -27,6 +27,8 @@ const Post = ({ post, postType = "" }) => {
 
 	const { data: authPage } = useQuery({ queryKey: ["authPage"] });
 
+	const navigate = useNavigate();
+
 	const queryClient = useQueryClient();
 
 	const { mutate: deletePost, isPending: isDeletePending } = useMutation({
@@ -48,6 +50,7 @@ const Post = ({ post, postType = "" }) => {
 		onSuccess: () => {
 			toast.success("Post Deleted Successfully");
 			queryClient.invalidateQueries({ queryKey: ["posts"] });
+			navigate(`/profile/${postSender.username}`);
 		},
 		onError: (error) => {
 			toast.error(error.message || "Failed To Delete Post!");
