@@ -22,6 +22,7 @@ const Post = ({ post, postType = "" }) => {
 	const [comment, setComment] = useState("");
 	const postSender = post.page;
 	const [isLiked, setIsLiked] = useState(post.isLiked);
+	const [isSaved, setIsSaved] = useState(post.isSaved);
 	const [numberOfLikes, setNumberOfLikes] = useState(post.numberOfLikes);
 
 	const { data: authPage } = useQuery({ queryKey: ["authPage"] });
@@ -66,21 +67,19 @@ const Post = ({ post, postType = "" }) => {
 					if (!res.ok || data.success === false)
 						throw new Error(data.msg || "Failed To Like/Unlike");
 
-					if (!isLiked) {
-						setNumberOfLikes((prevState) => prevState + 1);
-					} else {
-						setNumberOfLikes((prevState) =>
-							prevState > 1 ? prevState - 1 : 0
-						);
-					}
-					setIsLiked((prevState) => !prevState);
-
 					return data;
 				} catch (error) {
 					throw new Error(error);
 				}
 			},
 			onSuccess: (returnData) => {
+				if (!isLiked) {
+					setNumberOfLikes((prevState) => prevState + 1);
+				} else {
+					setNumberOfLikes((prevState) => (prevState > 1 ? prevState - 1 : 0));
+				}
+				setIsLiked((prevState) => !prevState);
+
 				// queryClient.invalidateQueries({ queryKey: ["posts"] });
 
 				if (postType !== "single") {
@@ -161,6 +160,28 @@ const Post = ({ post, postType = "" }) => {
 		},
 	});
 
+	const { mutate: saveUnsavePost, isPending: isSaveUnsavePending } =
+		useMutation({
+			mutationFn: async () => {
+				const res = await fetch(`/api/v1.0/posts/save/${post._id}`, {
+					method: "POST",
+				});
+				const data = await res.json();
+
+				if (!res.ok || data.success === false)
+					throw new Error(data.msg || "Failed To Save/Unsave post");
+
+				// TODO: return saved status (for synching problems)
+				return data;
+			},
+			onSuccess: () => {
+				setIsSaved((prevState) => !prevState);
+			},
+			onError: (error) => {
+				toast.error(error.message);
+			},
+		});
+
 	const isMyPost = authPage._id === post.page?._id;
 
 	const formattedDate = formatDate(post.createdAt);
@@ -189,8 +210,8 @@ const Post = ({ post, postType = "" }) => {
 
 	// TODO: add save post
 	const handleSavePost = () => {
-		toast.error("Sorry, saving posts are not available yet");
-		// saveUnsavePost();
+		if (isSaveUnsavePending) return;
+		saveUnsavePost();
 	};
 
 	let caption;
@@ -313,10 +334,15 @@ const Post = ({ post, postType = "" }) => {
 						</div>
 					</div>
 					<div className="flex gap-1 items-center cursor-pointer group">
-						<CiBookmark
-							onClick={handleSavePost}
-							className="w-6 h-6  text-slate-500 group-hover:text-gray-400"
-						/>
+						{!isSaveUnsavePending && (
+							<CiBookmark
+								onClick={handleSavePost}
+								className={`w-6 h-6 group-hover:text-gray-400 ${
+									isSaved ? "text-cyan-400" : "text-slate-500"
+								}`}
+							/>
+						)}
+						{isSaveUnsavePending && <Loading size="sm" />}
 					</div>
 					<dialog
 						id={`comments_modal_${post._id}`}

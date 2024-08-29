@@ -8,7 +8,20 @@ import Loading from "../../components/common/Loading";
 
 import Post from "../../components/common/Post";
 
-const Posts = ({ pageUsername = "" }) => {
+const Posts = ({ pageUsername = "", postFeedType = "me" }) => {
+	const getApi = (postFeedType) => {
+		switch (postFeedType) {
+			case "me":
+				return `/api/v1.0/posts/page/${pageUsername}?skip=`;
+			case "saved":
+				return `/api/v1.0/posts/saved?skip=`;
+			case "liked":
+				return `/api/v1.0/posts/likes?skip=`;
+		}
+	};
+
+	const apiUri = getApi(postFeedType);
+
 	const [skip, setSkip] = useState(0);
 	const [totalPosts, setTotalPosts] = useState([]);
 	const [isLoadingNewPosts, setIsLoadingNewPosts] = useState(false);
@@ -29,9 +42,7 @@ const Posts = ({ pageUsername = "" }) => {
 			}
 			setIsLoadingNewPosts(true);
 			try {
-				const res = await fetch(
-					`/api/v1.0/posts/page/${pageUsername}?skip=${skip}`
-				);
+				const res = await fetch(apiUri + skip.toString());
 				const data = await res.json();
 
 				if (!res.ok || data.success === false)
@@ -53,16 +64,14 @@ const Posts = ({ pageUsername = "" }) => {
 		},
 	});
 
-	// const queryClient = useQueryClient();
-	// useEffect(() => {
-	// 	setDisabledLoading(false);
-	// 	setSkip(0);
-	// 	setTotalPosts([]);
-	// 	// refetch();
-	// 	queryClient.invalidateQueries({ queryKey: ["posts"] });
-	// 	// setIsLoadingNewPosts(true);
-	// 	// }, [pageUsername, refetch]);
-	// }, [pageUsername, queryClient]);
+	useEffect(() => {
+		setDisabledLoading(false);
+		setSkip(0);
+		setTotalPosts([]);
+		setTimeout(() => {
+			refetch();
+		}, 100);
+	}, [postFeedType, refetch, setSkip]);
 
 	useEffect(() => {
 		if (disabledLoading) {
@@ -72,8 +81,6 @@ const Posts = ({ pageUsername = "" }) => {
 		const observer = new IntersectionObserver(
 			(entries) => {
 				if (entries[0].isIntersecting) {
-					// fetchData();
-
 					refetch();
 				}
 			},

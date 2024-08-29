@@ -5,6 +5,7 @@ import FollowingRelationship from '../models/followingRelationship.model.js';
 import Post from '../models/post.model.js';
 import TmpFiles from '../models/tmpFiles.model.js';
 import Notification from '../models/notification.model.js'
+import Savedpost from '../models/savedposts.model.js';
 
 export const getRecentPosts = async (req, res, next) => {
     try {
@@ -66,7 +67,13 @@ export const getRecentPosts = async (req, res, next) => {
             return res.status(200).json({ success: true, posts: [] });
         }
 
-        res.status(200).json({ success: true, posts: posts });
+        const savedRes = await Promise.all(
+            posts.map(post => Savedpost.exists({ pageId, postId: post._id }))
+        )
+
+        const postsWithSaved = posts.map((post, idx) => { return { ...post.toObject(), isSaved: !!savedRes[idx] } });
+
+        res.status(200).json({ success: true, posts: postsWithSaved });
     } catch (err) {
         console.log(`Error in getRecentPosts : ${err}`);
         const error = new Error(`Internal Server Error`);
@@ -95,6 +102,7 @@ export const getPostByPostId = async (req, res, next) => {
         }
 
         // TODO: make select more optimized (count likes, ... in query , ...)
+        // add get comments
         const post = await Post.findOne({ _id: postId }, {
             comments: { $slice: ['$comments', commentStart, commentStart + commentCount] },
             numberOfLikes: { $size: '$likes' },
@@ -145,7 +153,11 @@ export const getPostByPostId = async (req, res, next) => {
             return next(error);
         }
 
-        return res.status(200).json(post);
+        const saveRes = await Savedpost.exists({ pageId: currentPageId, postId: post._id })
+
+        const postWithSaved = { ...post.toObject(), isSaved: !!saveRes }
+
+        return res.status(200).json(postWithSaved);
     } catch (err) {
         console.log(`Error in getPostByPostId : ${err}`);
         const error = new Error(`Internal Server Error`)
@@ -157,14 +169,47 @@ export const getPostByPostId = async (req, res, next) => {
 export const getLikedPosts = async (req, res, next) => {
     try {
         const page = req.user;
+        const pageId = page._id.toString();
+        const data = req.validatedData;
+        const skip = parseInt(data.skip) || 0;
 
         // TODO: add thumbnail and return thumbnail and id of posts
+        // TODO: make it sorted for likes
         const likedPosts = await Post.find({ _id: { $in: page.likedPosts } })
             .select('assetType type caption assets')
+            .skip(skip)
+            .limit(6)
+            .sort({ createdAt: -1 })
+            .exec()
 
         res.status(200).json({ success: true, posts: likedPosts });
     } catch (err) {
         console.log(`Error in getLikedPosts : ${err}`);
+        const error = new Error(`Internal Server Error`);
+        error.status = 500;
+        return next(error);
+    }
+}
+
+export const getSavedPosts = async (req, res, next) => {
+    try {
+        const pageId = req.user._id.toString();
+        const data = req.validatedData;
+        const skip = parseInt(data.skip) || 0;
+
+        const saved = await Savedpost.find({ pageId })
+            .select("postId")
+            .populate("postId", "assetType type assets caption")
+            .skip(skip)
+            .limit(6)
+            .sort({ createdAt: -1 })
+            .exec()
+
+        const savedPostsPack = saved.map((doc) => doc.postId);
+
+        res.status(200).json({ success: true, posts: savedPostsPack });
+    } catch (err) {
+        console.log(`Error in getPagePosts : ${err}`);
         const error = new Error(`Internal Server Error`);
         error.status = 500;
         return next(error);
@@ -412,6 +457,58 @@ export const commentOnPost = async (req, res, next) => {
         });
     } catch (err) {
         console.log(`Error in CommentOnPost : ${err}`);
+        const error = new Error(`Internal Server Error`)
+        error.status = 500;
+        return next(error);
+    }
+}
+
+export const saveUnsavePost = async (req, res, next) => {
+    try {
+        const data = req.validatedData;
+        const pageId = req.user._id.toString();
+        const postId = data.postId;
+
+        const post = await Post.findById(postId).exec();
+        if (!post) {
+            const error = new Error(`A post with post id ${postId} was not found`);
+            error.status = 404;
+            return next(error)
+        }
+
+        const targetPageId = post.page.toString();
+
+        const [targetPageType, isFollowing] = await Promise.all([
+            Page.findById(targetPageId).select('pageType').exec(),
+            FollowingRelationship.exists({ pageId: pageId, followedPageId: targetPageId }).exec(),
+        ])
+
+        if (targetPageId !== pageId && (targetPageType.pageType === 'private' && !isFollowing)) {
+            const error = new Error(`The Page Who Posted This Post Is Private You have to follow it first`);
+            error.status = 401;
+            return next(error);
+        }
+
+        const isSaved = await Savedpost.exists({ pageId, postId });
+
+        if (isSaved) {
+            await Savedpost.deleteOne({ pageId, postId })
+
+            return res.status(200).json({ success: true, msg: "post unsaved" })
+        } else {
+            const newSavedpost = new Savedpost({
+                pageId,
+                postId
+            })
+
+            await newSavedpost.save();
+
+            return res.status(200).json({ success: true, msg: "post saved" })
+        }
+
+
+    } catch (err) {
+        console.log(`Error in savePost : ${err}`);
         const error = new Error(`Internal Server Error`)
         error.status = 500;
         return next(error);

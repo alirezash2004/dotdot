@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useParams } from "react-router-dom";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import toast from "react-hot-toast";
@@ -6,7 +7,14 @@ import { useUsername } from "../../components/Hooks/useUsername";
 import { usePageProfile } from "../../components/Hooks/usePageProfile";
 import { useLogout } from "../../components/Hooks/useLogout";
 
-import { CiEdit, CiLock, CiLogout } from "react-icons/ci";
+import {
+	CiBookmark,
+	CiEdit,
+	CiHeart,
+	CiLock,
+	CiLogout,
+	CiUser,
+} from "react-icons/ci";
 
 import ProfileTopSkeleton from "../../components/skeletons/ProfileTopSkeleton";
 
@@ -15,6 +23,8 @@ import Loading from "../../components/common/Loading";
 import Posts from "./ProfilePosts";
 
 const ProfilePage = () => {
+	const [postFeedType, setPostFeedType] = useState("me");
+
 	let { username: paramUsername } = useParams();
 
 	const { logout, isLoggingOut, loggedOut } = useLogout();
@@ -119,7 +129,9 @@ const ProfilePage = () => {
 					)}
 				</div>
 			)}
-			<div className="pb-7 border-b border-gray-700">
+			<div
+				className={`pb-16 ${!isMyProfile ? "border-b border-gray-700" : ""}`}
+			>
 				{isPageProfileFetching && !isMyProfile && <ProfileTopSkeleton />}
 
 				{(!isPageProfileFetching || isMyProfile) && (
@@ -240,7 +252,43 @@ const ProfilePage = () => {
 					</>
 				)}
 			</div>
-			{isMyProfile && <Posts pageUsername={paramUsername} />}{" "}
+			{isMyProfile && (
+				<>
+					<div role="tablist" className="tabs tabs-bordered tabs-lg">
+						<a
+							role="tab"
+							className={`tab flex gap-2 ${
+								postFeedType === "me" ? "tab-active" : ""
+							}`}
+							onClick={() => setPostFeedType("me")}
+						>
+							<span>Me</span>
+							<CiUser className="w-6 h-6" />
+						</a>
+						<a
+							role="tab"
+							className={`tab flex gap-2 ${
+								postFeedType === "saved" ? "tab-active" : ""
+							}`}
+							onClick={() => setPostFeedType("saved")}
+						>
+							<span>Saved</span>
+							<CiBookmark className="w-6 h-6" />
+						</a>
+						<a
+							role="tab"
+							className={`tab flex gap-2 ${
+								postFeedType === "liked" ? "tab-active" : ""
+							}`}
+							onClick={() => setPostFeedType("liked")}
+						>
+							<span>Liked</span>
+							<CiHeart className="w-6 h-6" />
+						</a>
+					</div>
+					<Posts pageUsername={paramUsername} postFeedType={postFeedType} />
+				</>
+			)}{" "}
 			{/* Fucking 3 days for this */}
 			{!isMyProfile && (
 				<>
