@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
+import { Helmet } from "react-helmet-async";
 
 import Loading from "../../components/common/Loading";
 
@@ -96,6 +97,9 @@ const NotificationPage = () => {
 
 	return (
 		<>
+			<Helmet>
+				<title>Notifications - DotDot Social Media</title>
+			</Helmet>
 			<div className="flex-[4_4_0] border-l border-r border-gray-700 min-h-screen">
 				<div className="flex justify-between items-center p-4 border-b border-gray-700">
 					<p className="font-bold">Notifications</p>

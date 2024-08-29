@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import toast from "react-hot-toast";
+import { Helmet } from "react-helmet-async";
 
 import Post from "../../components/common/Post";
 import PostSkeleton from "../../components/skeletons/PostSkeleton";
@@ -36,11 +37,22 @@ const PostPage = () => {
 	});
 
 	return (
-		<div className="flex flex-[4_4_0] flex-col pt-10">
-			{(isPending || isFetching) && <PostSkeleton />}
-			{!isPending && !isFetching && !post && <div className="w-full flex pt-32 items-center justify-center text-5xl text-red-700">Post Not Found!</div>}
-			{!isPending && !isFetching && post && <Post postType="single" post={post} />}
-		</div>
+		<>
+			<Helmet>
+				<title>Post - DotDot Social Media</title>
+			</Helmet>
+			<div className="flex flex-[4_4_0] flex-col pt-10">
+				{(isPending || isFetching) && <PostSkeleton />}
+				{!isPending && !isFetching && !post && (
+					<div className="w-full flex pt-32 items-center justify-center text-5xl text-red-700">
+						Post Not Found!
+					</div>
+				)}
+				{!isPending && !isFetching && post && (
+					<Post postType="single" post={post} />
+				)}
+			</div>
+		</>
 	);
 };
 

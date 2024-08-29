@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "react-hot-toast";
+import { Helmet } from "react-helmet-async";
 
 import Input from "../../../components/common/Input";
 import DotDotLogo from "../../../components/imgs/DotDot";
@@ -62,69 +63,74 @@ const LoginPage = () => {
 	};
 
 	return (
-		<div className="max-w-screen-xl mx-auto flex h-screen px-11">
-			<div className="flex-1 hidden lg:flex items-center justify-center">
-				<DotDotLogo className="lg:w-2/3" />
-			</div>
-			<div className="flex-1 flex flex-col justify-center items-center">
-				<form
-					className="lg:w-2/3 mx-auto flex flex-col gap-4"
-					onSubmit={handleSubmit}
-				>
-					<DotDotLogo className="w-32 lg:hidden" />
-					<h1 className="text-2xl input-bordered mb-4">
-						{"Let's"} Jump Right In ..
-					</h1>
-					<Input
-						Icon={<CiHashtag />}
-						type="text"
-						className="grow"
-						placeholder="Username"
-						name="username"
-						autoComplete="true"
-						onChange={handleInputChange}
-						value={formData.username}
-					/>
-					<Input
-						Icon={<CiKeyboard />}
-						type="password"
-						className="grow"
-						placeholder="Password"
-						name="password"
-						autoComplete="true"
-						onChange={handleInputChange}
-						value={formData.password}
-					/>
-					<button
-						className={`btn btn-secondary rounded-full ${
-							isPending ? "btn-disabled" : ""
-						}`}
+		<>
+			<Helmet>
+				<title>Login - DotDot Social Media</title>
+			</Helmet>
+			<div className="max-w-screen-xl mx-auto flex h-screen px-11">
+				<div className="flex-1 hidden lg:flex items-center justify-center">
+					<DotDotLogo className="lg:w-2/3" />
+				</div>
+				<div className="flex-1 flex flex-col justify-center items-center">
+					<form
+						className="lg:w-2/3 mx-auto flex flex-col gap-4"
+						onSubmit={handleSubmit}
 					>
-						{isPending ? "Loading ..." : "Login"}
-					</button>
-					{isError && (
-						<p className="text-red-500">
-							<CiWarning className="inline text-2xl" /> {error.message}
-						</p>
-					)}
-				</form>
-				<div className="flex flex-col w-full lg:w-2/3 gap-2 mt-5">
-					<p className="text-white text-md">{"Don't"} have an account?</p>
-					<Link
-						to="/signup"
-						onClick={isPending && (e => e.preventDefault())}
-					>
+						<DotDotLogo className="w-32 lg:hidden" />
+						<h1 className="text-2xl input-bordered mb-4">
+							{"Let's"} Jump Right In ..
+						</h1>
+						<Input
+							Icon={<CiHashtag />}
+							type="text"
+							className="grow"
+							placeholder="Username"
+							name="username"
+							autoComplete="true"
+							onChange={handleInputChange}
+							value={formData.username}
+						/>
+						<Input
+							Icon={<CiKeyboard />}
+							type="password"
+							className="grow"
+							placeholder="Password"
+							name="password"
+							autoComplete="true"
+							onChange={handleInputChange}
+							value={formData.password}
+						/>
 						<button
-							className={`btn rounded-full btn-primary btn-outline text-white w-full ${
+							className={`btn btn-secondary rounded-full ${
 								isPending ? "btn-disabled" : ""
 							}`}
 						>
-							Sign Up
+							{isPending ? "Loading ..." : "Login"}
 						</button>
-					</Link>
+						{isError && (
+							<p className="text-red-500">
+								<CiWarning className="inline text-2xl" /> {error.message}
+							</p>
+						)}
+					</form>
+					<div className="flex flex-col w-full lg:w-2/3 gap-2 mt-5">
+						<p className="text-white text-md">{"Don't"} have an account?</p>
+						<Link
+							to="/signup"
+							onClick={isPending && ((e) => e.preventDefault())}
+						>
+							<button
+								className={`btn rounded-full btn-primary btn-outline text-white w-full ${
+									isPending ? "btn-disabled" : ""
+								}`}
+							>
+								Sign Up
+							</button>
+						</Link>
+					</div>
 				</div>
 			</div>
-		</div>
+		</>
 	);
 };
 

@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "react-hot-toast";
+import { Helmet } from "react-helmet-async";
 
 import Input from "../../../components/common/Input";
 import DotDotLogo from "../../../components/imgs/DotDot";
@@ -62,82 +63,91 @@ const SignUpPage = () => {
 	};
 
 	return (
-		<div className="max-w-screen-xl mx-auto flex h-screen px-11">
-			<div className="flex-1 hidden lg:flex items-center justify-center">
-				<DotDotLogo className="lg:w-2/3" />
-			</div>
-			<div className="flex-1 flex flex-col justify-center items-center">
-				<form
-					className="lg:w-2/3 mx-auto flex flex-col gap-4"
-					onSubmit={handleSubmit}
-				>
-					<DotDotLogo className="w-32 lg:hidden" />
-					<h1 className="text-4xl input-bordered mb-4">Join DotDot</h1>
-					<Input
-						Icon={<CiMail />}
-						type="email"
-						placeholder="Email"
-						name="email"
-						onChange={handleInputChange}
-						value={formData.email}
-					/>
-					<div className="flex gap-4 flex-wrap">
+		<>
+			<Helmet>
+				<title>Signup - DotDot Social Media</title>
+			</Helmet>
+			
+			<div className="max-w-screen-xl mx-auto flex h-screen px-11">
+				<div className="flex-1 hidden lg:flex items-center justify-center">
+					<DotDotLogo className="lg:w-2/3" />
+				</div>
+				<div className="flex-1 flex flex-col justify-center items-center">
+					<form
+						className="lg:w-2/3 mx-auto flex flex-col gap-4"
+						onSubmit={handleSubmit}
+					>
+						<DotDotLogo className="w-32 lg:hidden" />
+						<h1 className="text-4xl input-bordered mb-4">Join DotDot</h1>
 						<Input
-							Icon={<CiPen />}
-							type="text"
-							placeholder="Full name"
-							name="fullName"
+							Icon={<CiMail />}
+							type="email"
+							placeholder="Email"
+							name="email"
 							onChange={handleInputChange}
-							value={formData.fullName}
-							className="flex-1"
+							value={formData.email}
 						/>
+						<div className="flex gap-4 flex-wrap">
+							<Input
+								Icon={<CiPen />}
+								type="text"
+								placeholder="Full name"
+								name="fullName"
+								onChange={handleInputChange}
+								value={formData.fullName}
+								className="flex-1"
+							/>
+							<Input
+								Icon={<CiUser />}
+								type="text"
+								placeholder="Username"
+								name="username"
+								autoComplete="true"
+								onChange={handleInputChange}
+								value={formData.username}
+								className="flex-1"
+							/>
+						</div>
 						<Input
-							Icon={<CiUser />}
-							type="text"
-							placeholder="Username"
-							name="username"
+							Icon={<CiLock />}
+							type="password"
+							placeholder="Password"
+							name="password"
 							autoComplete="true"
 							onChange={handleInputChange}
-							value={formData.username}
-							className="flex-1"
+							value={formData.password}
 						/>
-					</div>
-					<Input
-						Icon={<CiLock />}
-						type="password"
-						placeholder="Password"
-						name="password"
-						autoComplete="true"
-						onChange={handleInputChange}
-						value={formData.password}
-					/>
-					<button
-						className={`btn btn-secondary rounded-full ${
-							isPending ? "btn-disabled" : ""
-						}`}
-					>
-						{isPending ? "Loading ..." : "Signup"}
-					</button>
-					{isError && (
-						<p className="text-red-500">
-							<CiWarning className="inline text-2xl" /> {error.message}
-						</p>
-					)}
-				</form>
-				<div className="flex flex-col w-full lg:w-2/3 gap-2 mt-5">
-					<p className="text-white text-md">Already have an account?</p>
-					<Link to="/login" onClick={isPending && ((e) => e.preventDefault())}>
 						<button
-							className={`btn rounded-full btn-primary btn-outline text-white w-full ${
+							className={`btn btn-secondary rounded-full ${
 								isPending ? "btn-disabled" : ""
 							}`}
 						>
-							Sign in
+							{isPending ? "Loading ..." : "Signup"}
 						</button>
-					</Link>
+						{isError && (
+							<p className="text-red-500">
+								<CiWarning className="inline text-2xl" /> {error.message}
+							</p>
+						)}
+					</form>
+					<div className="flex flex-col w-full lg:w-2/3 gap-2 mt-5">
+						<p className="text-white text-md">Already have an account?</p>
+						<Link
+							to="/login"
+							onClick={isPending && ((e) => e.preventDefault())}
+						>
+							<button
+								className={`btn rounded-full btn-primary btn-outline text-white w-full ${
+									isPending ? "btn-disabled" : ""
+								}`}
+							>
+								Sign in
+							</button>
+						</Link>
+					</div>
 				</div>
 			</div>
-		</div>
+		</>
 	);
 };
 
