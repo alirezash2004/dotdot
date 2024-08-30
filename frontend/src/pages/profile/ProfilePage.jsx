@@ -22,6 +22,7 @@ import ProfileTopSkeleton from "../../components/skeletons/ProfileTopSkeleton";
 import Loading from "../../components/common/Loading";
 
 import Posts from "./ProfilePosts";
+import EditProfileModel from "./EditProfileModel";
 
 const ProfilePage = () => {
 	const [postFeedType, setPostFeedType] = useState("me");
@@ -41,7 +42,7 @@ const ProfilePage = () => {
 		targetPage,
 		isFetching: isPageProfileFetching,
 		isFollowing,
-		ChangeFollowingStatus,
+		refetch: refetchProfilePage,
 	} = usePageProfile({
 		username: paramUsername,
 		isValidUsername: isValidUsername,
@@ -81,7 +82,7 @@ const ProfilePage = () => {
 						: `You are now following ${targetPage.username}`
 				);
 
-				ChangeFollowingStatus();
+				refetchProfilePage();
 			},
 			onError: (error) => {
 				toast.error(error.message);
@@ -90,10 +91,6 @@ const ProfilePage = () => {
 
 	const handleFollowUnfollow = () => {
 		followUnfollow();
-	};
-
-	const handleEditProfile = () => {
-		console.log("Edit");
 	};
 
 	if (!isValidUsername) {
@@ -227,33 +224,27 @@ const ProfilePage = () => {
 									</a>
 								</div>
 								<div className="flex flex-col md:flex-row items-center gap-4">
-									<button
-										onClick={
-											isMyProfile ? handleEditProfile : handleFollowUnfollow
-										}
-										className={`btn w-48 md:w-auto md:px-16 ${
-											isMyProfile ? "btn-outline" : ""
-										} ${
-											!isMyProfile && isFollowing
-												? "btn-secondary"
-												: "btn-primary"
-										} ${
-											(isPageProfileFetching && !isMyProfile) ||
-											isFollowUnfollowPending
-												? "btn-disabled"
-												: ""
-										}`}
-									>
-										{(isPageProfileFetching && !isMyProfile) ||
-											(isFollowUnfollowPending && <Loading />)}
-										{isMyProfile && "Edit Profile"}
-										{!isMyProfile && !isPageProfileFetching && (
-											<>
-												{!isMyProfile && !isFollowing && "Follow"}
-												{!isMyProfile && isFollowing && "Following"}
-											</>
-										)}
-									</button>
+									{isMyProfile && <EditProfileModel authPage={authPage} />}
+									{!isMyProfile && (
+										<button
+											onClick={handleFollowUnfollow}
+											className={`btn w-48 md:w-auto md:px-16 ${
+												isFollowing ? "btn-secondary" : "btn-primary"
+											} ${
+												isPageProfileFetching || isFollowUnfollowPending
+													? "btn-disabled"
+													: ""
+											}`}
+										>
+											{(isPageProfileFetching || isFollowUnfollowPending) && (
+												<Loading />
+											)}
+											{!isPageProfileFetching && isFollowing
+												? "Following"
+												: "Follow"}
+										</button>
+									)}
+
 									{isMyProfile && (
 										<button className="btn w-48 md:w-auto px-8 btn-primary">
 											Update

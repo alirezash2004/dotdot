@@ -1,4 +1,4 @@
-import { genPassword } from '../utils/passwordsUtil.js';
+import { genPassword, validatePassword } from '../utils/passwordsUtil.js';
 
 import Page from '../models/page.model.js';
 
@@ -76,14 +76,14 @@ export const updatePageinfo = async (req, res, next) => {
         const pageId = req.user._id.toString();
         const data = req.validatedData;
 
-        const { username, fullName, email, password, pageType, pageSetting, pageProfile } = data;
+        const { username, fullName, email, password, newpassword, pageType, theme, language, country, bio, website, birthdate } = data;
 
         const [page, usernameExist] = await Promise.all([
             await Page.findById(pageId).exec(),
             await Page.exists({ username: username }).exec(),
         ]);
 
-        if (usernameExist) {
+        if (usernameExist && req.user.username !== username) {
             const err = new Error(`Username ${username} already exists!`);
             err.status = 400;
             return next(err);
@@ -91,26 +91,45 @@ export const updatePageinfo = async (req, res, next) => {
 
         // TODO: add old password and check if it's valid | add confirm password
 
-        const hashedPass = genPassword(password);
+        if (password) {
+            if (validatePassword(password || "", page.password, page.salt)) {
+                const hashedPass = genPassword(newpassword);
 
-        page.username = username || page.username;
+                page.password = hashedPass.hash || page.password;
+                page.salt = hashedPass.salt || page.salt;
+            } else {
+                const error = new Error(`Wrong Password`)
+                error.status = 400;
+                return next(error);
+            }
+        } else if (!password && newpassword) {
+            const error = new Error(`Current Password Required`)
+            error.status = 400;
+            return next(error);
+        }
+
+        let usernameChange = false;
+
+        if (username && req.user.username !== username) {
+            page.username = username;
+            usernameChange = true;
+        }
+
         page.fullName = fullName || page.fullName;
         page.email = email || page.email;
-        page.password = hashedPass.hash || page.password;
-        page.salt = hashedPass.salt || page.salt;
         page.pageType = pageType || page.pageType;
 
-        page.pageSetting.theme = pageSetting.theme || page.pageSetting.theme;
-        page.pageSetting.language = pageSetting.language || page.pageSetting.language;
-        page.pageSetting.country = pageSetting.country || page.pageSetting.country;
+        page.pageSetting.theme = theme || page.pageSetting.theme;
+        page.pageSetting.language = language || page.pageSetting.language;
+        page.pageSetting.country = country || page.pageSetting.country;
 
-        page.pageProfile.bio = pageProfile.bio || page.pageProfile.bio;
-        page.pageProfile.website = pageProfile.website || page.pageProfile.website;
-        page.pageProfile.birthdate = pageProfile.birthdate || page.pageProfile.birthdate;
+        page.pageProfile.bio = bio || page.pageProfile.bio;
+        page.pageProfile.website = website || page.pageProfile.website;
+        page.pageProfile.birthdate = birthdate || page.pageProfile.birthdate;
 
         const savePage = await page.save();
 
-        return res.status(200).json(savePage);
+        return res.status(200).json({ success: true, usernameChange, username: savePage.username });
     } catch (err) {
         console.log(`Error in updatePageinfo : ${err}`);
         const error = new Error(`Internal Server Error`)

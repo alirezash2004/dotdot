@@ -10,14 +10,11 @@ export function usePageProfile({
 	const [isPageFetched, setIsPageFetched] = useState(false);
 	const [isFollowing, setIsFollowing] = useState(false);
 
-	const ChangeFollowingStatus = () => {
-		setIsFollowing((prevState) => !prevState);
-	};
-
 	const {
 		data: targetPage,
 		isPending: isTargetPagePending,
 		isFetching: isTargetPageFetching,
+		refetch,
 	} = useQuery({
 		queryKey: ["pageprofile"],
 		queryFn: async () => {
@@ -69,6 +66,6 @@ export function usePageProfile({
 			isFollowingReltaionFetching,
 		isFollowing: isFollowing,
 		targetPage: targetPage,
-		ChangeFollowingStatus: ChangeFollowingStatus,
+		refetch,
 	};
 }
