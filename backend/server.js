@@ -48,7 +48,7 @@ app.use('/api/v1.0', v1_0);
 // if (process.env.NODE_ENV === "production") {
 //     app.use(express.static(path.join(__dirname, '/frontend/dist')));
 
-//     app.get("*", (res, res) => {
+//     app.get("*", (req, res) => {
 //         res.sendFile(path.resolve(__dirname, "frontend", "dist", "index.html"));
 //     })
 // }
