@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import { LazyLoadImage } from "react-lazy-load-image-component";
@@ -15,8 +15,11 @@ import {
 	CiTrash,
 } from "react-icons/ci";
 import { formatDate } from "../../utils/date";
+import HorizontalScrollCarousel from "./HorizontalScrollCarousel";
 
 const Post = ({ post, postType = "" }) => {
+	// console.log(post);
+
 	const commentBox = useRef(null);
 	const [showFullCaption, setShowFullCaption] = useState(false);
 	const [comment, setComment] = useState("");
@@ -227,8 +230,18 @@ const Post = ({ post, postType = "" }) => {
 		caption = "";
 	}
 
+	const postMediaData = useMemo(() => {
+		return (
+			<HorizontalScrollCarousel
+				imgs={post.assets.map((asset) =>
+					asset.url.replace("localhost", "10.61.18.10")
+				)}
+			/>
+		);
+	}, [post.assets]);
+
 	// TODO: fix localhost addressing on postmedia urls on backend
-	const postUrl = post.assets[0].url.replace("localhost", "10.61.18.11");
+	const postUrl = post.assets[0].url.replace("localhost", "10.61.18.10");
 
 	return postType === "pageProfile" ? (
 		<>
@@ -245,7 +258,7 @@ const Post = ({ post, postType = "" }) => {
 		</>
 	) : (
 		<>
-			<div className="flex mb-16 mx-4 md:mx-auto gap-2 flex-col items-start pb-4 border rounded-lg p-5 border-gray-700 ">
+			<div className="flex mb-14 mx-4 md:mx-auto gap-2 flex-col items-start pb-4 border rounded-lg p-5 border-gray-700">
 				<div className="flex w-full">
 					<div className="avatar">
 						<Link
@@ -281,20 +294,36 @@ const Post = ({ post, postType = "" }) => {
 						</span>
 					)}
 				</div>
-				<div className="flex flex-col mt-2">
-					{post.assets.length > 0 && (
+				<div className="flex flex-col mt-2 w-full">
+					{/* <HorizontalScrollCarousel
+						imgs={post.assets.map((asset) =>
+							asset.url.replace("localhost", "10.61.18.10")
+						)}
+					/> */}
+					{postMediaData}
+					{/* {post.assets.map((asset) => (
+						<LazyLoadImage
+							key={asset._id}
+							effect="blur"
+							src={asset.url.replace("localhost", "10.61.18.10")}
+							className="md:w-96 rounded-lg mx-auto object-cover"
+						/>
+					))} */}
+					{/* {post.assets.length > 0 && (
 						<LazyLoadImage
 							effect="blur"
 							src={postUrl}
 							className="md:w-96 rounded-lg mx-auto object-cover"
 						/>
+					)} */}
+					{caption && (
+						<p
+							className="my-3 cursor-pointer px-2 md:w-96"
+							onClick={() => setShowFullCaption((prevState) => !prevState)}
+						>
+							{caption}
+						</p>
 					)}
-					<p
-						className="my-3 cursor-pointer px-2 md:w-96"
-						onClick={() => setShowFullCaption((prevState) => !prevState)}
-					>
-						{caption}
-					</p>
 				</div>
 				<div className="flex justify-between w-full mt-auto">
 					<div className="flex">

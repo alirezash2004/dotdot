@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 
 import Post from "./Post";
@@ -87,13 +87,9 @@ const Posts = () => {
 					totalPosts?.length === 0 && (
 						<p className="text-center my-4">OOPS! No Posts Found!</p>
 					)}
-				{!isLoading && posts && (
-					<>
-						{posts.map((post) => (
-							<Post key={post._id} post={post} />
-						))}
-					</>
-				)}
+				{!isLoading &&
+					posts &&
+					posts.map((post) => <Post key={post._id} post={post} />)}
 
 				{(isLoading || isFetching || isLoadingNewPosts) && (
 					<div className="flex flex-col gap-16 mx-auto">

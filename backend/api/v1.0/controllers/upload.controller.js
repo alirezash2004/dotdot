@@ -35,7 +35,7 @@ const uploadSingleImage = multer({
 export const singleImageUpload = async (req, res, next) => {
     const pageId = req.user._id.toString();
     const tmpfilesCount = await TmpFiles.countDocuments({ pageId: pageId });
-    if (tmpfilesCount >= 3) {
+    if (tmpfilesCount >= 6) {
         await TmpFiles.deleteOne({ pageId }).sort({ createdAt: -1 })
     }
 

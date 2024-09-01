@@ -109,9 +109,10 @@ const Posts = ({ pageUsername = "", postFeedType = "me" }) => {
 				)}
 			{!isLoading && posts && (
 				<div className="grid grid-cols-2 md:grid-cols-3">
-					{totalPosts.map((post) => (
-						<Post key={post._id} post={post} postType="pageProfile" />
-					))}
+					{totalPosts.length !== 0 &&
+						totalPosts.map((post) => (
+							<Post key={post._id} post={post} postType="pageProfile" />
+						))}
 				</div>
 			)}
 

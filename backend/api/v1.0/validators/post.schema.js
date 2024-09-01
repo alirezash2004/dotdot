@@ -1,12 +1,4 @@
 export const postsSchema = {
-    type: {
-        matches: {
-            errorMessage: 'type must be single OR multiple',
-            options: /\b(single|multiple)\b/,
-        },
-        trim: true,
-        escape: true,
-    },
     assetType: {
         matches: {
             errorMessage: 'assetType must be picture OR video',

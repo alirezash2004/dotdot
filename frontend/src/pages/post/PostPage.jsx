@@ -41,7 +41,7 @@ const PostPage = () => {
 			<Helmet>
 				<title>Post - DotDot Social Media</title>
 			</Helmet>
-			<div className="flex flex-[4_4_0] flex-col pt-10">
+			<div className="flex flex-[4_4_0] flex-col pt-10 mb-12">
 				{(isPending || isFetching) && <PostSkeleton />}
 				{!isPending && !isFetching && !post && (
 					<div className="w-full flex pt-32 items-center justify-center text-5xl text-red-700">

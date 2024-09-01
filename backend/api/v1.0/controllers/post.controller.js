@@ -41,6 +41,7 @@ export const getRecentPosts = async (req, res, next) => {
                 numberOfShares: { $size: '$shares' },
                 isLiked: { $in: [req.user._id, '$likes'] },
                 assets: 1,
+                type: 1,
                 caption: 1,
                 createdAt: 1,
             })
@@ -109,6 +110,7 @@ export const getPostByPostId = async (req, res, next) => {
             numberOfShares: { $size: '$shares' },
             isLiked: { $in: [req.user._id, '$likes'] },
             assets: 1,
+            type: 1,
             caption: 1,
             createdAt: 1,
         })
@@ -176,7 +178,7 @@ export const getLikedPosts = async (req, res, next) => {
         // TODO: add thumbnail and return thumbnail and id of posts
         // TODO: make it sorted for likes
         const likedPosts = await Post.find({ _id: { $in: page.likedPosts } })
-            .select('assetType type caption assets')
+            .select('assetType type caption assets type')
             .skip(skip)
             .limit(6)
             .sort({ createdAt: -1 })
@@ -205,7 +207,7 @@ export const getSavedPosts = async (req, res, next) => {
             .sort({ createdAt: -1 })
             .exec()
 
-        const savedPostsPack = saved.map((doc) => doc.postId);
+        const savedPostsPack = saved.map((doc) => doc.postId).filter((post) => post !== null);
 
         res.status(200).json({ success: true, posts: savedPostsPack });
     } catch (err) {
@@ -260,7 +262,7 @@ export const newPost = async (req, res, next) => {
 
         const data = req.validatedData;
 
-        const { type, assetType, caption, postmedia } = data;
+        const { assetType, caption, postmedia } = data;
 
         const pageId = req.user._id.toString();
 
@@ -291,9 +293,10 @@ export const newPost = async (req, res, next) => {
                 medias.push(media);
             }
 
+
             const post = {
                 page: pageId,
-                type: type,
+                type: medias.length === 1 ? "signle" : "multiple",
                 caption: caption,
                 assetType: assetType,
             }
@@ -550,6 +553,7 @@ export const deletePostByPostId = async (req, res, next) => {
             // PostMedia.deleteMany({ postId }).exec(), // delete all post media
             Post.deleteOne({ _id: postId }).exec(),
             Page.findByIdAndUpdate(pageId, { $inc: { postsCount: -1 } }).exec(),
+            Savedpost.deleteMany({ postId }).exec()
         ])
 
         return res.status(200).json({ success: true, msg: 'post deleted!' });
