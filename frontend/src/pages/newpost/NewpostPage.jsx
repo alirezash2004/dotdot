@@ -1,11 +1,13 @@
 import { useMutation } from "@tanstack/react-query";
 import { useRef, useState } from "react";
-import toast from "react-hot-toast";
 import { Helmet } from "react-helmet-async";
+import toast from "react-hot-toast";
 
-import { CiMedicalCross, CiMountain1 } from "react-icons/ci";
-import useUploadFiles from "../../components/Hooks/useUploadFiles";
 import HorizontalScrollCarousel from "../../components/common/HorizontalScrollCarousel";
+
+import useUploadFiles from "../../components/Hooks/useUploadFiles";
+
+import { CiMountain1 } from "react-icons/ci";
 
 const NewpostPage = () => {
 	const imgRef = useRef(null);

@@ -1,4 +1,5 @@
 import { Helmet } from "react-helmet-async";
+
 import Posts from "../../components/common/Posts";
 
 const HomePage = () => {

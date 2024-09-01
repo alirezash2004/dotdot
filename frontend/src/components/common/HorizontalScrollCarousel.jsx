@@ -1,16 +1,7 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { motion, useMotionValue } from "framer-motion";
-import { CiMedicalCross } from "react-icons/ci";
 
-// const imgs = [
-// 	"/imgs/nature/1.jpg",
-// 	"/imgs/nature/2.jpg",
-// 	"/imgs/nature/3.jpg",
-// 	"/imgs/nature/4.jpg",
-// 	"/imgs/nature/5.jpg",
-// 	"/imgs/nature/6.jpg",
-// 	"/imgs/nature/7.jpg",
-// ];
+import { CiMedicalCross } from "react-icons/ci";
 
 const ONE_SECOND = 1000;
 const AUTO_DELAY = ONE_SECOND * 10;
@@ -27,23 +18,6 @@ const HorizontalScrollCarousel = ({ imgs, handleDeleteImage }) => {
 	const [imgIndex, setImgIndex] = useState(0);
 	const SwipeCarousel = () => {
 		const dragX = useMotionValue(0);
-
-		// useEffect(() => {
-		// 	const intervalRef = setInterval(() => {
-		// 		const x = dragX.get();
-
-		// 		if (x === 0) {
-		// 			setImgIndex((pv) => {
-		// 				if (pv === imgs.length - 1) {
-		// 					return 0;
-		// 				}
-		// 				return pv + 1;
-		// 			});
-		// 		}
-		// 	}, AUTO_DELAY);
-
-		// 	return () => clearInterval(intervalRef);
-		// }, []);
 
 		const onDragEnd = () => {
 			const x = dragX.get();
@@ -77,7 +51,6 @@ const HorizontalScrollCarousel = ({ imgs, handleDeleteImage }) => {
 				</motion.div>
 
 				<Dots imgIndex={imgIndex} setImgIndex={setImgIndex} />
-				{/* <GradientEdges /> */}
 			</div>
 		);
 	};
@@ -152,15 +125,6 @@ const HorizontalScrollCarousel = ({ imgs, handleDeleteImage }) => {
 						})}
 					</div>
 				)}
-			</>
-		);
-	};
-
-	const GradientEdges = () => {
-		return (
-			<>
-				<div className="pointer-events-none absolute bottom-0 left-0 top-0 w-[10vw] max-w-[100px] bg-gradient-to-r from-neutral-950/50 to-neutral-950/0" />
-				<div className="pointer-events-none absolute bottom-0 right-0 top-0 w-[10vw] max-w-[100px] bg-gradient-to-l from-neutral-950/50 to-neutral-950/0" />
 			</>
 		);
 	};

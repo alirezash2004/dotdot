@@ -1,10 +1,12 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 
 import Post from "./Post";
 import PostSkeleton from "../skeletons/PostSkeleton";
-import { CiCirclePlus } from "react-icons/ci";
+
 import Loading from "./Loading";
+
+import { CiCirclePlus } from "react-icons/ci";
 
 const Posts = () => {
 	const [skip, setSkip] = useState(0);

@@ -2,10 +2,12 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useMemo, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
-import { LazyLoadImage } from "react-lazy-load-image-component";
 import "react-lazy-load-image-component/src/effects/blur.css";
 
 import Loading from "./Loading";
+import HorizontalScrollCarousel from "./HorizontalScrollCarousel";
+
+import { formatDate } from "../../utils/date";
 
 import {
 	CiBookmark,
@@ -14,12 +16,8 @@ import {
 	CiLocationArrow1,
 	CiTrash,
 } from "react-icons/ci";
-import { formatDate } from "../../utils/date";
-import HorizontalScrollCarousel from "./HorizontalScrollCarousel";
 
 const Post = ({ post, postType = "" }) => {
-	// console.log(post);
-
 	const commentBox = useRef(null);
 	const [showFullCaption, setShowFullCaption] = useState(false);
 	const [comment, setComment] = useState("");

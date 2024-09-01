@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import toast from "react-hot-toast";
 import { Helmet } from "react-helmet-async";
+import toast from "react-hot-toast";
 
 import Post from "../../components/common/Post";
 import PostSkeleton from "../../components/skeletons/PostSkeleton";
