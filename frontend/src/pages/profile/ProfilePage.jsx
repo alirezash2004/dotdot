@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useParams } from "react-router-dom";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 import { Helmet } from "react-helmet-async";
 
@@ -23,15 +23,22 @@ import Loading from "../../components/common/Loading";
 
 import Posts from "./ProfilePosts";
 import EditProfileModel from "./EditProfileModel";
+import useUploadFiles from "../../components/Hooks/useUploadFiles";
+import changeHost from "../../utils/changeHost.js";
 
 const ProfilePage = () => {
 	const [postFeedType, setPostFeedType] = useState("me");
+	const [profileImg, setProfileImg] = useState({});
 
 	let { username: paramUsername } = useParams();
 
 	const { logout, isLoggingOut, loggedOut } = useLogout();
 
 	const { data: authPage } = useQuery({ queryKey: ["authPage"] });
+
+	const profileImageInputRef = useRef(null);
+
+	const queryClinet = useQueryClient();
 
 	const { isValidUsername, isMyProfile } = useUsername({
 		username: paramUsername,
@@ -89,6 +96,42 @@ const ProfilePage = () => {
 			},
 		});
 
+	const {
+		isUploadError,
+		isUploaded,
+		isUploaing,
+		setIsUploaded,
+		upload,
+		uploadError,
+	} = useUploadFiles({ destination: "profilePic" });
+
+	const { mutateAsync: ChangeProfile, isPending: isChangeProfilePending } =
+		useMutation({
+			mutationFn: async (fileAccesstoken) => {
+				const res = await fetch(`/api/v1.0/pages/updatepageprofile`, {
+					method: "PUT",
+					headers: {
+						"Content-Type": "application/json",
+					},
+					body: JSON.stringify({
+						fileAccesstoken,
+					}),
+				});
+				const data = await res.json();
+
+				if (!res.ok || data.success === false)
+					throw new Error(data.msg || "Failed To Update Profile");
+
+				return data;
+			},
+			onSuccess: () => {
+				toast.success("profile pic updated successfully");
+			},
+			onError: (error) => {
+				toast.error(error.message);
+			},
+		});
+
 	const handleFollowUnfollow = () => {
 		followUnfollow();
 	};
@@ -105,6 +148,26 @@ const ProfilePage = () => {
 
 	// console.log(targetPage);
 	// console.log(authPage);
+
+	const handleProfileImageChange = (file) => {
+		if (file) {
+			setProfileImg({ file: file, blob: URL.createObjectURL(file) });
+		}
+	};
+
+	const handleUpdateProfileImage = async () => {
+		if (!profileImg.file || isUploaing) return;
+		try {
+			const token = await upload([profileImg]);
+			if (isUploadError) throw new Error(uploadError);
+			await ChangeProfile(token[0]);
+			await queryClinet.invalidateQueries(["pageprofile"]);
+			setProfileImg({});
+			profileImageInputRef.current.value = "";
+		} catch (error) {
+			toast.error(error.message);
+		}
+	};
 
 	return (
 		<>
@@ -149,9 +212,11 @@ const ProfilePage = () => {
 										<div className="w-20 md:w-32 rounded-full relative group/avatar">
 											<img
 												src={
-													isMyProfile
-														? authPage.profilePicture
-														: targetPage?.profilePicture ||
+													profileImg.blob
+														? profileImg.blob
+														: isMyProfile
+														? changeHost(authPage.profilePicture)
+														: changeHost(targetPage?.profilePicture) ||
 														  "/avatar-placeholder.png"
 												}
 											/>
@@ -160,11 +225,22 @@ const ProfilePage = () => {
 												<div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 md:transform-none md:top-7 md:right-5 md:left-auto p-1 text-black bg-white rounded-full group-hover/avatar:opacity-100 opacity-50 md:opacity-100 transition-all cursor-pointer">
 													<CiEdit
 														className="w-4 h-4 cursor-pointer"
-														onClick={() => {}}
+														onClick={() => {
+															profileImageInputRef.current.click();
+														}}
 													/>
 												</div>
 											)}
 										</div>
+										<input
+											type="file"
+											accept="image/*"
+											hidden
+											ref={profileImageInputRef}
+											onChange={(e) =>
+												handleProfileImageChange(e.target.files[0])
+											}
+										/>
 									</div>
 									<div className="flex flex-col items-center md:items-start">
 										<span className="text-lg text-primary">
@@ -245,9 +321,18 @@ const ProfilePage = () => {
 										</button>
 									)}
 
-									{isMyProfile && (
-										<button className="btn w-48 md:w-auto px-8 btn-primary">
-											Update
+									{isMyProfile && profileImg.file && (
+										<button
+											className={`btn w-48 md:w-auto px-8 btn-primary ${
+												isChangeProfilePending || isUploaing
+													? "btn-disabled"
+													: ""
+											}`}
+											onClick={handleUpdateProfileImage}
+										>
+											{isUploaing && !isChangeProfilePending && "Uploading ..."}
+											{isChangeProfilePending && "Changing Profile ..."}
+											{!isUploaing && !isChangeProfilePending && "Update"}
 										</button>
 									)}
 								</div>
@@ -308,7 +393,7 @@ const ProfilePage = () => {
 								</div>
 							</div>
 						) : (
-							<Posts pageUsername={paramUsername} />
+							renderPosts
 						)}
 					</>
 				)}

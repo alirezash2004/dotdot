@@ -4,16 +4,18 @@ import { checkSchema } from 'express-validator';
 import protectRoute from '../middleware/protectRoute.js';
 import validationResultHandler from '../middleware/validationResultHandler.js';
 
-import { getPage, updatePageinfo, deletePage } from '../controllers/page.controller.js';
+import { getPage, updatePageinfo, deletePage, updatePageProfile } from '../controllers/page.controller.js';
 
 import { usernameSchema } from '../validators/global.schema.js';
-import { pageUpdateSchema } from '../validators/page.schema.js';
+import { pageUpdateSchema, updateProfileSchema } from '../validators/page.schema.js';
 
 const router = Router();
 
 router.get('/:username', protectRoute, checkSchema(usernameSchema, ['params']), validationResultHandler, getPage);
 
 router.put('/update', protectRoute, checkSchema(pageUpdateSchema), validationResultHandler, updatePageinfo);
+
+router.put('/updatepageprofile', protectRoute, checkSchema(updateProfileSchema), validationResultHandler, updatePageProfile);
 
 router.delete('/', protectRoute, deletePage);
 

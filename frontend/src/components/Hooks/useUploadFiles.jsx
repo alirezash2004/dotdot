@@ -2,7 +2,25 @@ import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
 import toast from "react-hot-toast";
 
-const useUploadFiles = () => {
+const useUploadFiles = ({ destination }) => {
+	const getFormDestDataFromDestination = () => {
+		switch (destination) {
+			case "singlePic":
+				return {
+					url: `/api/v1.0/postMedia/upload/singleImage`,
+					fieldName: "postImage",
+				};
+
+			case "profilePic":
+				return {
+					url: `/api/v1.0/postMedia/upload/profilePic`,
+					fieldName: "profileImage",
+				};
+		}
+	};
+
+	const formDest = getFormDestDataFromDestination();
+
 	const [isUploaded, setIsUploaded] = useState(false);
 
 	const {
@@ -15,9 +33,9 @@ const useUploadFiles = () => {
 		mutationFn: async (file) => {
 			try {
 				const formData = new FormData();
-				formData.append("postImage", file);
+				formData.append(formDest.fieldName, file);
 
-				const res = await fetch(`/api/v1.0/postMedia/upload/singleImage`, {
+				const res = await fetch(formDest.url, {
 					method: "POST",
 					body: formData,
 				});
@@ -63,7 +81,7 @@ const useUploadFiles = () => {
 		upload,
 		isUploaing,
 		isUploaded,
-		setIsUploaded
+		setIsUploaded,
 	};
 };
 

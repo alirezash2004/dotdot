@@ -19,7 +19,7 @@ const NewpostPage = () => {
 	const [posted, setPosted] = useState(false);
 
 	const { upload, isUploadError, isUploaing, isUploaded, setIsUploaded } =
-		useUploadFiles();
+		useUploadFiles({ destination: "singlePic" });
 
 	const { mutate: Post, isPending: isPosting } = useMutation({
 		mutationFn: async ({ fileAccesstoken, caption }) => {

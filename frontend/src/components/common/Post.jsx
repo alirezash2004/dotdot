@@ -16,6 +16,7 @@ import {
 	CiLocationArrow1,
 	CiTrash,
 } from "react-icons/ci";
+import changeHost from "../../utils/changeHost.js";
 
 const Post = ({ post, postType = "" }) => {
 	const commentBox = useRef(null);
@@ -231,15 +232,13 @@ const Post = ({ post, postType = "" }) => {
 	const postMediaData = useMemo(() => {
 		return (
 			<HorizontalScrollCarousel
-				imgs={post.assets.map((asset) =>
-					asset.url.replace("localhost", "10.61.18.10")
-				)}
+				imgs={post.assets.map((asset) => changeHost(asset.url))}
 			/>
 		);
 	}, [post.assets]);
 
 	// TODO: fix localhost addressing on postmedia urls on backend
-	const postUrl = post.assets[0].url.replace("localhost", "10.61.18.10");
+	const postUrl = changeHost(post.assets[0].url);
 
 	return postType === "pageProfile" ? (
 		<>
@@ -256,7 +255,7 @@ const Post = ({ post, postType = "" }) => {
 		</>
 	) : (
 		<>
-			<div className="flex mb-14 mx-4 md:mx-auto gap-2 flex-col items-start pb-4 border rounded-lg p-5 border-gray-700">
+			<div className="flex mb-14 mx-4 md:mx-auto gap-2 flex-col items-start pb-4 border rounded-lg p-5 border-gray-700 md:w-3/4">
 				<div className="flex w-full">
 					<div className="avatar">
 						<Link
@@ -264,7 +263,11 @@ const Post = ({ post, postType = "" }) => {
 							className="w-8 rounded-full overflow-hidden"
 						>
 							<img
-								src={postSender.profilePicture || "/avatar-placeholder.png"}
+								src={
+									changeHost(postSender.profilePicture) ||
+									"/avatar-placeholder.png"
+								}
+								className="aspect-square"
 							/>
 						</Link>
 					</div>
@@ -295,7 +298,7 @@ const Post = ({ post, postType = "" }) => {
 				<div className="flex flex-col mt-2 w-full">
 					{/* <HorizontalScrollCarousel
 						imgs={post.assets.map((asset) =>
-							asset.url.replace("localhost", "10.61.18.10")
+							changeHost(asset.url)
 						)}
 					/> */}
 					{postMediaData}
@@ -303,7 +306,7 @@ const Post = ({ post, postType = "" }) => {
 						<LazyLoadImage
 							key={asset._id}
 							effect="blur"
-							src={asset.url.replace("localhost", "10.61.18.10")}
+							changeHost(asset.url)
 							className="md:w-96 rounded-lg mx-auto object-cover"
 						/>
 					))} */}

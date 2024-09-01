@@ -298,14 +298,14 @@ export const pageUpdateSchema = {
         trim: true,
         escape: true,
     },
-    country: {
-        matches: {
-            errorMessage: 'Unexpected country format',
-            options: /^[A-Za-z\s]+$/,
-        },
-        trim: true,
-        escape: true,
-    },
+    // country: {
+    //     matches: {
+    //         errorMessage: 'Unexpected country format',
+    //         options: /^[A-Za-z\s]+$/,
+    //     },
+    //     trim: true,
+    //     escape: true,
+    // },
     bio: {
         optional: {
             options: { checkFalsy: true }
@@ -338,3 +338,16 @@ export const pageUpdateSchema = {
         trim: true,
     }
 };
+
+export const updateProfileSchema = {
+    fileAccesstoken: {
+        exists: {
+            errorMessage: 'Website is required'
+        },
+        matches: {
+            errorMessage: "Unexpected fileAccesstoken",
+            options: /^[a-z0-9]{72}$/,
+        },
+        trim: true,
+    }
+}

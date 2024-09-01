@@ -24,7 +24,7 @@ const EditProfileModel = ({ authPage }) => {
 		website: "",
 		theme: "",
 		language: "",
-		country: "",
+		// country: "",
 		// birthdate: "",
 	});
 
@@ -49,7 +49,7 @@ const EditProfileModel = ({ authPage }) => {
 				// birthdate: authPage.pageProfile.birthdate,
 				theme: authPage.pageSetting.theme,
 				language: authPage.pageSetting.language,
-				country: authPage.pageSetting.country,
+				// country: authPage.pageSetting.country,
 			});
 		}
 	}, [authPage]);

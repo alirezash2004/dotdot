@@ -1,6 +1,7 @@
 import { genPassword, validatePassword } from '../utils/passwordsUtil.js';
 
 import Page from '../models/page.model.js';
+import TmpFiles from '../models/tmpFiles.model.js';
 
 // @desc   Get page
 // @route  POST /api/v1.0/@:pageId
@@ -79,8 +80,8 @@ export const updatePageinfo = async (req, res, next) => {
         const { username, fullName, email, password, newpassword, pageType, theme, language, country, bio, website, birthdate } = data;
 
         const [page, usernameExist] = await Promise.all([
-            await Page.findById(pageId).exec(),
-            await Page.exists({ username: username }).exec(),
+            Page.findById(pageId).exec(),
+            Page.exists({ username: username }).exec(),
         ]);
 
         if (usernameExist && req.user.username !== username) {
@@ -132,6 +133,37 @@ export const updatePageinfo = async (req, res, next) => {
         return res.status(200).json({ success: true, usernameChange, username: savePage.username });
     } catch (err) {
         console.log(`Error in updatePageinfo : ${err}`);
+        const error = new Error(`Internal Server Error`)
+        error.status = 500;
+        return next(error);
+    }
+}
+
+export const updatePageProfile = async (req, res, next) => {
+    try {
+        const pageId = req.user._id.toString();
+        const fileAccesstoken = req.validatedData.fileAccesstoken;
+
+        const page = await Page.findById(pageId).exec();
+
+        const media = await TmpFiles.findOne({ fileAccesstoken: fileAccesstoken, pageId: pageId }).exec();
+
+        if (!media) {
+            const error = new Error(`A postmedia with token ${mediaAccessToken} was not found!`);
+            error.status = 404;
+            return next(error);
+        }
+
+        page.profilePicture = media.url;
+
+        const [savePage, _] = await Promise.all([
+            page.save(),
+            TmpFiles.findByIdAndDelete(media._id)
+        ])
+
+        return res.status(200).json({ success: true, username: savePage.profilePicture });
+    } catch (err) {
+        console.log(`Error in updatePageProfile : ${err}`);
         const error = new Error(`Internal Server Error`)
         error.status = 500;
         return next(error);
