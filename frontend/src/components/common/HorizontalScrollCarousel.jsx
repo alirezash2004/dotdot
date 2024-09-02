@@ -27,21 +27,25 @@ const HorizontalScrollCarousel = ({ imgs, handleDeleteImage }) => {
 			} else if (x >= DRAG_BUFFER && imgIndex > 0) {
 				setImgIndex((pv) => pv - 1);
 			}
+			setImgIndex((pv) => pv);
 		};
 
 		return (
 			<div className="relative overflow-hidden w-full">
 				<motion.div
-					drag="x"
+					drag
 					dragConstraints={{
 						left: 0,
 						right: 0,
+						top: 0,
+						bottom: 0
 					}}
 					style={{
 						x: dragX,
 					}}
 					animate={{
 						translateX: `-${imgIndex * 100}%`,
+						translateY: `-0%`,
 					}}
 					transition={SPRING_OPTIONS}
 					onDragEnd={onDragEnd}

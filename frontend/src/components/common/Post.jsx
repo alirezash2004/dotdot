@@ -163,7 +163,13 @@ const Post = ({ post, postType = "" }) => {
 						</span>
 					)}
 				</div>
-				<div className="flex flex-col mt-2 w-full">
+				{/* TODO: make double like animated */}
+				<div
+					className="flex flex-col mt-2 w-full"
+					onDoubleClick={() => {
+						if (!isLiked) handleLikePost();
+					}}
+				>
 					{postMediaData}
 					{caption && (
 						<p
