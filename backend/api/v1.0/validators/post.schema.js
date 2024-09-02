@@ -10,7 +10,7 @@ export const postsSchema = {
     caption: {
         matches: {
             errorMessage: 'caption has invalid charachter',
-            options: /[\p{L}\p{N}\s,.!?;:()'\"-]+|[\p{So}]/,
+            options: /[\p{L}\p{N}\s,.!?;:()'\"-]|[\p{So}]/,
         },
         trim: true,
         escape: true,

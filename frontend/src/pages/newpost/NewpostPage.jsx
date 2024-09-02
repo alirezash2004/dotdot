@@ -23,8 +23,6 @@ const NewpostPage = () => {
 
 	const { mutate: Post, isPending: isPosting } = useMutation({
 		mutationFn: async ({ fileAccesstoken, caption }) => {
-			console.log(fileAccesstoken);
-
 			const res = await fetch(`/api/v1.0/posts/create`, {
 				method: "POST",
 				headers: {

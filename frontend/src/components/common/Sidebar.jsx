@@ -2,6 +2,10 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 
+import changeHost from "../../utils/changeHost.js";
+
+import { useLogout } from "../Hooks/useLogout";
+
 import DotDotLogo from "../../components/imgs/DotDot";
 
 import {
@@ -11,7 +15,6 @@ import {
 	CiLogout,
 	CiUser,
 } from "react-icons/ci";
-import { useLogout } from "../Hooks/useLogout";
 import Loading from "./Loading";
 
 const Sidebar = () => {
@@ -121,8 +124,9 @@ const Sidebar = () => {
 							<div className="w-8 rounded-full">
 								<img
 									src={
-										authPage?.profileImg ||
-										`https://avatar.iran.liara.run/username?username=${authPage?.username}`
+										authPage.profilePicture
+											? changeHost(authPage.profilePicture)
+											: `https://avatar.iran.liara.run/username?username=${authPage?.username}`
 									}
 								/>
 							</div>

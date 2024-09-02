@@ -6,6 +6,10 @@ import Post from '../models/post.model.js';
 import TmpFiles from '../models/tmpFiles.model.js';
 import Notification from '../models/notification.model.js'
 import Savedpost from '../models/savedposts.model.js';
+import sharp from 'sharp';
+import { __filename, __dirname } from '../../../currentPath.js';
+import path from 'path';
+import fs from 'fs';
 
 export const getRecentPosts = async (req, res, next) => {
     try {
@@ -303,11 +307,67 @@ export const newPost = async (req, res, next) => {
 
             const newPost = new Post(post);
 
-            for (let i = 0; i < medias.length; i++) {
-                const media = medias[i];
+            if (medias.length > 1) {
+                for (let i = 0; i < medias.length; i++) {
+                    const media = medias[i];
 
-                newPost.assets.push({ url: media.url });
+                    const timestamp = Date.now();
+                    const f1 = media.filename.split(".")[0].split("-");
+                    const filename = `${f1[1]}-${f1[2]}`;
+                    const ref = `post-m-p-${timestamp}-${filename}.webp`;
+
+                    fs.access(path.join(__dirname, 'uploads', 'posts'), (error) => {
+                        if (error) {
+                            fs.mkdirSync(path.join(__dirname, 'uploads', 'posts'));
+                        }
+                    });
+
+                    await sharp(media.path)
+                        .resize({
+                            width: 1080,
+                            height: 1080,
+                            fit: sharp.fit.cover,
+                            position: sharp.strategy.entropy
+                        })
+                        .webp({ quality: 20 })
+                        .normalize()
+                        .toFile(path.join(__dirname, 'uploads', 'posts', ref))
+
+                    const flUrl = req.protocol + "://" + req.get("host") + "/posts/" + ref;
+
+                    fs.unlinkSync(media.path);
+
+                    newPost.assets.push({ url: flUrl });
+                }
+            } else if (medias.length == 1) {
+                const media = medias[0];
+                const timestamp = Date.now();
+                const f1 = media.filename.split(".")[0].split("-");
+                const filename = `${f1[1]}-${f1[2]}`;
+                const ref = `post-m-p-${timestamp}-${filename}.webp`;
+
+                fs.access(path.join(__dirname, 'uploads', 'posts'), (error) => {
+                    if (error) {
+                        fs.mkdirSync(path.join(__dirname, 'uploads', 'posts'));
+                    }
+                });
+
+                await sharp(media.path)
+                    .webp({ quality: 20 })
+                    .normalize()
+                    .toFile(path.join(__dirname, 'uploads', 'posts', ref))
+
+                const flUrl = req.protocol + "://" + req.get("host") + "/posts/" + ref;
+
+                fs.unlinkSync(media.path);
+
+                newPost.assets.push({ url: flUrl });
+            } else {
+                const error = new Error(`post media can not be empty`);
+                error.status = 500;
+                return next(error);
             }
+
 
             await newPost.save();
 
@@ -372,7 +432,7 @@ export const likeUnlikePost = async (req, res, next) => {
             // unlike post
             await Post.updateOne({ _id: postId }, { $pull: { likes: pageId } });
             await Page.updateOne({ _id: pageId }, { $pull: { likedPosts: postId } });
-            res.status(200).json({ success: true, data: { numberOfLikes: postObj.numberOfLikes - 1 }, msg: 'Post Unliked Successfully' });
+            res.status(200).json({ success: true, data: { numberOfLikes: postObj.numberOfLikes - 1, isLiked: false }, msg: 'Post Unliked Successfully' });
         } else {
             // like post
             await Post.updateOne({ _id: postId }, { $push: { likes: pageId } });
@@ -388,7 +448,7 @@ export const likeUnlikePost = async (req, res, next) => {
                 await notification.save();
             }
 
-            res.status(200).json({ success: true, data: { numberOfLikes: postObj.numberOfLikes + 1 }, msg: 'Post Liked Successfully' });
+            res.status(200).json({ success: true, data: { numberOfLikes: postObj.numberOfLikes + 1, isLiked: true }, msg: 'Post Liked Successfully' });
         }
     } catch (err) {
         console.log(`Error in likeUnlikePost : ${err}`);
@@ -497,7 +557,7 @@ export const saveUnsavePost = async (req, res, next) => {
         if (isSaved) {
             await Savedpost.deleteOne({ pageId, postId })
 
-            return res.status(200).json({ success: true, msg: "post unsaved" })
+            return res.status(200).json({ success: true, data: { isSaved: false }, msg: "post unsaved" })
         } else {
             const newSavedpost = new Savedpost({
                 pageId,
@@ -506,7 +566,7 @@ export const saveUnsavePost = async (req, res, next) => {
 
             await newSavedpost.save();
 
-            return res.status(200).json({ success: true, msg: "post saved" })
+            return res.status(200).json({ success: true, data: { isSaved: true }, msg: "post saved" })
         }
 
 
@@ -522,6 +582,8 @@ export const deletePostByPostId = async (req, res, next) => {
     try {
 
         const pageId = req.user._id.toString();
+
+        const pageUsername = req.user.username;
 
         const data = req.validatedData;
 
@@ -556,7 +618,7 @@ export const deletePostByPostId = async (req, res, next) => {
             Savedpost.deleteMany({ postId }).exec()
         ])
 
-        return res.status(200).json({ success: true, msg: 'post deleted!' });
+        return res.status(200).json({ success: true, username: pageUsername, msg: 'post deleted!' });
 
     } catch (err) {
         console.log(`Error in deletePostByPostId : ${err}`);

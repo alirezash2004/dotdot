@@ -76,8 +76,6 @@ export const singleImageUpload = async (req, res, next) => {
             return res.status(400).json({ success: false, msg: 'No File Provided!' });
         }
 
-        // TODO: check maximum upload count by checking count of userId in fileData
-
         let fileAccesstoken = crypto.randomBytes(36).toString('hex');
 
         const fileData = {

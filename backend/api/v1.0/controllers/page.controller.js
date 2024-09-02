@@ -3,6 +3,11 @@ import { genPassword, validatePassword } from '../utils/passwordsUtil.js';
 import Page from '../models/page.model.js';
 import TmpFiles from '../models/tmpFiles.model.js';
 
+import sharp from 'sharp';
+import { __filename, __dirname } from '../../../currentPath.js';
+import fs from 'fs';
+import path from 'path';
+
 // @desc   Get page
 // @route  POST /api/v1.0/@:pageId
 // Access
@@ -154,7 +159,33 @@ export const updatePageProfile = async (req, res, next) => {
             return next(error);
         }
 
-        page.profilePicture = media.url;
+        const timestamp = Date.now();
+        const f1 = media.filename.split(".")[0].split("-");
+        const filename = `${f1[1]}-${f1[2]}`;
+        const ref = `profile-${timestamp}-${filename}.webp`;
+
+        fs.access(path.join(__dirname, 'uploads', 'profiles'), (error) => {
+            if (error) {
+                fs.mkdirSync(path.join(__dirname, 'uploads', 'profiles'));
+            }
+        });
+
+        await sharp(media.path)
+            .resize({
+                width: 1080,
+                height: 1080,
+                fit: sharp.fit.cover,
+                position: sharp.strategy.entropy
+            })
+            .webp({ quality: 20 })
+            .normalize()
+            .toFile(path.join(__dirname, 'uploads', 'profiles', ref))
+
+        const flUrl = req.protocol + "://" + req.get("host") + "/profiles/" + ref;
+
+        fs.unlinkSync(media.path);
+
+        page.profilePicture = flUrl;
 
         const [savePage, _] = await Promise.all([
             page.save(),
