@@ -297,6 +297,11 @@ export const newPost = async (req, res, next) => {
                 medias.push(media);
             }
 
+            if (medias.length == 0) {
+                const error = new Error(`Postmedia can't be empty`);
+                error.status = 404;
+                return next(error);
+            }
 
             const post = {
                 page: pageId,
@@ -307,40 +312,9 @@ export const newPost = async (req, res, next) => {
 
             const newPost = new Post(post);
 
-            if (medias.length > 1) {
-                for (let i = 0; i < medias.length; i++) {
-                    const media = medias[i];
+            for (let i = 0; i < medias.length; i++) {
+                const media = medias[i];
 
-                    const timestamp = Date.now();
-                    const f1 = media.filename.split(".")[0].split("-");
-                    const filename = `${f1[1]}-${f1[2]}`;
-                    const ref = `post-m-p-${timestamp}-${filename}.webp`;
-
-                    fs.access(path.join(__dirname, 'uploads', 'posts'), (error) => {
-                        if (error) {
-                            fs.mkdirSync(path.join(__dirname, 'uploads', 'posts'));
-                        }
-                    });
-
-                    await sharp(media.path)
-                        .resize({
-                            width: 1080,
-                            height: 1080,
-                            fit: sharp.fit.cover,
-                            position: sharp.strategy.entropy
-                        })
-                        .webp({ quality: 20 })
-                        .normalize()
-                        .toFile(path.join(__dirname, 'uploads', 'posts', ref))
-
-                    const flUrl = req.protocol + "://" + req.get("host") + "/posts/" + ref;
-
-                    fs.unlinkSync(media.path);
-
-                    newPost.assets.push({ url: flUrl });
-                }
-            } else if (medias.length == 1) {
-                const media = medias[0];
                 const timestamp = Date.now();
                 const f1 = media.filename.split(".")[0].split("-");
                 const filename = `${f1[1]}-${f1[2]}`;
@@ -352,20 +326,24 @@ export const newPost = async (req, res, next) => {
                     }
                 });
 
+                sharp.cache(false);
+
                 await sharp(media.path)
+                    .resize(post.type === "multiple" ? {
+                        width: 1080,
+                        height: 1080,
+                        fit: sharp.fit.cover,
+                        position: sharp.strategy.entropy
+                    } : {})
                     .webp({ quality: 20 })
                     .normalize()
                     .toFile(path.join(__dirname, 'uploads', 'posts', ref))
 
                 const flUrl = req.protocol + "://" + req.get("host") + "/posts/" + ref;
 
-                fs.unlinkSync(media.path);
-
+                fs.unlinkSync(media.path)
+                
                 newPost.assets.push({ url: flUrl });
-            } else {
-                const error = new Error(`post media can not be empty`);
-                error.status = 500;
-                return next(error);
             }
 
 

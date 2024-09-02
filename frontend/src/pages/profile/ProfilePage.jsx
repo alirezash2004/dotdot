@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
@@ -135,6 +135,14 @@ const ProfilePage = () => {
 	const handleFollowUnfollow = () => {
 		followUnfollow();
 	};
+
+	const renderPosts = useMemo(() => {
+		if (isValidUsername) {
+			return <Posts pageUsername={paramUsername} />;
+		} else {
+			return <></>;
+		}
+	}, [paramUsername, isValidUsername]);
 
 	if (!isValidUsername) {
 		return (

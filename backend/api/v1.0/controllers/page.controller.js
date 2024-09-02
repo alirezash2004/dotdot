@@ -170,6 +170,8 @@ export const updatePageProfile = async (req, res, next) => {
             }
         });
 
+        sharp.cache(false);
+
         await sharp(media.path)
             .resize({
                 width: 1080,

@@ -30,7 +30,7 @@ const HorizontalScrollCarousel = ({ imgs, handleDeleteImage }) => {
 		};
 
 		return (
-			<div className="relative overflow-hidden py-8 w-full">
+			<div className="relative overflow-hidden w-full">
 				<motion.div
 					drag="x"
 					dragConstraints={{
@@ -58,7 +58,7 @@ const HorizontalScrollCarousel = ({ imgs, handleDeleteImage }) => {
 	const Images = ({ imgIndex }) => {
 		return (
 			<>
-				{(imgs.length > 1 || handleDeleteImage) &&
+				{imgs.length > 1 &&
 					imgs.map((imgSrc, idx) => {
 						return (
 							<motion.div
@@ -102,6 +102,32 @@ const HorizontalScrollCarousel = ({ imgs, handleDeleteImage }) => {
 						alt=""
 						className="rounded-lg mx-auto object-cover"
 					/>
+				)}
+				{imgs.length == 1 && handleDeleteImage && (
+					<>
+						<div className="relative w-11/12 mx-auto">
+							<div
+								className="flex items-center absolute top-0 right-0 z-50 cursor-pointer text-red-700 bg-slate-900 p-2 rounded-full w-12 h-12 btn-outline btn-square btn"
+								onClick={() => {
+									setImgIndex((prevIndex) =>
+										prevIndex !== 0 ? prevIndex - 1 : 0
+									);
+									handleDeleteImage(imgs[0]);
+								}}
+							>
+								<CiMedicalCross className="rotate-45 w-6 h-6" />
+							</div>
+							<motion.img
+								animate={{
+									scale: 0.95,
+								}}
+								transition={SPRING_OPTIONS}
+								src={imgs[0].blob}
+								alt=""
+								className="rounded-lg mx-auto object-cover"
+							/>
+						</div>
+					</>
 				)}
 			</>
 		);
