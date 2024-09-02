@@ -1,13 +1,19 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { useMemo, useRef, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import toast from "react-hot-toast";
 import "react-lazy-load-image-component/src/effects/blur.css";
+
+import useDeletePost from "../Hooks/PostHooks/useDeletePost.jsx";
+import useLikeUnlikePost from "../Hooks/PostHooks/useLikeUnlikePost.jsx";
+import useCommentOnPost from "../Hooks/PostHooks/useCommentOnPost.jsx";
+import useSaveUnsavePost from "../Hooks/PostHooks/useSaveUnsavePost.jsx";
 
 import Loading from "./Loading";
 import HorizontalScrollCarousel from "./HorizontalScrollCarousel";
 
 import { formatDate } from "../../utils/date";
+import changeHost from "../../utils/changeHost.js";
 
 import {
 	CiBookmark,
@@ -16,9 +22,9 @@ import {
 	CiLocationArrow1,
 	CiTrash,
 } from "react-icons/ci";
-import changeHost from "../../utils/changeHost.js";
 
 const Post = ({ post, postType = "" }) => {
+	const postId = post._id;
 	const commentBox = useRef(null);
 	const [showFullCaption, setShowFullCaption] = useState(false);
 	const [comment, setComment] = useState("");
@@ -29,163 +35,27 @@ const Post = ({ post, postType = "" }) => {
 
 	const { data: authPage } = useQuery({ queryKey: ["authPage"] });
 
-	const navigate = useNavigate();
+	const { deletePost, isDeletePending } = useDeletePost({ postId });
 
-	const queryClient = useQueryClient();
-
-	const { mutate: deletePost, isPending: isDeletePending } = useMutation({
-		mutationFn: async () => {
-			try {
-				const res = await fetch(`/api/v1.0/posts/${post._id}`, {
-					method: "DELETE",
-				});
-				const data = await res.json();
-
-				if (!res.ok || data.success === false)
-					throw new Error(data.msg || "Failed To Delete Post");
-
-				return data;
-			} catch (error) {
-				throw new Error(error);
-			}
-		},
-		onSuccess: () => {
-			toast.success("Post Deleted Successfully");
-			queryClient.invalidateQueries({ queryKey: ["posts"] });
-			navigate(`/profile/${postSender.username}`);
-		},
-		onError: (error) => {
-			toast.error(error.message || "Failed To Delete Post!");
-			queryClient.invalidateQueries({ queryKey: ["posts"] });
-		},
+	const { likeUnlikePost, isLikeUnlikePending } = useLikeUnlikePost({
+		postId,
+		postType,
+		setIsLiked,
+		setNumberOfLikes,
 	});
 
-	const { mutate: likeUnlikePost, isPending: isLikeUnlikePending } =
-		useMutation({
-			mutationFn: async () => {
-				try {
-					const res = await fetch(`/api/v1.0/posts/like/${post._id}`, {
-						method: "POST",
-					});
-					const data = await res.json();
-
-					if (!res.ok || data.success === false)
-						throw new Error(data.msg || "Failed To Like/Unlike");
-
-					return data;
-				} catch (error) {
-					throw new Error(error);
-				}
-			},
-			onSuccess: (returnData) => {
-				if (!isLiked) {
-					setNumberOfLikes((prevState) => prevState + 1);
-				} else {
-					setNumberOfLikes((prevState) => (prevState > 1 ? prevState - 1 : 0));
-				}
-				setIsLiked((prevState) => !prevState);
-
-				// queryClient.invalidateQueries({ queryKey: ["posts"] });
-
-				if (postType !== "single") {
-					queryClient.setQueryData(["posts"], (oldData) => {
-						return oldData.map((p) => {
-							if (p._id === post._id) {
-								return {
-									...p,
-									isLiked: !p.isLiked,
-									numberOfLikes: returnData.data.numberOfLikes,
-								};
-							}
-							return p;
-						});
-					});
-				}
-			},
-			onError: (error) => {
-				toast.error(error.message || "Failed To Like/Unlike Post!");
-			},
-		});
-
-	const { mutate: commentOnPost, isPending: isCommentPending } = useMutation({
-		mutationFn: async () => {
-			try {
-				const res = await fetch(`/api/v1.0/posts/comment/${post._id}`, {
-					method: "POST",
-					headers: {
-						"Content-Type": "application/json",
-					},
-					body: JSON.stringify({ text: comment }),
-				});
-				const data = await res.json();
-
-				if (!res.ok || data.success === false)
-					throw new Error(data.msg || "Failed To Comment On This Post");
-
-				return data.data.comment;
-			} catch (error) {
-				throw new Error(error);
-			}
-		},
-		onSuccess: (returnData) => {
-			// console.log(returnData);
-			toast.success("Commented On Post Successfully");
-			setComment("");
-			document.querySelector("#commentInp").value = "";
-
-			if (postType !== "single") {
-				queryClient.setQueryData(["posts"], (oldData) => {
-					return oldData.map((p) => {
-						if (p._id === post._id) {
-							// console.log(p);
-
-							return {
-								...p,
-								comments: [...p.comments, returnData],
-							};
-						}
-						return p;
-					});
-				});
-			} else {
-				post.comments.push(returnData);
-			}
-
-			setTimeout(() => {
-				let comments = commentBox.current.children;
-
-				comments[comments.length - 1].scrollIntoView({
-					behavior: "smooth",
-					block: "end",
-				});
-			}, 100);
-		},
-		onError: (error) => {
-			toast.error(error.message);
-		},
+	const { commentOnPost, isCommentPending } = useCommentOnPost({
+		postId,
+		postType,
+		setComment,
+		commentBox,
+		postCommentsArr: post.comments,
 	});
 
-	const { mutate: saveUnsavePost, isPending: isSaveUnsavePending } =
-		useMutation({
-			mutationFn: async () => {
-				const res = await fetch(`/api/v1.0/posts/save/${post._id}`, {
-					method: "POST",
-				});
-				const data = await res.json();
-
-				if (!res.ok || data.success === false)
-					throw new Error(data.msg || "Failed To Save/Unsave post");
-
-				// TODO: return saved status (for synching problems)
-				return data;
-			},
-			onSuccess: () => {
-				setIsSaved((prevState) => !prevState);
-			},
-			onError: (error) => {
-				toast.error(error.message);
-			},
-		});
+	const { saveUnsavePost, isSaveUnsavePending } = useSaveUnsavePost({
+		postId,
+		setIsSaved,
+	});
 
 	const isMyPost = authPage._id === post.page?._id;
 
@@ -199,7 +69,7 @@ const Post = ({ post, postType = "" }) => {
 	const handlePostComment = (e) => {
 		e.preventDefault();
 		if (isCommentPending) return;
-		commentOnPost();
+		commentOnPost(comment);
 	};
 
 	const handleLikePost = () => {
@@ -213,7 +83,6 @@ const Post = ({ post, postType = "" }) => {
 		// sharePost();
 	};
 
-	// TODO: add save post
 	const handleSavePost = () => {
 		if (isSaveUnsavePending) return;
 		saveUnsavePost();
@@ -237,7 +106,6 @@ const Post = ({ post, postType = "" }) => {
 		);
 	}, [post.assets]);
 
-	// TODO: fix localhost addressing on postmedia urls on backend
 	const postUrl = changeHost(post.assets[0].url);
 
 	return postType === "pageProfile" ? (
@@ -378,7 +246,7 @@ const Post = ({ post, postType = "" }) => {
 						{isSaveUnsavePending && <Loading size="sm" />}
 					</div>
 					<dialog
-						id={`comments_modal_${post._id}`}
+						id={`comments_modal_${postId}`}
 						className="modal border-none outline-none"
 					>
 						<div className="modal-box rounded border border-gray-700">
