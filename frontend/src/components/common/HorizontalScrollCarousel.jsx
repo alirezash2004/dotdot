@@ -100,7 +100,7 @@ const HorizontalScrollCarousel = ({ imgs, handleDeleteImage }) => {
 						transition={SPRING_OPTIONS}
 						src={imgs[0]}
 						alt=""
-						className="rounded-lg mx-auto object-cover"
+						className="rounded-lg mx-auto object-cover pointer-events-none"
 					/>
 				)}
 				{imgs.length == 1 && handleDeleteImage && (

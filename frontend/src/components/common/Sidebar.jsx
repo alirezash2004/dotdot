@@ -123,6 +123,7 @@ const Sidebar = () => {
 						<div className="avatar hidden md:inline-flex">
 							<div className="w-8 rounded-full">
 								<img
+									className="pointer-events-none"
 									src={
 										authPage.profilePicture
 											? changeHost(authPage.profilePicture)

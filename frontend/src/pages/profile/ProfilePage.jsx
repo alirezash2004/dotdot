@@ -227,6 +227,7 @@ const ProfilePage = () => {
 														: changeHost(targetPage?.profilePicture) ||
 														  "/avatar-placeholder.png"
 												}
+												className="pointer-events-none"
 											/>
 											{/* <img src={"/avatar-placeholder.png"} /> */}
 											{isMyProfile && (

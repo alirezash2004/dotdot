@@ -117,7 +117,7 @@ const Post = ({ post, postType = "" }) => {
 				<img
 					src={postUrl}
 					alt=""
-					className="w-full object-cover opacity-80 group-hover/post:opacity-100 transition-all duration-200"
+					className="w-full object-cover opacity-80 group-hover/post:opacity-100 transition-all duration-200 pointer-events-none"
 				/>
 			</Link>
 		</>
@@ -135,7 +135,7 @@ const Post = ({ post, postType = "" }) => {
 									changeHost(postSender.profilePicture) ||
 									"/avatar-placeholder.png"
 								}
-								className="aspect-square"
+								className="aspect-square pointer-events-none"
 							/>
 						</Link>
 					</div>
@@ -164,27 +164,7 @@ const Post = ({ post, postType = "" }) => {
 					)}
 				</div>
 				<div className="flex flex-col mt-2 w-full">
-					{/* <HorizontalScrollCarousel
-						imgs={post.assets.map((asset) =>
-							changeHost(asset.url)
-						)}
-					/> */}
 					{postMediaData}
-					{/* {post.assets.map((asset) => (
-						<LazyLoadImage
-							key={asset._id}
-							effect="blur"
-							changeHost(asset.url)
-							className="md:w-96 rounded-lg mx-auto object-cover"
-						/>
-					))} */}
-					{/* {post.assets.length > 0 && (
-						<LazyLoadImage
-							effect="blur"
-							src={postUrl}
-							className="md:w-96 rounded-lg mx-auto object-cover"
-						/>
-					)} */}
 					{caption && (
 						<p
 							className="my-3 cursor-pointer px-2 md:w-96"
