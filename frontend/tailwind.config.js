@@ -13,7 +13,11 @@ export default {
 
   daisyui: {
     themes: [
-      "light",
+      {
+        light: {
+          ...daisyUIThemes["garden"]
+        },
+      },
       {
         black: {
           ...daisyUIThemes["night"],

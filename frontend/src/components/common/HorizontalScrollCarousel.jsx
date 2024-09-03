@@ -1,7 +1,13 @@
 import { useState } from "react";
-import { motion, useMotionValue } from "framer-motion";
+import {
+	animate,
+	motion,
+	motionValue,
+	transform,
+	useMotionValue,
+} from "framer-motion";
 
-import { CiMedicalCross } from "react-icons/ci";
+import { CiHeart, CiMedicalCross } from "react-icons/ci";
 
 const ONE_SECOND = 1000;
 const AUTO_DELAY = ONE_SECOND * 10;
@@ -30,15 +36,49 @@ const HorizontalScrollCarousel = ({ imgs, handleDeleteImage }) => {
 			setImgIndex((pv) => pv);
 		};
 
+		const sequance = (selector) => {
+			return [
+				[
+					selector,
+					{
+						scale: 1,
+						translateX: "-50%",
+						translateY: "-50%",
+						opacity: 1,
+						display: "block",
+					},
+					{ duration: 0 },
+				],
+				[selector, { scale: 1.5, translateX: "-50%", translateY: "-50%" }],
+				[
+					selector,
+					{
+						scale: 1,
+						translateX: "-50%",
+						translateY: "-50%",
+						opacity: 0,
+						display: "none",
+					},
+				],
+			];
+		};
+
+		const PID = imgs[0].split("/")[4].split(".")[0].slice(7);
+
 		return (
 			<div className="relative overflow-hidden w-full">
+				<div
+					className={`hidden opacity-0 absolute top-1/2 left-1/2 z-40 -translate-x-1/2 -translate-y-1/2 ${PID}`}
+				>
+					<CiHeart className="w-24 h-24 bg-red-600 rounded-full" />
+				</div>
 				<motion.div
 					drag
 					dragConstraints={{
 						left: 0,
 						right: 0,
 						top: 0,
-						bottom: 0
+						bottom: 0,
 					}}
 					style={{
 						x: dragX,
@@ -50,10 +90,10 @@ const HorizontalScrollCarousel = ({ imgs, handleDeleteImage }) => {
 					transition={SPRING_OPTIONS}
 					onDragEnd={onDragEnd}
 					className="flex cursor-grab items-center active:cursor-grabbing"
+					onDoubleClick={() => animate(sequance("." + PID))}
 				>
 					<Images imgIndex={imgIndex} />
 				</motion.div>
-
 				<Dots imgIndex={imgIndex} setImgIndex={setImgIndex} />
 			</div>
 		);
