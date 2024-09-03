@@ -3,6 +3,8 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 import { Helmet } from "react-helmet-async";
 
+import changeHost from "../../utils/changeHost.js";
+
 import Loading from "../../components/common/Loading";
 
 import {
@@ -154,7 +156,7 @@ const NotificationPage = () => {
 									<div className="w-8 rounded-full">
 										<img
 											src={
-												notification.from.profileImg ||
+												changeHost(notification.from.profilePicture) ||
 												"/avatar-placeholder.png"
 											}
 										/>
