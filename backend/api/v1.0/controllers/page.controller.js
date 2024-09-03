@@ -162,7 +162,7 @@ export const updatePageProfile = async (req, res, next) => {
         const timestamp = Date.now();
         const f1 = media.filename.split(".")[0].split("-");
         const filename = `${f1[1]}-${f1[2]}`;
-        const ref = `profile-${timestamp}-${filename}.webp`;
+        const newProfRef = `profile-${timestamp}-${filename}.webp`;
 
         fs.access(path.join(__dirname, 'uploads', 'profiles'), (error) => {
             if (error) {
@@ -174,17 +174,24 @@ export const updatePageProfile = async (req, res, next) => {
 
         await sharp(media.path)
             .resize({
-                width: 1080,
-                height: 1080,
+                width: 400,
+                height: 400,
                 fit: sharp.fit.cover,
                 position: sharp.strategy.entropy
             })
             .webp({ quality: 20 })
             .normalize()
-            .toFile(path.join(__dirname, 'uploads', 'profiles', ref))
+            .toFile(path.join(__dirname, 'uploads', 'profiles', newProfRef))
 
-        const flUrl = req.protocol + "://" + req.get("host") + "/profiles/" + ref;
+        const flUrl = req.protocol + "://" + req.get("host") + "/profiles/" + newProfRef;
 
+        // delete old profile pic
+        const oldProfRef = page.profilePicture.split('/')[4];
+        if (!!oldProfRef) {
+            fs.unlinkSync(path.join(__dirname, 'uploads', 'profiles', oldProfRef));
+        }
+
+        // delete uncropped pic
         fs.unlinkSync(media.path);
 
         page.profilePicture = flUrl;

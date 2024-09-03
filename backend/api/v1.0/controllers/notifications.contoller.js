@@ -5,10 +5,12 @@ export const getNotifications = async (req, res, next) => {
         const pageId = req.user._id;
 
         const notifications = await Notification.find({ to: pageId })
+            .select("from type")
             .populate({
                 path: 'from',
                 select: 'username profilePicture'
             })
+            .sort({ createdAt: -1 })
 
         await Notification.updateMany({ to: pageId }, { read: true });
 
