@@ -2,11 +2,17 @@ import generateTokenAndSetCookie from '../utils/jwtUtil.js';
 import { genPassword, validatePassword } from '../utils/passwordsUtil.js';
 
 import Page from '../models/page.model.js';
+import Notification from "../models/notification.model.js";
 
 export const getMe = async (req, res, next) => {
     try {
-        const page = await Page.findById(req.user._id).select('-password -salt');
-        res.status(200).json(page);
+        const pageId = req.user._id;
+
+        const page = await Page.findById(pageId).select('-password -salt');
+
+        const notifications = await Notification.countDocuments({ to: pageId, read: false })
+
+        res.status(200).json({ success: true, page: { ...page.toObject(), notifications } });
     } catch (err) {
         console.log(`Error in getMe : ${err}`);
         const error = new Error(`Internal Server Error`)

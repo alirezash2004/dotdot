@@ -68,7 +68,12 @@ const Sidebar = () => {
 							<span className="text-lg hidden md:block">Profile</span>
 						</Link>
 					</li>
-					<li className="flex justify-center md:justify-start">
+					<li className="flex justify-center md:justify-start indicator">
+						{authPage.notifications !== 0 && (
+							<span className="indicator-item badge badge-secondary indicator-middle">
+								{authPage.notifications}
+							</span>
+						)}
 						<Link
 							to="/notifications"
 							className="flex items-center gap-3 hover:bg-stone-600 transition-all rounded-full duration-300 py-2 px-2 max-w-fit cursor-pointer justify-center md:pr-4"

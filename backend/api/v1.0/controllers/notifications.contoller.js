@@ -12,7 +12,7 @@ export const getNotifications = async (req, res, next) => {
 
         await Notification.updateMany({ to: pageId }, { read: true });
 
-        return res.status(200).json({ notifications });
+        return res.status(200).json({ success: true, notifications });
     } catch (err) {
         console.log(`Error in getNotifications : ${err}`);
         const error = new Error(`Internal Server Error`);

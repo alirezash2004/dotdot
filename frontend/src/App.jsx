@@ -33,7 +33,7 @@ function App() {
 				if (!res.ok || data.success === false)
 					throw new Error(data.msg || "Something went wrong!");
 
-				return data;
+				return data.page;
 			} catch (error) {
 				throw new Error(error);
 			}
