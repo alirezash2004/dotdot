@@ -2,8 +2,6 @@ import { useState } from "react";
 import {
 	animate,
 	motion,
-	motionValue,
-	transform,
 	useMotionValue,
 } from "framer-motion";
 
@@ -63,7 +61,9 @@ const HorizontalScrollCarousel = ({ imgs, handleDeleteImage }) => {
 			];
 		};
 
-		const PID = imgs[0].split("/")[4].split(".")[0].slice(7);
+		const PID = !handleDeleteImage
+			? imgs[0].split("/")[4].split(".")[0].slice(7)
+			: "";
 
 		return (
 			<div className="relative overflow-hidden w-full">
@@ -73,7 +73,7 @@ const HorizontalScrollCarousel = ({ imgs, handleDeleteImage }) => {
 					<CiHeart className="w-24 h-24 bg-red-600 rounded-full" />
 				</div>
 				<motion.div
-					drag
+					drag='x'
 					dragConstraints={{
 						left: 0,
 						right: 0,
@@ -90,7 +90,9 @@ const HorizontalScrollCarousel = ({ imgs, handleDeleteImage }) => {
 					transition={SPRING_OPTIONS}
 					onDragEnd={onDragEnd}
 					className="flex cursor-grab items-center active:cursor-grabbing"
-					onDoubleClick={() => animate(sequance("." + PID))}
+					onDoubleClick={() =>
+						!handleDeleteImage ? animate(sequance("." + PID)) : ""
+					}
 				>
 					<Images imgIndex={imgIndex} />
 				</motion.div>
@@ -149,7 +151,7 @@ const HorizontalScrollCarousel = ({ imgs, handleDeleteImage }) => {
 				)}
 				{imgs.length == 1 && handleDeleteImage && (
 					<>
-						<div className="relative w-11/12 mx-auto">
+						<div className="relative w-8/12 mx-auto">
 							<div
 								className="flex items-center absolute top-0 right-0 z-50 cursor-pointer text-red-700 bg-slate-900 p-2 rounded-full w-12 h-12 btn-outline btn-square btn"
 								onClick={() => {
@@ -168,7 +170,7 @@ const HorizontalScrollCarousel = ({ imgs, handleDeleteImage }) => {
 								transition={SPRING_OPTIONS}
 								src={imgs[0].blob}
 								alt=""
-								className="rounded-lg mx-auto object-cover"
+								className="rounded-lg mx-auto object-cover pointer-events-none"
 							/>
 						</div>
 					</>
