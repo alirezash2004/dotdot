@@ -103,8 +103,6 @@ const NewpostPage = () => {
 	};
 
 	const handleDeleteImage = (fileToDelete) => {
-		console.log(fileToDelete);
-
 		if (isUploaing || isPosting) return;
 		const findIndex = files.indexOf(fileToDelete);
 		setFiles((prevData) => prevData.filter((item, idx) => idx !== findIndex));
@@ -213,7 +211,7 @@ const NewpostPage = () => {
 				</div>
 				<input
 					type="file"
-					accept="image/*"
+					accept=".png,.jpeg,.jpg"
 					hidden
 					multiple
 					ref={imgRef}

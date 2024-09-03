@@ -243,7 +243,7 @@ const ProfilePage = () => {
 										</div>
 										<input
 											type="file"
-											accept="image/*"
+											accept=".png,.jpeg,.jpg"
 											hidden
 											ref={profileImageInputRef}
 											onChange={(e) =>
@@ -384,6 +384,7 @@ const ProfilePage = () => {
 							</a>
 						</div>
 						<Posts pageUsername={paramUsername} postFeedType={postFeedType} />
+						{/* {renderPosts} */}
 					</>
 				)}{" "}
 				{/* Fucking 3 days for this */}

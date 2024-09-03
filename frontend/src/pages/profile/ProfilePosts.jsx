@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { CiCirclePlus } from "react-icons/ci";
 
@@ -64,14 +64,16 @@ const Posts = ({ pageUsername = "", postFeedType = "me" }) => {
 		},
 	});
 
+	const queryClinet = useQueryClient();
+
 	useEffect(() => {
 		setDisabledLoading(false);
 		setSkip(0);
 		setTotalPosts([]);
 		setTimeout(() => {
-			refetch();
+			queryClinet.invalidateQueries(["profilePosts"], { cancelRefetch: false });
 		}, 100);
-	}, [postFeedType, refetch, setSkip]);
+	}, [postFeedType, setSkip, queryClinet]);
 
 	useEffect(() => {
 		if (disabledLoading) {
