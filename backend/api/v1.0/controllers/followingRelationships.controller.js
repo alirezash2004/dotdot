@@ -47,10 +47,10 @@ export const checkIsFollowing = async (req, res, next) => {
 
         const isFollowing = await FollowingRelationship.exists({ pageId: pageId, followedPageId: followedPageId }).exec();
         if (!isFollowing) {
-            return res.status(200).json({ isFollowing: false });
+            return res.status(200).json({ success: true, isFollowing: false });
         }
 
-        return res.status(200).json({ isFollowing: true });
+        return res.status(200).json({ success: true, isFollowing: true });
     } catch (err) {
         console.log(`Error in checkIsFollowing : ${err}`);
         const error = new Error(`Internal Server Error`)

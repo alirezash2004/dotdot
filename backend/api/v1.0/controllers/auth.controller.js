@@ -8,7 +8,7 @@ export const getMe = async (req, res, next) => {
     try {
         const pageId = req.user._id;
 
-        const page = await Page.findById(pageId).select('-password -salt');
+        const page = await Page.findById(pageId).select('-password -salt -createdAt -updatedAt -likedPosts -lastLogin -active -__v');
 
         const notifications = await Notification.countDocuments({ to: pageId, read: false })
 

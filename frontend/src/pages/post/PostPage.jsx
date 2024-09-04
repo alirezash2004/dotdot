@@ -26,7 +26,7 @@ const PostPage = () => {
 				if (!res.ok || data.success === false)
 					throw new Error(data.msg || "Failed To Fetch Post!");
 
-				return data;
+				return data.post;
 			} catch (error) {
 				toast.error(error.message);
 				throw new Error(error);

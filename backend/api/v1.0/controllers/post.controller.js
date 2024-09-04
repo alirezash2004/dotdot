@@ -163,7 +163,7 @@ export const getPostByPostId = async (req, res, next) => {
 
         const postWithSaved = { ...post.toObject(), isSaved: !!saveRes }
 
-        return res.status(200).json(postWithSaved);
+        return res.status(200).json({ success: true, post: postWithSaved });
     } catch (err) {
         console.log(`Error in getPostByPostId : ${err}`);
         const error = new Error(`Internal Server Error`)
@@ -342,7 +342,7 @@ export const newPost = async (req, res, next) => {
                 const flUrl = req.protocol + "://" + req.get("host") + "/posts/" + ref;
 
                 fs.unlinkSync(media.path)
-                
+
                 newPost.assets.push({ url: flUrl });
             }
 

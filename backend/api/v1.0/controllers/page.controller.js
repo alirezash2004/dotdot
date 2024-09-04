@@ -201,7 +201,7 @@ export const updatePageProfile = async (req, res, next) => {
             TmpFiles.findByIdAndDelete(media._id)
         ])
 
-        return res.status(200).json({ success: true, username: savePage.profilePicture });
+        return res.status(200).json({ success: true, profilePicture: savePage.profilePicture });
     } catch (err) {
         console.log(`Error in updatePageProfile : ${err}`);
         const error = new Error(`Internal Server Error`)
