@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "react-hot-toast";
 import { Helmet } from "react-helmet-async";
@@ -8,6 +8,7 @@ import Input from "../../../components/common/Input";
 import DotDotLogo from "../../../components/imgs/DotDot";
 
 import { CiLock, CiMail, CiPen, CiUser, CiWarning } from "react-icons/ci";
+import { animate, motion } from "framer-motion";
 
 const SignUpPage = () => {
 	const [formData, setFormData] = useState({
@@ -62,13 +63,21 @@ const SignUpPage = () => {
 		}));
 	};
 
+	useEffect(() => {
+		animate([[".circle-animate", { scale: 1.5 }]]);
+	}, []);
+
 	return (
 		<>
+			<div className="w-screen h-screen absolute top-0 left-0 flex items-center justify-center z-0">
+				<motion.div className="w-96 h-96 block rounded-full bg-secondary  circle-animate scale-0 opacity-10"></motion.div>
+			</div>
+
 			<Helmet>
 				<title>Signup - DotDot Social Media</title>
 			</Helmet>
-			
-			<div className="max-w-screen-xl mx-auto flex h-screen px-11">
+
+			<div className="max-w-screen-xl mx-auto flex h-screen px-11 z-20">
 				<div className="flex-1 hidden lg:flex items-center justify-center">
 					<DotDotLogo className="lg:w-2/3" />
 				</div>
