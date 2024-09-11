@@ -5,15 +5,24 @@ const useSaveUnsavePost = ({ postId, setIsSaved }) => {
 	const { mutate: saveUnsavePost, isPending: isSaveUnsavePending } =
 		useMutation({
 			mutationFn: async () => {
-				const res = await fetch(`/api/v1.0/posts/save/${postId}`, {
-					method: "POST",
-				});
-				const data = await res.json();
+				try {
+					const res = await fetch(`/api/v1.0/posts/save/${postId}`, {
+						method: "POST",
+					});
 
-				if (!res.ok || data.success === false)
-					throw new Error(data.msg || "Failed To Save/Unsave post");
+					if (res.status === 500) {
+						throw new Error("Internal Server Error");
+					}
 
-				return data.data;
+					const data = await res.json();
+
+					if (!res.ok || data.success === false)
+						throw new Error(data.msg || "Failed To Save/Unsave post");
+
+					return data.data;
+				} catch (error) {
+					throw new Error(error);
+				}
 			},
 			onSuccess: (returnData) => {
 				setIsSaved(returnData.isSaved);

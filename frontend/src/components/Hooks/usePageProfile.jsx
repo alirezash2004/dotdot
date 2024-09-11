@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 
 export function usePageProfile({
@@ -14,7 +14,7 @@ export function usePageProfile({
 		data: targetPage,
 		isPending: isTargetPagePending,
 		isFetching: isTargetPageFetching,
-		refetch,
+		refetch: fetchPage,
 	} = useQuery({
 		queryKey: ["pageprofile"],
 		queryFn: async () => {
@@ -30,12 +30,14 @@ export function usePageProfile({
 
 			return data.data;
 		},
-		enabled: !isMyProfile && isValidUsername,
+		// enabled: false,
+		// enabled: !isMyProfile && isValidUsername,
 	});
 
 	const {
 		isPending: isFollowingReltaionPending,
 		isFetching: isFollowingReltaionFetching,
+		refetch: fetchRelation,
 	} = useQuery({
 		queryKey: ["followingRelation"],
 		queryFn: async () => {
@@ -51,12 +53,18 @@ export function usePageProfile({
 
 			return data;
 		},
+		// enabled: false,
 		enabled:
 			isPageFetched &&
 			!isMyProfile &&
 			!isTargetPageFetching &&
 			!isTargetPagePending,
 	});
+
+	const fetchProfilePage = async () => {
+		await fetchPage();
+		await fetchRelation();
+	};
 
 	return {
 		isFetching:
@@ -66,6 +74,6 @@ export function usePageProfile({
 			isFollowingReltaionFetching,
 		isFollowing: isFollowing,
 		targetPage: targetPage,
-		refetch,
+		fetchProfilePage,
 	};
 }

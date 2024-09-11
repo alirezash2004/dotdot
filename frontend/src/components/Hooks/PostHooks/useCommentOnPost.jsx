@@ -20,6 +20,11 @@ const useCommentOnPost = ({
 					},
 					body: JSON.stringify({ text: comment }),
 				});
+
+				if (res.status === 500) {
+					throw new Error("Internal Server Error");
+				}
+
 				const data = await res.json();
 
 				if (!res.ok || data.success === false)
@@ -64,7 +69,7 @@ const useCommentOnPost = ({
 			}, 100);
 		},
 		onError: (error) => {
-			toast.error(error.message);
+			toast.error(`failed to post comment. ${error.message}`);
 		},
 	});
 

@@ -19,6 +19,7 @@ export const getRecentPosts = async (req, res, next) => {
         const commentStart = 0;
         const commentCount = 100;
 
+        // TODO: add process more comments of post
         const posts = await Post
             .find({
                 $or: [
@@ -236,11 +237,10 @@ export const getPagePosts = async (req, res, next) => {
             return next(error);
         }
 
+        // access in response is to determine if page have access to load targetPage posts or not
         const isFollowing = await FollowingRelationship.exists({ pageId: pageId, followedPageId: targetPage._id }).exec();
         if (targetPage._id.toString() !== pageId && (targetPage.pageType === 'private' && !isFollowing)) {
-            const error = new Error(`Page Is Private You have to follow it first`);
-            error.status = 401;
-            return next(error);
+            return res.status(401).json({ success: false, msg: `Page Is Private You have to follow it first`, access: false })
         }
 
         const posts = await Post
@@ -251,7 +251,7 @@ export const getPagePosts = async (req, res, next) => {
             .sort({ createdAt: -1 })
             .exec();
 
-        res.status(200).json({ success: true, posts: posts });
+        res.status(200).json({ success: true, posts: posts, access: true });
     } catch (err) {
         console.log(`Error in getPagePosts : ${err}`);
         const error = new Error(`Internal Server Error`);

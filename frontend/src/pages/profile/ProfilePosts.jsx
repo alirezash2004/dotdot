@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 
-import { CiCirclePlus } from "react-icons/ci";
+import { CiCirclePlus, CiLock } from "react-icons/ci";
 
 import ProfilePostsSkeleton from "../../components/skeletons/ProfilePostsSkeleton";
 import Loading from "../../components/common/Loading";
@@ -27,6 +27,7 @@ const Posts = ({ pageUsername = "", postFeedType = "me" }) => {
 	const [isLoadingNewPosts, setIsLoadingNewPosts] = useState(false);
 	const [disabledLoading, setDisabledLoading] = useState(false);
 	const observerTarget = useRef(null);
+	const [isPageAccess, setIsPageAccess] = useState(true);
 
 	const {
 		data: posts,
@@ -35,21 +36,29 @@ const Posts = ({ pageUsername = "", postFeedType = "me" }) => {
 		isFetching,
 		isPending,
 	} = useQuery({
-		queryKey: ["profilePosts"],
+		queryKey: ["profilePosts", pageUsername],
 		queryFn: async () => {
 			if (isLoadingNewPosts) {
 				return [];
 			}
+			
 			setIsLoadingNewPosts(true);
 			try {
 				const res = await fetch(apiUri + skip.toString());
 				const data = await res.json();
+
+				if (data.access === false) {
+					setTotalPosts([]);
+					setIsPageAccess(false);
+					return [];
+				}
 
 				if (!res.ok || data.success === false)
 					throw new Error(data.msg || "Failed To Fetch Posts!");
 
 				setTotalPosts((prevData) => [...prevData, ...data.posts]);
 				setSkip((prevData) => prevData + 6);
+				setIsPageAccess(true);
 
 				if (data.posts.length === 0) {
 					setDisabledLoading(true);
@@ -62,11 +71,13 @@ const Posts = ({ pageUsername = "", postFeedType = "me" }) => {
 				throw new Error(error);
 			}
 		},
+		retry: false
 	});
 
 	const queryClinet = useQueryClient();
 
 	useEffect(() => {
+		setIsPageAccess(true);
 		setDisabledLoading(false);
 		setSkip(0);
 		setTotalPosts([]);
@@ -102,35 +113,49 @@ const Posts = ({ pageUsername = "", postFeedType = "me" }) => {
 
 	return (
 		<>
-			{!isLoading &&
-				!isFetching &&
-				!isLoadingNewPosts &&
-				!isPending &&
-				totalPosts?.length === 0 && (
-					<p className="text-center my-4">OOPS! No Posts Found!</p>
-				)}
-			{!isLoading && posts && (
-				<div className="grid grid-cols-2 md:grid-cols-3">
-					{totalPosts.length !== 0 &&
-						totalPosts.map((post) => (
-							<Post key={post._id} post={post} postType="pageProfile" />
-						))}
+			{!isPageAccess ? (
+				<div className="flex w-full items-center justify-center h-1/3">
+					<div className="flex flex-col gap-3 items-center justify-center px-4 py-12 shadow-2xl rounded-2xl">
+						<CiLock className="w-10 h-10 md:w-12 md:h-12" />
+						<h3 className="text-xl md:text-3xl">This Page Is Private</h3>
+						<h4 className="text-sm text-slate-500">
+							You Have To First Follow To See Posts
+						</h4>
+					</div>
 				</div>
-			)}
-
-			{(isLoading || isFetching || isLoadingNewPosts || isPending) && (
-				<ProfilePostsSkeleton />
-			)}
-			{!disabledLoading && (
-				<div
-					ref={observerTarget}
-					className="flex mx-auto pt-20 pb-20 w-full items-center justify-center"
-				>
-					{(isLoading || isFetching) && <Loading size="lg" />}
-					{!(isLoading || isFetching || isLoadingNewPosts || isPending) && (
-						<CiCirclePlus className="text-6xl mt-56" />
+			) : (
+				<>
+					{!isLoading &&
+						!isFetching &&
+						!isLoadingNewPosts &&
+						!isPending &&
+						totalPosts?.length === 0 && (
+							<p className="text-center my-4">OOPS! No Posts Found!</p>
+						)}
+					{!isLoading && posts && (
+						<div className="grid grid-cols-2 md:grid-cols-3">
+							{totalPosts.length !== 0 &&
+								totalPosts.map((post) => (
+									<Post key={post._id} post={post} postType="pageProfile" />
+								))}
+						</div>
 					)}
-				</div>
+
+					{(isLoading || isFetching || isLoadingNewPosts || isPending) && (
+						<ProfilePostsSkeleton />
+					)}
+					{!disabledLoading && (
+						<div
+							ref={observerTarget}
+							className="flex mx-auto pt-20 pb-20 w-full items-center justify-center"
+						>
+							{(isLoading || isFetching) && <Loading size="lg" />}
+							{!(isLoading || isFetching || isLoadingNewPosts || isPending) && (
+								<CiCirclePlus className="text-6xl mt-56" />
+							)}
+						</div>
+					)}
+				</>
 			)}
 		</>
 	);

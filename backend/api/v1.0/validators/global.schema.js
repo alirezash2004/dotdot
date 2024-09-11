@@ -20,3 +20,13 @@ export const usernameSchema = {
         escape: true,
     }
 };
+
+export const pageIdSchema = {
+    pageId: {
+        exists: {
+            errorMessage: "pageId is required"
+        },
+        isEmpty: { negated: true },
+        trim: true,
+    }
+}

@@ -34,13 +34,16 @@ const LoginPage = () => {
 					body: JSON.stringify({ username, password }),
 				});
 
+				if (res.status === 500) {
+					throw new Error("Internal Server Error");
+				}
+
 				const data = await res.json();
 
 				if (!res.ok || data.success === false)
 					throw new Error(data.msg || "Failed To Login");
 			} catch (error) {
-				toast.error(error.message, { duration: 6000 });
-				throw error;
+				throw new Error(error);
 			}
 		},
 		onSuccess: () => {
@@ -48,6 +51,9 @@ const LoginPage = () => {
 			queryClient.invalidateQueries({
 				queryKey: ["authPage"],
 			});
+		},
+		onError: (error) => {
+			toast.error(error.message, { duration: 6000 });
 		},
 	});
 

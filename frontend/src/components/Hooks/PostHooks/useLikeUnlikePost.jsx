@@ -16,6 +16,11 @@ const useLikeUnlikePost = ({
 					const res = await fetch(`/api/v1.0/posts/like/${postId}`, {
 						method: "POST",
 					});
+
+					if (res.status === 500) {
+						throw new Error("Internal Server Error");
+					}
+
 					const data = await res.json();
 
 					if (!res.ok || data.success === false)
@@ -46,7 +51,7 @@ const useLikeUnlikePost = ({
 				}
 			},
 			onError: (error) => {
-				toast.error(error.message || "Failed To Like/Unlike Post!");
+				toast.error(`Failed To Like/Unlike Post! ${error.message}`);
 			},
 		});
 

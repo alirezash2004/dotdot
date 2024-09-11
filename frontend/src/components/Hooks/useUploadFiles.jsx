@@ -39,6 +39,7 @@ const useUploadFiles = ({ destination }) => {
 					method: "POST",
 					body: formData,
 				});
+	
 				const data = await res.json();
 
 				if (!res.ok || data.success === false)
@@ -51,7 +52,7 @@ const useUploadFiles = ({ destination }) => {
 		},
 		onSuccess: (returnData) => {},
 		onError: (error) => {
-			toast.error("Failed To Upload Files");
+			toast.error(`Failed To Upload Files. ${error.message}`);
 		},
 		retry: 3,
 	});

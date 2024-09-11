@@ -1,4 +1,4 @@
-import { isValidObjectId } from 'mongoose';
+import mongoose, { isValidObjectId } from 'mongoose';
 
 import Page from '../models/page.model.js';
 import FollowingRelationship from '../models/followingRelationship.model.js';
@@ -53,6 +53,115 @@ export const checkIsFollowing = async (req, res, next) => {
         return res.status(200).json({ success: true, isFollowing: true });
     } catch (err) {
         console.log(`Error in checkIsFollowing : ${err}`);
+        const error = new Error(`Internal Server Error`)
+        error.status = 500;
+        return next(error);
+    }
+}
+
+export const getFollowers = async (req, res, next) => {
+    try {
+        const myPageId = req.user._id.toString()
+        const data = req.validatedData;
+        const { pageId } = data;
+
+        const skip = parseInt(data.skip) || 0;
+
+        const isValidPageId = isValidObjectId(pageId);
+
+        if (!isValidPageId) {
+            const error = new Error(`pageId is not valid!`);
+            error.status = 400;
+            return error;
+        }
+
+        // TODO: optimize (move find fillowingrealtionship to promise.all)
+        const [targetPageType, isFollowing] = await Promise.all([
+            Page.findById(pageId).select('pageType').exec(),
+            FollowingRelationship.exists({ pageId: myPageId, followedPageId: pageId }).exec(),
+        ])
+
+        if (pageId !== myPageId && (targetPageType.pageType === 'private' && !isFollowing)) {
+            const error = new Error(`Page Is Private You have to follow it first`);
+            error.status = 401;
+            return next(error);
+        }
+
+        const followers = await FollowingRelationship
+            .find({ pageId: { $ne: myPageId }, followedPageId: pageId })
+            .select('pageId')
+            .populate({
+                path: 'pageId',
+                select: 'username fullName profilePicture pageType',
+            })
+            .skip(skip)
+            .limit(10)
+            .exec();
+
+        const followingRes = await Promise.all(
+            followers.map(follower => FollowingRelationship.exists({ pageId: myPageId, followedPageId: follower.pageId }))
+        )
+
+        const followersWithMyFollowingStatus = followers.map((follower, idx) => { return { ...follower.toObject(), isFollowing: !!followingRes[idx] } })
+
+        return res.status(200).json({ success: true, data: followersWithMyFollowingStatus });
+
+    } catch (err) {
+        console.log(`Error in getFollowers : ${err}`);
+        const error = new Error(`Internal Server Error`)
+        error.status = 500;
+        return next(error);
+    }
+}
+
+export const getFollowings = async (req, res, next) => {
+    try {
+        const myPageId = req.user._id.toString()
+        const data = req.validatedData;
+        const { pageId } = data;
+
+        const skip = parseInt(data.skip) || 0;
+
+        const isValidPageId = isValidObjectId(pageId);
+
+        if (!isValidPageId) {
+            const error = new Error(`pageId is not valid!`);
+            error.status = 400;
+            return error;
+        }
+
+        const [targetPageType, isFollowing] = await Promise.all([
+            Page.findById(pageId).select('pageType').exec(),
+            FollowingRelationship.exists({ pageId: myPageId, followedPageId: pageId }).exec(),
+        ])
+
+        if (pageId !== myPageId && (targetPageType.pageType === 'private' && !isFollowing)) {
+            const error = new Error(`Page Is Private You have to follow it first`);
+            error.status = 401;
+            return next(error);
+        }
+
+        const followings = await FollowingRelationship
+            .find({ pageId: pageId, followedPageId: { $ne: myPageId } })
+            .select('followedPageId')
+            .populate({
+                path: 'followedPageId',
+                select: 'username fullName profilePicture pageType',
+            })
+            .skip(skip)
+            .limit(10)
+            .exec();
+
+        const followingRes = await Promise.all(
+            followings.map(following => FollowingRelationship.exists({ pageId: myPageId, followedPageId: following.pageId }))
+        )
+
+        const followingsWithMyFollowingStatus = followings.map((following, idx) => { return { ...following.toObject(), isFollowing: !!followingRes[idx] } })
+
+        return res.status(200).json({ success: true, data: followingsWithMyFollowingStatus });
+
+    } catch (err) {
+        console.log(`Error in getfollowings : ${err}`);
         const error = new Error(`Internal Server Error`)
         error.status = 500;
         return next(error);

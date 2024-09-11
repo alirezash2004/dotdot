@@ -13,6 +13,11 @@ const useDeletePost = ({ postId }) => {
 				const res = await fetch(`/api/v1.0/posts/${postId}`, {
 					method: "DELETE",
 				});
+
+				if (res.status === 500) {
+					throw new Error("Internal Server Error");
+				}
+
 				const data = await res.json();
 
 				if (!res.ok || data.success === false)
@@ -29,7 +34,7 @@ const useDeletePost = ({ postId }) => {
 			navigate(`/profile/${returnData.username}`);
 		},
 		onError: (error) => {
-			toast.error(error.message || "Failed To Delete Post!");
+			toast.error(`Failed To Delete Post! ${error.message}`);
 			queryClient.invalidateQueries({ queryKey: ["posts"] });
 		},
 	});

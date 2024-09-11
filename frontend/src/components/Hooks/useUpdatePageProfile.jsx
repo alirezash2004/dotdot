@@ -22,6 +22,10 @@ const useUpdatePageProfile = () => {
 					body: JSON.stringify(formData),
 				});
 
+				if (res.status === 500) {
+					throw new Error("Internal Server Error");
+				}
+
 				const data = await res.json();
 
 				if (!res.ok || data.success === false)

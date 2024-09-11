@@ -23,25 +23,34 @@ const NewpostPage = () => {
 
 	const { mutate: Post, isPending: isPosting } = useMutation({
 		mutationFn: async ({ fileAccesstoken, caption }) => {
-			const res = await fetch(`/api/v1.0/posts/create`, {
-				method: "POST",
-				headers: {
-					"Content-Type": "application/json",
-				},
-				body: JSON.stringify({
-					assetType: "picture",
-					caption: caption !== "" ? caption : " ",
-					postmedia: {
-						mediaAccessTokens: [...fileAccesstoken],
+			try {
+				const res = await fetch(`/api/v1.0/posts/create`, {
+					method: "POST",
+					headers: {
+						"Content-Type": "application/json",
 					},
-				}),
-			});
-			const data = await res.json();
+					body: JSON.stringify({
+						assetType: "picture",
+						caption: caption !== "" ? caption : " ",
+						postmedia: {
+							mediaAccessTokens: [...fileAccesstoken],
+						},
+					}),
+				});
 
-			if (!res.ok || data.success === false)
-				throw new Error(data.msg || "Failed To Create New Post");
+				if (res.status === 500) {
+					throw new Error("Internal Server Error");
+				}
 
-			return data;
+				const data = await res.json();
+
+				if (!res.ok || data.success === false)
+					throw new Error(data.msg || "Failed To Create New Post");
+
+				return data;
+			} catch (error) {
+				throw new Error(error);
+			}
 		},
 		onSuccess: () => {
 			toast.success("post uploaded successfully");

@@ -43,15 +43,24 @@ const NotificationPage = () => {
 		isPending: isDeleteAllNotifsPending,
 	} = useMutation({
 		mutationFn: async () => {
-			const res = await fetch(`/api/v1.0/notifications/`, {
-				method: "DELETE",
-			});
-			const data = await res.json();
-
-			if (!res.ok || data.success === false)
-				throw new Error(data.msg || "Failed To Fetch Notifs");
-
-			return data;
+			try {
+				const res = await fetch(`/api/v1.0/notifications/`, {
+					method: "DELETE",
+				});
+	
+				if (res.status === 500) {
+					throw new Error("Internal Server Error");
+				}
+	
+				const data = await res.json();
+	
+				if (!res.ok || data.success === false)
+					throw new Error(data.msg || "Failed To Fetch Notifs");
+	
+				return data;
+			} catch (error) {
+				throw new Error(error);
+			}
 		},
 		onSuccess: () => {
 			toast.success("all notifications deleted successfully");
@@ -65,15 +74,24 @@ const NotificationPage = () => {
 	const { mutate: deleteNotification, isPending: isDeleteNotifPending } =
 		useMutation({
 			mutationFn: async (notifId) => {
-				const res = await fetch(`/api/v1.0/notifications/${notifId}`, {
-					method: "DELETE",
-				});
-				const data = await res.json();
+				try {
+					const res = await fetch(`/api/v1.0/notifications/${notifId}`, {
+						method: "DELETE",
+					});
 
-				if (!res.ok || data.success === false)
-					throw new Error(data.msg || "Failed To Fetch Notifs");
+					if (res.status === 500) {
+						throw new Error("Internal Server Error");
+					}	
 
-				return notifId;
+					const data = await res.json();
+
+					if (!res.ok || data.success === false)
+						throw new Error(data.msg || "Failed To Fetch Notifs");
+
+					return notifId;
+				} catch (error) {
+					throw new Error(error);
+				}
 			},
 			onSuccess: (notifId) => {
 				toast.success("notification deleted successfully");

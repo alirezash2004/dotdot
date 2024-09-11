@@ -23,6 +23,8 @@ router.get('/page/:username', protectRoute, checkSchema(skipQuerySchema, ['query
 // Get single post by postId
 router.get('/:postId', protectRoute, checkSchema(postIdSchema, ['params']), validationResultHandler, getPostByPostId);
 
+// TODO: add a dynnamic route for fetching posts media 
+
 router.post('/create', protectRoute, checkSchema(postsSchema), validationResultHandler, newPost);
 
 router.post('/like/:postId', protectRoute, checkSchema(postIdSchema, ['params']), validationResultHandler, likeUnlikePost);
@@ -32,7 +34,5 @@ router.post('/comment/:postId', protectRoute, checkSchema(postIdSchema, ['params
 router.post('/save/:postId', protectRoute, checkSchema(postIdSchema, ['params']), validationResultHandler, saveUnsavePost);
 
 router.delete('/:postId', protectRoute, checkSchema(postIdSchema, ['params']), validationResultHandler, deletePostByPostId);
-
-// TODO: add /save for save/unsave a post
 
 export default router;
