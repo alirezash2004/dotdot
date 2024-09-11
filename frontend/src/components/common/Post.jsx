@@ -18,7 +18,9 @@ import changeHost from "../../utils/changeHost.js";
 import {
 	CiBookmark,
 	CiChat1,
+	CiGrid42,
 	CiHeart,
+	CiImageOn,
 	CiLocationArrow1,
 	CiTrash,
 } from "react-icons/ci";
@@ -112,12 +114,16 @@ const Post = ({ post, postType = "" }) => {
 		<>
 			<Link
 				to={`/post/${post?._id}`}
-				className="flex w-full aspect-square border border-slate-800 group/post"
+				className="flex w-full aspect-square border border-slate-800 group/post relative bg-slate-900"
 			>
+				<div className="absolute top-2 right-2 text-3xl text-slate-200 z-20">
+					{post.assets.length === 1 && <CiImageOn />}
+					{post.assets.length > 1 && <CiGrid42 />}
+				</div>
 				<img
 					src={postUrl}
 					alt=""
-					className="w-full object-cover opacity-80 group-hover/post:opacity-100 transition-all duration-200 pointer-events-none"
+					className="w-full object-cover opacity-80 group-hover/post:opacity-100 transition-opacity duration-200 pointer-events-none"
 				/>
 			</Link>
 		</>

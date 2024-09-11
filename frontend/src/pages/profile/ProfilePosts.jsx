@@ -8,7 +8,11 @@ import Loading from "../../components/common/Loading";
 
 import Post from "../../components/common/Post";
 
-const Posts = ({ pageUsername = "", postFeedType = "me" }) => {
+const Posts = ({
+	pageUsername = "",
+	postFeedType = "me",
+	isMyProfile = false,
+}) => {
 	const getApi = (postFeedType) => {
 		switch (postFeedType) {
 			case "me":
@@ -41,7 +45,7 @@ const Posts = ({ pageUsername = "", postFeedType = "me" }) => {
 			if (isLoadingNewPosts) {
 				return [];
 			}
-			
+
 			setIsLoadingNewPosts(true);
 			try {
 				const res = await fetch(apiUri + skip.toString());
@@ -71,10 +75,9 @@ const Posts = ({ pageUsername = "", postFeedType = "me" }) => {
 				throw new Error(error);
 			}
 		},
-		retry: false
+		enabled: false,
+		retry: false,
 	});
-
-	const queryClinet = useQueryClient();
 
 	useEffect(() => {
 		setIsPageAccess(true);
@@ -82,9 +85,9 @@ const Posts = ({ pageUsername = "", postFeedType = "me" }) => {
 		setSkip(0);
 		setTotalPosts([]);
 		setTimeout(() => {
-			queryClinet.invalidateQueries(["profilePosts"], { cancelRefetch: false });
+			refetch();
 		}, 100);
-	}, [postFeedType, setSkip, queryClinet]);
+	}, [postFeedType, setSkip, refetch, isMyProfile]);
 
 	useEffect(() => {
 		if (disabledLoading) {
