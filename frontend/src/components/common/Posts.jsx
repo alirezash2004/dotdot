@@ -45,7 +45,6 @@ const Posts = () => {
 				setIsLoadingNewPosts(false);
 				return [...totalPosts, ...data.posts];
 			} catch (error) {
-				// toast.error(error.message);
 				throw new Error(error);
 			}
 		},
@@ -60,10 +59,6 @@ const Posts = () => {
 			(entries) => {
 				if (entries[0].isIntersecting) {
 					refetch();
-					// queryClinet.invalidateQueries(
-					// 	{ queryKey: ["posts"] },
-					// 	{ cancelRefetch: false }
-					// );
 				}
 			},
 			{ rootMargin: "50px", threshold: 1.0 }

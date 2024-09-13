@@ -1,4 +1,3 @@
-import { useMutation } from "@tanstack/react-query";
 import { useRef, useState } from "react";
 import { Helmet } from "react-helmet-async";
 import toast from "react-hot-toast";
@@ -8,6 +7,7 @@ import HorizontalScrollCarousel from "../../components/common/HorizontalScrollCa
 import useUploadFiles from "../../components/Hooks/useUploadFiles";
 
 import { CiMountain1 } from "react-icons/ci";
+import useNewpost from "./useNewpost";
 
 const NewpostPage = () => {
 	const imgRef = useRef(null);
@@ -17,60 +17,32 @@ const NewpostPage = () => {
 	const [isDragging, setIsDragging] = useState(false);
 	const [caption, setCaption] = useState("");
 	const [posted, setPosted] = useState(false);
+	const [fileTokens, setFileTokens] = useState([]);
 
 	const { upload, isUploadError, isUploaing, isUploaded, setIsUploaded } =
 		useUploadFiles({ destination: "singlePic" });
 
-	const { mutate: Post, isPending: isPosting } = useMutation({
-		mutationFn: async ({ fileAccesstoken, caption }) => {
-			try {
-				const res = await fetch(`/api/v1.0/posts/create`, {
-					method: "POST",
-					headers: {
-						"Content-Type": "application/json",
-					},
-					body: JSON.stringify({
-						assetType: "picture",
-						caption: caption !== "" ? caption : " ",
-						postmedia: {
-							mediaAccessTokens: [...fileAccesstoken],
-						},
-					}),
-				});
-
-				if (res.status === 500) {
-					throw new Error("Internal Server Error");
-				}
-
-				const data = await res.json();
-
-				if (!res.ok || data.success === false)
-					throw new Error(data.msg || "Failed To Create New Post");
-
-				return data;
-			} catch (error) {
-				throw new Error(error);
-			}
-		},
-		onSuccess: () => {
-			toast.success("post uploaded successfully");
-			setCaption("");
-			setFiles([]);
-			imgRef.current.value = "";
-			setPosted(true);
-		},
-		onError: (error) => {
-			toast.error(error.message);
-		},
+	const { newpost, isPosting } = useNewpost({
+		imgRef,
+		setCaption,
+		setFiles,
+		setFileTokens,
+		setPosted,
 	});
 
 	const handlePostUpload = async () => {
-		// TODO: add recive token and save it instead of reuploading if upload fails
 		if (isUploaing) return;
 		setPosted(false);
-		const UploadedfileTokens = await upload(files);
-		if (isUploadError) return;
-		Post({
+		let UploadedfileTokens;
+		if (fileTokens.length === files.length) {
+			console.log("use", fileTokens);
+			UploadedfileTokens = fileTokens;
+		} else {
+			console.log("nouse");
+			UploadedfileTokens = await upload(files);
+			if (isUploadError) return;
+		}
+		newpost({
 			fileAccesstoken: UploadedfileTokens,
 			caption: caption,
 		});
@@ -91,6 +63,7 @@ const NewpostPage = () => {
 			}
 
 			setFiles(newFiles);
+			setFileTokens([]);
 		}
 	};
 
@@ -115,6 +88,7 @@ const NewpostPage = () => {
 		if (isUploaing || isPosting) return;
 		const findIndex = files.indexOf(fileToDelete);
 		setFiles((prevData) => prevData.filter((item, idx) => idx !== findIndex));
+		setFileTokens([]);
 		setPosted(false);
 
 		setTimeout(() => {
@@ -193,22 +167,6 @@ const NewpostPage = () => {
 							{isDragging && <span>Drop Image Here</span>}
 						</div>
 					)}
-					{/* {files &&
-						files.map((currentFile) => (
-							<div key={currentFile.blob.split("/")[3]} className="relative">
-								<div
-									className="flex items-center absolute -top-6 -right-6 cursor-pointer text-red-700 bg-slate-900 p-2 rounded-full w-12 h-12 btn-outline btn-square btn"
-									onClick={() => handleDeleteImage(currentFile)}
-								>
-									<CiMedicalCross className="rotate-45 w-6 h-6" />
-								</div>
-								<img
-									src={currentFile.blob}
-									alt=""
-									className="max-w-40 md:max-w-96 rounded-md"
-								/>
-							</div>
-						))} */}
 					{files.length !== 0 && (
 						<HorizontalScrollCarousel
 							className="relative"

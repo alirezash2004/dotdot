@@ -97,7 +97,9 @@ const Posts = ({
 		const observer = new IntersectionObserver(
 			(entries) => {
 				if (entries[0].isIntersecting) {
-					refetch();
+					setTimeout(() => {
+						refetch();
+					}, 100);
 				}
 			},
 			{ rootMargin: "50px", threshold: 1.0 }
