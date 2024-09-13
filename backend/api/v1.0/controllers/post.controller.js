@@ -335,7 +335,7 @@ export const newPost = async (req, res, next) => {
                         fit: sharp.fit.cover,
                         position: sharp.strategy.entropy
                     } : {})
-                    .webp({ quality: 20 })
+                    .webp({ quality: 30 })
                     .normalize()
                     .toFile(path.join(__dirname, 'uploads', 'posts', ref))
 
@@ -575,7 +575,7 @@ export const deletePostByPostId = async (req, res, next) => {
             return next(err);
         }
 
-        const post = await Post.findById(postId).select('page').exec()
+        const post = await Post.findById(postId).select('page assets').exec()
 
         if (!post) {
             const error = new Error(`A post with post id ${postId} was not found`);
@@ -596,8 +596,17 @@ export const deletePostByPostId = async (req, res, next) => {
             Savedpost.deleteMany({ postId }).exec()
         ])
 
-        return res.status(200).json({ success: true, username: pageUsername, msg: 'post deleted!' });
+        // delete post assets
+        for (const asset of post.assets) {
+            const assetRef = asset.url.split('/')[4];
+            try {
+                fs.unlinkSync(path.join(__dirname, 'uploads', 'posts', assetRef));
+            } catch (error) {
+                console.log(`Error in deletePostByPostId : Failed To Delete Post Asset. ${error}`);
+            }
+        }
 
+        return res.status(200).json({ success: true, username: pageUsername, msg: 'post deleted!' });
     } catch (err) {
         console.log(`Error in deletePostByPostId : ${err}`);
         const error = new Error(`Internal Server Error`)

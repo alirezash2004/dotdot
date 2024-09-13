@@ -10,10 +10,15 @@ export const postsSchema = {
     caption: {
         matches: {
             errorMessage: 'caption has invalid charachter',
-            options: /[\p{L}\p{N}\s,.!?;:()'\"-]|[\p{So}]/,
+            options: /^[\p{L}\p{N}\s.,?!'"()\\[\]{}@#$%&* =~^|<>:;—]*$/u,
+        },
+        isLength: {
+            errorMessage: "Caption must not exceed 300 characters.",
+            options: {
+                max: 300
+            }
         },
         trim: true,
-        escape: true,
     },
     postmedia: {
         isObject: {

@@ -9,6 +9,7 @@ configDotenv();
 import v1_0 from './api/versionRouter.js';
 
 import logger from "./api/v1.0/middleware/logger.js";
+import customHeaders from "./api/v1.0/middleware/customHeaders.js";
 
 const __dirname = path.resolve();
 
@@ -17,6 +18,9 @@ const PORT = process.env.PORT || 8000;
 
 // create app
 const app = express();
+
+app.disable('x-powered-by');
+app.use(customHeaders);
 
 app.use(express.json({ limit: '14mb' })) // for parsing application/json
 app.use(express.urlencoded({ extended: true, limit: '14mb' })) // for parsing application/x-www-form-urlencoded
@@ -37,9 +41,13 @@ app.use(logger); // Logger middleware
 // fake delay - TODO: remove later
 app.use(function (req, res, next) { setTimeout(next, 1000) });
 
-// setup static folder ::to_review
-app.use(express.static('public'));
-app.use(express.static(path.join(__dirname, 'backend', 'uploads')));
+// setup static folder
+app.use(express.static(path.join(__dirname, 'backend', 'uploads'), {
+    extensions: ['webp'],
+    dotfiles: 'ignore',
+    immutable: true,
+    maxAge: '1h'
+}));
 
 // Routes
 app.use('/api/v1.0', v1_0);
