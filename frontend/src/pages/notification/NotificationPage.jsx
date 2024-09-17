@@ -187,6 +187,7 @@ const NotificationPage = () => {
 									{notification.type === "follow" && "Followed you"}
 									{notification.type === "like" && "Liked your post"}
 									{notification.type === "comment" && "Commented on your post"}
+									{notification.type === "message" && "Sent You A New Message"}
 								</div>
 							</Link>
 							{/* TODO: handle signle notification delete */}
