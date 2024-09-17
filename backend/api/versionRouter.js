@@ -6,6 +6,7 @@ import pagesRoutes from './v1.0/routes/pages.routes.js';
 import followingRelationshipsRoutes from './v1.0/routes/followingRelationships.routes.js';
 import uploadPostMediaRoutes from './v1.0/routes/uploadPostMedia.routes.js';
 import notificationsRoutes from './v1.0/routes/notifications.routes.js';
+import messagesRoutes from './v1.0/routes/message.routes.js';
 
 import notFound from './v1.0/middleware/notFound.js';
 import errorHandler from './v1.0/middleware/errorHandler.js';
@@ -25,6 +26,8 @@ router.use('/followingRelationships', followingRelationshipsRoutes);
 router.use('/postMedia', uploadPostMediaRoutes);
 
 router.use('/notifications', notificationsRoutes);
+
+router.use('/messages', messagesRoutes);
 
 // router.use(express.static(path.join(__dirname, 'public')));
 
