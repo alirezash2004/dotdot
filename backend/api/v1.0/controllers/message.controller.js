@@ -66,7 +66,7 @@ export const getMessages = async (req, res, next) => {
             })
             .populate({
                 path: 'messages',
-                select: 'text updatedAt'
+                select: 'text updatedAt from to',
             })
 
         if (!conversation) {
@@ -75,7 +75,7 @@ export const getMessages = async (req, res, next) => {
 
         const messages = conversation.messages;
 
-        return res.status(200).json(messages);
+        return res.status(200).json({ success: true, data: messages });
     } catch (err) {
         console.log(`Error in getMessages : ${err}`);
         const error = new Error(`Internal Server Error`)
@@ -129,11 +129,22 @@ export const sendMessage = async (req, res, next) => {
             conversation.messages.push(newMessage._id);
         }
 
-        const notification = new Notification({
+        let notification = await Notification.findOne({
             from,
             to,
             type: 'message',
-        });
+        })
+
+        if (!notification) {
+            notification = new Notification({
+                from,
+                to,
+                type: 'message',
+            });
+        } else {
+            notification.updatedAt = Date.now();
+            notification.read = false;
+        }
 
         // TODO: SOCKET IO FUNCTIONALITY
 
@@ -143,7 +154,7 @@ export const sendMessage = async (req, res, next) => {
             notification.save()
         ])
 
-        return res.status(201).json({ success: true, msg: "message successfully sent" });
+        return res.status(201).json({ success: true, msg: "message successfully sent", data: newMessage });
     } catch (err) {
         console.log(`Error in sendMessage : ${err}`);
         const error = new Error(`Internal Server Error`)
