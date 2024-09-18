@@ -4,6 +4,7 @@ import toast from "react-hot-toast";
 import { Helmet } from "react-helmet-async";
 
 import changeHost from "../../utils/changeHost.js";
+import { formatDate } from "../../utils/date/index.js";
 
 import Loading from "../../components/common/Loading";
 
@@ -30,7 +31,6 @@ const NotificationPage = () => {
 
 				if (!res.ok || data.success === false)
 					throw new Error(data.msg || "Failed To Fetch Notifs");
-
 				return data.notifications;
 			} catch (error) {
 				throw new Error(error);
@@ -56,7 +56,6 @@ const NotificationPage = () => {
 	
 				if (!res.ok || data.success === false)
 					throw new Error(data.msg || "Failed To Fetch Notifs");
-	
 				return data;
 			} catch (error) {
 				throw new Error(error);
@@ -188,6 +187,7 @@ const NotificationPage = () => {
 									{notification.type === "like" && "Liked your post"}
 									{notification.type === "comment" && "Commented on your post"}
 									{notification.type === "message" && "Sent You A New Message"}
+									<span className="text-sm text-slate-500">{formatDate(notification.updatedAt)}</span>
 								</div>
 							</Link>
 							{/* TODO: handle signle notification delete */}
