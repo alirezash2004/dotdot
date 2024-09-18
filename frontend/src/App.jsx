@@ -13,6 +13,7 @@ import NotificationPage from "./pages/notification/NotificationPage";
 import ProfilePage from "./pages/profile/ProfilePage";
 import PostPage from "./pages/post/PostPage";
 import NewpostPage from "./pages/newpost/NewpostPage";
+import ChatPage from "./pages/chat/ChatPage";
 
 function App() {
 	if (JSON.parse(localStorage.getItem("islight"))) {
@@ -51,7 +52,7 @@ function App() {
 
 	return (
 		<>
-			<div className="flex max-w-6xl mx-auto">
+			<div className="flex max-w-6xl mx-auto flex-col-reverse md:flex-row">
 				{authPage && <Sidebar />}
 				<Routes>
 					<Route
@@ -81,6 +82,10 @@ function App() {
 					<Route
 						path="/newpost"
 						element={authPage ? <NewpostPage /> : <Navigate to="/login" />}
+					/>
+					<Route
+						path="/chat"
+						element={authPage ? <ChatPage /> : <Navigate to="/login" />}
 					/>
 				</Routes>
 				<Toaster />

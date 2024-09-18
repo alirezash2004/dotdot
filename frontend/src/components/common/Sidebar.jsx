@@ -10,6 +10,7 @@ import DotDotLogo from "../../components/imgs/DotDot";
 
 import {
 	CiBellOn,
+	CiChat1,
 	CiCirclePlus,
 	CiHome,
 	CiLogout,
@@ -36,7 +37,7 @@ const Sidebar = () => {
 
 	return (
 		<div className="md:flex-[2_2_0] md:w-18 md:max-w-52">
-			<div className="fixed backdrop-blur-md backdrop-hue-rotate-30 mt-auto w-full bottom-0 left-0 flex flex-row border-t border-gray-700 z-50 justify-between px-2 md:w-full md:sticky md:top-0 md:bottom-auto md:h-screen md:flex-col md:border-r md:border-t-0 md:backdrop-filter-none">
+			<div className="fixed bg-gray-300 mt-auto w-full bottom-0 left-0 flex flex-row border-t border-gray-700 z-50 justify-between px-2 md:w-full md:sticky md:top-0 md:bottom-auto md:h-screen md:flex-col md:border-r md:border-t-0 md:backdrop-filter-none dark:bg-slate-900 md:bg-inherit">
 				<Link to="/" className="hidden md:flex justify-start md:mt-2">
 					<DotDotLogo className="px-2 w-16 hover:bg-stone-600 rounded" />
 				</Link>
@@ -48,6 +49,15 @@ const Sidebar = () => {
 						>
 							<CiHome className="w-8 h-8" />
 							<span className="text-lg hidden md:block">Home</span>
+						</Link>
+					</li>
+					<li className="hidden md:flex justify-center md:justify-start">
+						<Link
+							to="/chat"
+							className="flex items-center gap-3 hover:bg-stone-600 transition-all rounded-full duration-300 py-2 px-2 max-w-fit cursor-pointer justify-center md:pr-4"
+						>
+							<CiChat1 className="w-8 h-8" />
+							<span className="text-lg hidden md:block">Chat</span>
 						</Link>
 					</li>
 					<li className="flex justify-center md:justify-start">

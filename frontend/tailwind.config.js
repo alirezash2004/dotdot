@@ -23,7 +23,8 @@ export default {
           ...daisyUIThemes["night"],
         },
       }
-    ]
-  }
+    ],
+  },
+  darkMode: ['class', '[data-theme="black"]']
 }
 

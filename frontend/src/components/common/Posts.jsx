@@ -77,7 +77,7 @@ const Posts = () => {
 
 	return (
 		<>
-			<div className="flex flex-[4_4_0] flex-col pt-10">
+			<div className="flex flex-[4_4_0] flex-col pt-20 md:pt-10">
 				{!isLoading &&
 					!isFetching &&
 					!isLoadingNewPosts &&
