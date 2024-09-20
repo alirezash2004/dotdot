@@ -10,14 +10,14 @@ import v1_0 from './api/versionRouter.js';
 
 import logger from "./api/v1.0/middleware/logger.js";
 import customHeaders from "./api/v1.0/middleware/customHeaders.js";
+import { app, server } from "./socket/socket.js";
 
 const __dirname = path.resolve();
 
 // server port
 const PORT = process.env.PORT || 8000;
 
-// create app
-const app = express();
+
 
 app.disable('x-powered-by');
 app.use(customHeaders);
@@ -61,7 +61,7 @@ if (process.env.NODE_ENV === "production") {
     })
 }
 
-app.listen(PORT, () => {
+server.listen(PORT, () => {
     connectToMongoDB();
     console.log(`\nServer is running on port ${PORT}\n`['blue'])
 });

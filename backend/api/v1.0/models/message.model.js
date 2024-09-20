@@ -15,9 +15,10 @@ const messageSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.String,
         required: true
     },
-    createdAt: {
-        type: mongoose.Schema.Types.Date,
-        default: Date.now
+    read: {
+        type: mongoose.Schema.Types.Boolean,
+        required: true,
+        default: false
     }
 }, { timestamps: true });
 

@@ -10,7 +10,7 @@ export const getNotifications = async (req, res, next) => {
                 path: 'from',
                 select: 'username profilePicture'
             })
-            .sort({ createdAt: -1 })
+            .sort({ updatedAt: -1 })
 
         await Notification.updateMany({ to: pageId }, { read: true });
 

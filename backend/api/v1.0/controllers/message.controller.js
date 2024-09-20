@@ -1,27 +1,84 @@
-import { isValidObjectId } from "mongoose";
+import mongoose, { isValidObjectId } from "mongoose";
 
 import Page from "../models/page.model.js";
 import Conversation from "../models/conversation.model.js";
 import Message from "../models/message.model.js";
 import Notification from "../models/notification.model.js";
+import { io } from "../../../socket/socket.js";
+import { getPageSocketId } from "../../../socket/socket.js";
 
 export const getPagesForSidebar = async (req, res, next) => {
     try {
         const authPageId = req.user._id.toString();
 
         // TODO: add skip & limit
-        const conversations = await Conversation.find({
-            participants: { $in: [authPageId] }
-        }).populate({
-            path: 'participants',
-            select: 'fullName username profilePicture'
-        });
+        const conversations = await Conversation.aggregate([
+            // Match the conversations where the user is a participant
+            {
+                $match: {
+                    participants: { $in: [new mongoose.Types.ObjectId(authPageId)] }
+                }
+            },
+            // Lookup (populate) the participants field with only specific fields
+            {
+                $lookup: {
+                    from: 'pages', // assuming 'Page' collection is called 'pages'
+                    localField: 'participants',
+                    foreignField: '_id',
+                    as: 'participants',
+                    pipeline: [
+                        {
+                            $project: {
+                                _id: 1,
+                                fullName: 1,
+                                username: 1,
+                                profilePicture: 1
+                            }
+                        }
+                    ]
+                }
+            },
+            // Filter out the authPageId from the participants array
+            {
+                $addFields: {
+                    participants: {
+                        $filter: {
+                            input: "$participants",
+                            as: "participant",
+                            cond: { $ne: ["$$participant._id", new mongoose.Types.ObjectId(authPageId)] }
+                        }
+                    }
+                }
+            },
+            // Lookup (populate) the messages field
+            {
+                $lookup: {
+                    from: 'messages', // assuming the 'Message' collection is called 'messages'
+                    localField: 'messages',
+                    foreignField: '_id',
+                    as: 'messages'
+                }
+            },
+            // Sort messages within each conversation by the 'createdAt' field in descending order
+            {
+                $addFields: {
+                    lastMessage: { $arrayElemAt: [{ $sortArray: { input: "$messages", sortBy: { createdAt: -1 } } }, 0] }
+                }
+            },
+            // Sort conversations by the 'createdAt' field of the last message
+            {
+                $sort: { "lastMessage.createdAt": -1 }
+            },
+            // Project only the required fields
+            {
+                $project: {
+                    participants: 1, // Include the filtered participants with selected fields
+                    lastMessage: 1,
+                }
+            }
+        ]);
 
-        const otherParticipants = conversations.flatMap(conversation =>
-            conversation.participants.filter(participant => participant._id.toString() !== authPageId)
-        );
-
-        return res.status(200).json({ success: true, data: otherParticipants })
+        return res.status(200).json({ success: true, data: conversations })
     } catch (err) {
         console.log(`Error in getPagesForSidebar : ${err}`);
         const error = new Error(`Internal Server Error`)
@@ -60,14 +117,22 @@ export const getMessages = async (req, res, next) => {
         }
 
         // TODO: add chuck by chunk process of messages(skip & limit)
-        const conversation = await Conversation
-            .findOne({
-                participants: { $all: [currentPageId, targetPageId] }
-            })
-            .populate({
-                path: 'messages',
-                select: 'text updatedAt from to',
-            })
+        const [_, conversation] = await Promise.all([
+            Message.updateMany({ from: targetPageId, to: currentPageId, read: false }, { read: true }),
+            Conversation
+                .findOne({
+                    participants: { $all: [currentPageId, targetPageId] }
+                })
+                .populate({
+                    path: 'messages',
+                    select: 'text updatedAt from to read',
+                })
+        ])
+        
+        const toSocketId = getPageSocketId(targetPageId);
+        if (toSocketId) {
+            io.to(toSocketId).emit('messageRead', { to: currentPageId });
+        }
 
         if (!conversation) {
             return res.status(200).json([]);
@@ -146,17 +211,67 @@ export const sendMessage = async (req, res, next) => {
             notification.read = false;
         }
 
-        // TODO: SOCKET IO FUNCTIONALITY
-
         await Promise.all([
             newMessage.save(),
             conversation.save(),
             notification.save()
         ])
 
+        // TODO: SOCKET IO FUNCTIONALITY
+        const toSocketId = getPageSocketId(to);
+        if (toSocketId) {
+            io.to(toSocketId).emit('newMessage', newMessage);
+        }
+
         return res.status(201).json({ success: true, msg: "message successfully sent", data: newMessage });
     } catch (err) {
         console.log(`Error in sendMessage : ${err}`);
+        const error = new Error(`Internal Server Error`)
+        error.status = 500;
+        return next(error);
+    }
+}
+
+export const setReadMessages = async (req, res, next) => {
+    try {
+        const data = req.validatedData;
+        const currentPageId = req.user._id.toString();
+        const targetPageId = data.pageId;
+
+        const isValidId = isValidObjectId(targetPageId);
+
+        if (!isValidId) {
+            const err = new Error(`pageId is not valid!`);
+            err.status = 400;
+            return next(err);
+        }
+
+        if (currentPageId === targetPageId) {
+            const err = new Error(`you can not send message to yourself`);
+            err.status = 400;
+            return next(err);
+        }
+
+        let conversation = await Conversation.findOne({
+            participants: { $all: [currentPageId, targetPageId] },
+        })
+
+        if (!conversation) {
+            const err = new Error(`there is no conversation with this page`);
+            err.status = 404;
+            return next(err);
+        }
+
+        await Message.updateMany({ from: targetPageId, to: currentPageId, read: false }, { read: true });
+
+        const toSocketId = getPageSocketId(targetPageId);
+        if (toSocketId) {
+            io.to(toSocketId).emit('messageRead', { to: currentPageId });
+        }
+
+        return res.status(201).json({ success: true, msg: "all messages set to read" })
+    } catch (err) {
+        console.log(`Error in setReadMessages : ${err}`);
         const error = new Error(`Internal Server Error`)
         error.status = 500;
         return next(error);
