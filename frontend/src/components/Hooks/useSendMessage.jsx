@@ -12,7 +12,7 @@ const useSendMessage = () => {
 		setLoading(true);
 		try {
 			const res = await fetch(
-				`/api/v1.0/messages/send/${selectedConversation._id}`,
+				`/api/v1.0/messages/send/${selectedConversation?.participants[0]._id}`,
 				{
 					method: "POST",
 					headers: {
@@ -31,7 +31,11 @@ const useSendMessage = () => {
 			if (!res.ok || data.success === false)
 				throw new Error(data.msg || "Failed To Send Message");
 
-			setMessages([...messages, data.data]);
+			if (messages) {
+				setMessages([...messages, data.data]);
+			} else {
+				setMessages([data.data]);
+			}
 		} catch (error) {
 			toast.error(error.message);
 		} finally {

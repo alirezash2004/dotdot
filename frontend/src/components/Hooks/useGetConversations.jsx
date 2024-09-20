@@ -1,13 +1,10 @@
-import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 
 const useGetConversations = () => {
-	const [loading, setLoading] = useState(false);
-	const [conversations, setConversations] = useState([]);
-
-	useEffect(() => {
-		const getConversations = async () => {
-			setLoading(true);
+	const { data, refetch, isFetching } = useQuery({
+		queryKey: ["chatConversations"],
+		queryFn: async () => {
 			try {
 				const res = await fetch("/api/v1.0/messages/sbp");
 
@@ -19,20 +16,16 @@ const useGetConversations = () => {
 
 				if (!res.ok || data.success === false)
 					throw new Error(data.msg || "Failed To Load Conversations");
-
-				setConversations(data.data);
+				
+				return data.data;
 			} catch (error) {
-				toast.error(error);
+				toast.error(error.message);
 				throw new Error(error);
-			} finally {
-				setLoading(false);
 			}
-		};
+		},
+	});
 
-		getConversations();
-	}, []);
-
-	return { loading, conversations };
+	return { loading: isFetching, conversations: data };
 };
 
 export default useGetConversations;

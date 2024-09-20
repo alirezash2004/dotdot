@@ -9,7 +9,7 @@ export function useUsername({ username, authUsername }) {
 		setIsValidatingUsername(true);
 		const usernameRegx =
 			/^(?![0-9.])(?=[a-zA-Z0-9._]{6,16}$)[a-zA-Z][a-zA-Z0-9_.]*[^.]$/;
-		const usernameValid = usernameRegx.test(username);
+		const usernameValid = usernameRegx.test(username) && username !== undefined;
 		setUsernameValidate(usernameValid);
 		if (!usernameValid) {
 			setIsValidatingUsername(false);

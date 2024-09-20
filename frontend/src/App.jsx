@@ -87,6 +87,10 @@ function App() {
 						path="/chat"
 						element={authPage ? <ChatPage /> : <Navigate to="/login" />}
 					/>
+					<Route
+						path="/chat/:username"
+						element={authPage ? <ChatPage /> : <Navigate to="/login" />}
+					/>
 				</Routes>
 				<Toaster />
 			</div>

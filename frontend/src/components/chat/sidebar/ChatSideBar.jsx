@@ -5,6 +5,7 @@ import useConversation from "../../../zustand/useConversation";
 
 const ChatSideBar = () => {
 	const { selectedConversation } = useConversation();
+
 	return (
 		<>
 			<div

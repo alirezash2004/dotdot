@@ -1,11 +1,11 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 
 export function usePageProfile({
 	username,
-	isValidUsername,
 	isMyProfile,
 	authPageId,
+	disable = false,
 }) {
 	const [isPageFetched, setIsPageFetched] = useState(false);
 	const [isFollowing, setIsFollowing] = useState(false);
@@ -30,8 +30,7 @@ export function usePageProfile({
 
 			return data.data;
 		},
-		// enabled: false,
-		// enabled: !isMyProfile && isValidUsername,
+		enabled: disable ? false : true,
 	});
 
 	const {
@@ -53,17 +52,16 @@ export function usePageProfile({
 
 			return data;
 		},
-		// enabled: false,
-		enabled:
-			isPageFetched &&
-			!isMyProfile &&
-			!isTargetPageFetching &&
-			!isTargetPagePending,
+		enabled: isTargetPageFetching ? false : true,
 	});
 
 	const fetchProfilePage = async () => {
 		await fetchPage();
 		await fetchRelation();
+	};
+
+	const fetchPageOnly = async () => {
+		await fetchPage();
 	};
 
 	return {
@@ -75,5 +73,6 @@ export function usePageProfile({
 		isFollowing: isFollowing,
 		targetPage: targetPage,
 		fetchProfilePage,
+		fetchPageOnly,
 	};
 }

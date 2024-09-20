@@ -15,6 +15,7 @@ import ProfileTopSkeleton from "../../components/skeletons/ProfileTopSkeleton";
 import EditProfileModel from "./EditProfileModel.jsx";
 
 import { CiEdit } from "react-icons/ci";
+import { Link } from "react-router-dom";
 
 const ProfileHeader = ({ pageUsername }) => {
 	const [profileImg, setProfileImg] = useState({});
@@ -290,23 +291,31 @@ const ProfileHeader = ({ pageUsername }) => {
 						<div className="flex flex-col md:flex-row items-center gap-4">
 							{isMyProfile && <EditProfileModel authPage={authPage} />}
 							{!isMyProfile && (
-								<button
-									onClick={handleFollowUnfollow}
-									className={`btn w-48 md:w-auto md:px-16 ${
-										isFollowing ? "btn-secondary" : "btn-primary"
-									} ${
-										isPageProfileFetching || isFollowUnfollowPending
-											? "btn-disabled"
-											: ""
-									}`}
-								>
-									{(isPageProfileFetching || isFollowUnfollowPending) && (
-										<Loading />
-									)}
-									{!isPageProfileFetching && isFollowing
-										? "Following"
-										: "Follow"}
-								</button>
+								<>
+									<button
+										onClick={handleFollowUnfollow}
+										className={`btn w-48 md:w-auto md:px-16 ${
+											isFollowing ? "btn-secondary" : "btn-primary"
+										} ${
+											isPageProfileFetching || isFollowUnfollowPending
+												? "btn-disabled"
+												: ""
+										}`}
+									>
+										{(isPageProfileFetching || isFollowUnfollowPending) && (
+											<Loading />
+										)}
+										{!isPageProfileFetching && isFollowing
+											? "Following"
+											: "Follow"}
+									</button>
+									<Link
+										to={`/chat/${targetPage?.username}`}
+										className={`btn w-48 md:w-auto md:px-16 btn-secondary btn-outline`}
+									>
+										Message
+									</Link>
+								</>
 							)}
 
 							{isMyProfile && profileImg.file && (
