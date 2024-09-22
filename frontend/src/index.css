@@ -2,6 +2,47 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer base {
+    @font-face {
+        font-family: 'Vazir';
+        font-style: normal;
+        font-weight: 200;
+        font-display: swap;
+        src: url(/fonts/Vazir-Thin.woff2) format('woff2');
+    }
+
+    @font-face {
+        font-family: 'Vazir';
+        font-style: normal;
+        font-weight: 300;
+        font-display: swap;
+        src: url(/fonts/Vazir-Light.woff2) format('woff2');
+    }
+
+    @font-face {
+        font-family: 'Vazir';
+        font-style: normal;
+        font-weight: 400;
+        font-display: swap;
+        src: url(/fonts/Vazir.woff2) format('woff2');
+    }
+
+    @font-face {
+        font-family: 'Vazir';
+        font-style: normal;
+        font-weight: 500;
+        font-display: swap;
+        src: url(/fonts/Vazir-Medium.woff2) format('woff2');
+    }
+
+    @font-face {
+        font-family: 'Vazir';
+        font-style: normal;
+        font-weight: 900;
+        font-display: swap;
+        src: url(/fonts/Vazir-Black.woff2) format('woff2');
+    }
+}
 
 /* dark mode looking scrollbar */
 ::-webkit-scrollbar {

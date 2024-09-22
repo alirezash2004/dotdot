@@ -52,7 +52,7 @@ function App() {
 
 	return (
 		<>
-			<div className="flex max-w-6xl mx-auto flex-col-reverse md:flex-row">
+			<div className="flex max-w-6xl mx-auto flex-col-reverse md:flex-row font-[Vazir]">
 				{authPage && <Sidebar />}
 				<Routes>
 					<Route

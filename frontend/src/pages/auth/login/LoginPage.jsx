@@ -36,7 +36,7 @@ const LoginPage = () => {
 	return (
 		<>
 			<div className="w-screen h-screen absolute top-0 left-0 flex items-center justify-center z-0 overflow-hidden">
-				<motion.div className="w-96 h-96 block rounded-full bg-secondary  circle-animate scale-0 opacity-10"></motion.div>
+				<motion.div className="w-96 h-96 block rounded-full bg-secondary circle-animate scale-0 opacity-10"></motion.div>
 			</div>
 
 			<Helmet>
