@@ -11,9 +11,14 @@ const messageSchema = new mongoose.Schema({
         ref: 'Page',
         required: true
     },
-    text: {
-        type: mongoose.Schema.Types.String,
-        required: true
+    message: {
+        text: {
+            type: mongoose.Schema.Types.String,
+        },
+        post: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Post',
+        },
     },
     read: {
         type: mongoose.Schema.Types.Boolean,

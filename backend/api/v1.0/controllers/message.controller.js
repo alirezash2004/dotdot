@@ -6,6 +6,7 @@ import Message from "../models/message.model.js";
 import Notification from "../models/notification.model.js";
 import { io } from "../../../socket/socket.js";
 import { getPageSocketId } from "../../../socket/socket.js";
+import Post from "../models/post.model.js";
 
 export const getPagesForSidebar = async (req, res, next) => {
     try {
@@ -125,10 +126,24 @@ export const getMessages = async (req, res, next) => {
                 })
                 .populate({
                     path: 'messages',
-                    select: 'text updatedAt from to read',
+                    select: 'message.text message.post updatedAt from to read',
+                    populate: {
+                        path: 'message.post',
+                        select: 'assetType assets caption page',
+                    }
                 })
         ])
-        
+
+        // check if post exist
+        if (conversation && conversation.messages) {
+            conversation.messages = conversation.messages.map(message => {
+                if (message.message && message.message.post && message.message.post.assets) {
+                    message.message.post.assets = message.message.post.assets.slice(0, 1)
+                }
+                return message
+            })
+        }
+
         const toSocketId = getPageSocketId(targetPageId);
         if (toSocketId) {
             io.to(toSocketId).emit('messageRead', { to: currentPageId });
@@ -154,7 +169,37 @@ export const sendMessage = async (req, res, next) => {
         const data = req.validatedData;
         const from = req.user._id.toString();
         const to = data.pageId;
-        const message = { from: from, to: to, text: data.text };
+        let sendedPost = null;
+
+        let message = { from: from, to: to }
+        if (data.text) {
+            message.message = {
+                text: data.text
+            }
+        } else if (data.post) {
+            message.message = {
+                post: data.post
+            }
+            const isValidPostId = isValidObjectId(data.post);
+
+            if (!isValidPostId) {
+                const err = new Error(`postid is not valid!`);
+                err.status = 400;
+                return next(err);
+            }
+
+            sendedPost = await Post.findById(data.post).select('assetType assets caption page')
+
+            if (!sendedPost) {
+                const err = new Error(`post not found!`);
+                err.status = 404;
+                return next(err);
+            }
+        } else {
+            const err = new Error(`text or post required`);
+            err.status = 400;
+            return next(err);
+        }
 
         const isValidId = isValidObjectId(to);
 
@@ -217,7 +262,9 @@ export const sendMessage = async (req, res, next) => {
             notification.save()
         ])
 
-        // TODO: SOCKET IO FUNCTIONALITY
+        newMessage.message.post = sendedPost;
+
+        // SOCKET.IO FUNCTIONALITY
         const toSocketId = getPageSocketId(to);
         if (toSocketId) {
             io.to(toSocketId).emit('newMessage', newMessage);
@@ -262,7 +309,10 @@ export const setReadMessages = async (req, res, next) => {
             return next(err);
         }
 
-        await Message.updateMany({ from: targetPageId, to: currentPageId, read: false }, { read: true });
+        await Promise.all([
+            Message.updateMany({ from: targetPageId, to: currentPageId, read: false }, { read: true }),
+            Notification.updateMany({ from: currentPageId, to: targetPageId, type: "message", read: false }, { read: true })
+        ])
 
         const toSocketId = getPageSocketId(targetPageId);
         if (toSocketId) {

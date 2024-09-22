@@ -1,9 +1,6 @@
 export const newMessageSchema = {
     text: {
-        exists: {
-            errorMessage: 'text is required'
-        },
-        isEmpty: { negated: true },
+        optional: true,
         isLength: {
             errorMessage: "text must not exceed 300 characters.",
             options: {
@@ -15,5 +12,13 @@ export const newMessageSchema = {
         },
         trim: true,
         escape: true,
+    },
+    post: {
+        optional: true,
+        isString: {
+            errorMessage: 'post must be a string'
+        },
+        trim: true,
+        escape: true
     }
 }
