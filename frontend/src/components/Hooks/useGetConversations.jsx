@@ -1,8 +1,12 @@
 import { useQuery } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 
-const useGetConversations = () => {
-	const { data, refetch, isFetching } = useQuery({
+const useGetConversations = ({ disableOnloadFetch = false }) => {
+	const {
+		data,
+		refetch: fetchConversations,
+		isFetching,
+	} = useQuery({
 		queryKey: ["chatConversations"],
 		queryFn: async () => {
 			try {
@@ -16,16 +20,17 @@ const useGetConversations = () => {
 
 				if (!res.ok || data.success === false)
 					throw new Error(data.msg || "Failed To Load Conversations");
-				
+
 				return data.data;
 			} catch (error) {
 				toast.error(error.message);
 				throw new Error(error);
 			}
 		},
+		enabled: disableOnloadFetch ? false : true,
 	});
 
-	return { loading: isFetching, conversations: data };
+	return { loading: isFetching, conversations: data, fetchConversations };
 };
 
 export default useGetConversations;

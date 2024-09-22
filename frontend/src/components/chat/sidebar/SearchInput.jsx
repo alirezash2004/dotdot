@@ -10,7 +10,7 @@ import { CiSearch } from "react-icons/ci";
 const SearchInput = () => {
 	const [search, setSearch] = useState("");
 	const { setSelectedConversation } = useConversation();
-	const { conversations } = useGetConversations();
+	const { conversations } = useGetConversations({ disableOnloadFetch: false });
 
 	const handleSubmit = (e) => {
 		e.preventDefault();
@@ -19,7 +19,9 @@ const SearchInput = () => {
 		}
 
 		const conversation = conversations.find((conversation) =>
-			conversation.participants[0].fullName.toLowerCase().includes(search.toLowerCase())
+			conversation.participants[0].fullName
+				.toLowerCase()
+				.includes(search.toLowerCase())
 		);
 
 		if (!conversation) {

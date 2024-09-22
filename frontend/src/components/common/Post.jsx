@@ -1,3 +1,4 @@
+import { PageProfilePost } from "./PageProfilePost";
 import { useQuery } from "@tanstack/react-query";
 import { useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
@@ -18,12 +19,12 @@ import changeHost from "../../utils/changeHost.js";
 import {
 	CiBookmark,
 	CiChat1,
-	CiGrid42,
 	CiHeart,
-	CiImageOn,
 	CiLocationArrow1,
 	CiTrash,
 } from "react-icons/ci";
+import useGetConversations from "../Hooks/useGetConversations.jsx";
+import useSendMessage from "../Hooks/useSendMessage.jsx";
 
 const Post = ({ post, postType = "" }) => {
 	const postId = post._id;
@@ -34,6 +35,7 @@ const Post = ({ post, postType = "" }) => {
 	const [isLiked, setIsLiked] = useState(post.isLiked);
 	const [isSaved, setIsSaved] = useState(post.isSaved);
 	const [numberOfLikes, setNumberOfLikes] = useState(post.numberOfLikes);
+	const [sharePostTarget, setSharePostTarget] = useState(null);
 
 	const { data: authPage } = useQuery({ queryKey: ["authPage"] });
 
@@ -79,15 +81,44 @@ const Post = ({ post, postType = "" }) => {
 		likeUnlikePost();
 	};
 
-	// TODO: add share post
-	const handleSharePost = () => {
-		toast.error("Sorry, sharing posts are not available yet");
-		// sharePost();
-	};
+	const {
+		fetchConversations,
+		conversations,
+		loading: isConversationsFetching,
+	} = useGetConversations({
+		disableOnloadFetch: true,
+	});
 
+	const handleSharePost = async () => {
+		if (isConversationsFetching) return;
+
+		await fetchConversations();
+
+		setSharePostTarget(null);
+
+		setTimeout(() => {
+			document.getElementById(`sharepost_modal_${postId}`).showModal();
+		}, 100);
+	};
 	const handleSavePost = () => {
 		if (isSaveUnsavePending) return;
 		saveUnsavePost();
+	};
+
+	const { isLoading: isSendingMessage, sendMessage } = useSendMessage();
+
+	const handleSendpost = async (e) => {
+		e.preventDefault();
+		if (isSendingMessage) return;
+
+		if (!sharePostTarget) return toast.error("You have to select a page");
+
+		await sendMessage({
+			message: { post: post._id },
+			to: sharePostTarget,
+		});
+
+		document.querySelector(`#sharepost_modal_close_${postId}`).click();
 	};
 
 	let caption;
@@ -111,22 +142,7 @@ const Post = ({ post, postType = "" }) => {
 	const postUrl = changeHost(post.assets[0].url);
 
 	return postType === "pageProfile" ? (
-		<>
-			<Link
-				to={`/post/${post?._id}`}
-				className="flex w-full aspect-square border border-slate-800 group/post relative bg-slate-900"
-			>
-				<div className="absolute top-2 right-2 text-3xl text-slate-200 z-20">
-					{post.assets.length === 1 && <CiImageOn />}
-					{post.assets.length > 1 && <CiGrid42 />}
-				</div>
-				<img
-					src={postUrl}
-					alt=""
-					className="w-full object-cover opacity-80 group-hover/post:opacity-100 transition-opacity duration-200 pointer-events-none"
-				/>
-			</Link>
-		</>
+		<PageProfilePost post={post} postUrl={postUrl} />
 	) : (
 		<>
 			<div className="flex mb-14 mx-4 md:mx-auto gap-2 flex-col items-start pb-4 border rounded-lg p-5 border-gray-700 md:w-3/4">
@@ -220,10 +236,13 @@ const Post = ({ post, postType = "" }) => {
 							</span>
 						</div>
 						<div className="flex gap-1 items-center cursor-pointer group">
-							<CiLocationArrow1
-								onClick={handleSharePost}
-								className="w-6 h-6  text-slate-500 group-hover:text-red-400"
-							/>
+							{!isConversationsFetching && (
+								<CiLocationArrow1
+									onClick={handleSharePost}
+									className="w-6 h-6  text-slate-500 group-hover:text-red-400"
+								/>
+							)}
+							{isConversationsFetching && <Loading size="sm" />}
 						</div>
 					</div>
 					<div className="flex gap-1 items-center cursor-pointer group">
@@ -308,6 +327,94 @@ const Post = ({ post, postType = "" }) => {
 						</div>
 						<form method="dialog" className="modal-backdrop">
 							<button className="outline-none">close</button>
+						</form>
+					</dialog>
+					<dialog
+						id={`sharepost_modal_${postId}`}
+						className="modal border-none outline-none"
+					>
+						<div className="modal-box rounded border border-gray-700">
+							<h3 className="font-bold text-lg mb-4">Share Post</h3>
+
+							<form className="overflow-x-auto">
+								{/* <label className="input input-bordered flex items-center gap-2  mb-2">
+									Search
+									<input type="text" className="grow" placeholder="..." />
+								</label> */}
+								<table className="table">
+									<tbody>
+										{conversations &&
+											conversations.map((conversation, idx) => (
+												<tr key={idx}>
+													<th>
+														<label>
+															<input
+																type="radio"
+																name={`sharepost_radio_${postId}`}
+																className="radio"
+																id={`sharepost_radio_${postId}_${conversation.participants[0]._id}`}
+																onChange={() => {
+																	setSharePostTarget(
+																		conversation.participants[0]._id
+																	);
+																}}
+															/>
+														</label>
+													</th>
+													<td
+														className="flex-1 relative -left-10 cursor-pointer"
+														onClick={() => {
+															document
+																.querySelector(
+																	`#sharepost_radio_${postId}_${conversation.participants[0]._id}`
+																)
+																.click();
+														}}
+													>
+														<div className="flex items-center gap-3">
+															<div className="avatar">
+																<div className="mask mask-squircle h-12 w-12">
+																	<img
+																		src={changeHost(
+																			conversation.participants[0]
+																				.profilePicture
+																		)}
+																		alt="Page Profile"
+																	/>
+																</div>
+															</div>
+															<div>
+																<div className="font-bold">
+																	{conversation.participants[0].fullName}
+																</div>
+																<div className="text-sm opacity-50">
+																	{conversation.participants[0].username}
+																</div>
+															</div>
+														</div>
+													</td>
+												</tr>
+											))}
+									</tbody>
+								</table>
+								<button
+									className={`btn btn-secondary w-full rounded-full mt-4 ${
+										isSendingMessage && "bg-opacity-75"
+									}`}
+									onClick={handleSendpost}
+								>
+									{isSendingMessage && <Loading size="sm" />}
+									{!isSendingMessage && "Send"}
+								</button>
+							</form>
+						</div>
+						<form method="dialog" className="modal-backdrop">
+							<button
+								id={`sharepost_modal_close_${postId}`}
+								className="outline-none"
+							>
+								close
+							</button>
 						</form>
 					</dialog>
 				</div>

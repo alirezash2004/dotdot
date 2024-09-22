@@ -4,13 +4,17 @@ import Loading from "../../common/Loading";
 import Converasion from "./Conversation";
 
 const Converasions = () => {
-	const { loading, conversations } = useGetConversations();
+	const { loading, conversations } = useGetConversations({
+		disableOnloadFetch: false,
+	});
 
 	return (
 		<div className="py-2 flex flex-col overflow-auto">
 			{loading && <Loading />}
 
-			{!loading && conversations.length === 0 && <p className="w-full text-center">No Conversations</p>}
+			{!loading && conversations.length === 0 && (
+				<p className="w-full text-center">No Conversations</p>
+			)}
 
 			{conversations &&
 				conversations?.map((conversation, idx) => (

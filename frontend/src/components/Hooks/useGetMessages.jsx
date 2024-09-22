@@ -9,6 +9,8 @@ const useGetMessages = () => {
 	const [loading, setLoading] = useState(false);
 	const { messages, setMessages, selectedConversation } = useConversation();
 
+	// TODO: add useQuery for fetching messages
+
 	useEffect(() => {
 		const getMessages = async () => {
 			setLoading(true);

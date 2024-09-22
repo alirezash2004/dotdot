@@ -85,7 +85,10 @@ const useListenMessages = () => {
 			}
 		});
 
-		return () => socket?.off("newMessage");
+		return () => {
+			socket?.off("newMessage");
+			socket?.off("messageRead");
+		};
 	}, [
 		socket,
 		messages,

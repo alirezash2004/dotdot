@@ -28,7 +28,7 @@ const Converasion = ({ conversation, lastIdx }) => {
 				}`}
 				onClick={() => {
 					setSelectedConversation(conversation);
-					navigate(`/chat`);
+					navigate(`/chat/${targetPage.username}`);
 				}}
 			>
 				<div className={`avatar ${isOnline ? "online" : "offline"}`}>
@@ -44,7 +44,8 @@ const Converasion = ({ conversation, lastIdx }) => {
 					>
 						<p className="text-sm font-bold">{targetPage.fullName}</p>
 						<span className="text-slate-500 truncate">
-							{conversation.lastMessage.text}
+							{conversation.lastMessage.message?.text || ""}
+							{conversation.lastMessage.message?.post ? <span className="text-primary">Post</span> : ""}
 						</span>
 						{hasUnreadMessage && (
 							<span className="flex w-3 h-3 bg-primary rounded-full absolute right-4 top-1/2 -translate-y-1/2"></span>

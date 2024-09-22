@@ -33,7 +33,9 @@ const ChatMessageContainer = () => {
 		};
 	}, [setSelectedConversation]);
 
-	const { loading, conversations } = useGetConversations();
+	const { loading, conversations } = useGetConversations({
+		disableOnloadFetch: false,
+	});
 
 	const { username: paramUsername } = useParams();
 
@@ -78,7 +80,6 @@ const ChatMessageContainer = () => {
 			const isSelected =
 				selectedConversation?.participants[0].username ===
 				conv.participants[0].username;
-			console.log(isSelected);
 
 			if (!isSelected) {
 				const conversation = conversations?.find((conversation) =>
@@ -96,7 +97,6 @@ const ChatMessageContainer = () => {
 						}
 					});
 				}
-				console.log(selectedConversation);
 
 				setTimeout(() => {
 					if (!selectedConversation) {
@@ -108,13 +108,18 @@ const ChatMessageContainer = () => {
 	}
 
 	return (
-		<div className="md:min-w-[450px] md:flex-[4_4_0] flex flex-col w-screen md:w-auto h-[94vh] md:h-screen z-30 pb-20 md:pb-0">
+		<div
+			className={`transition-all duration-500 md:min-w-[450px] md:flex-[4_4_0] flex flex-col w-screen md:w-auto h-[100vh] md:h-screen z-30 mb-1 md:pb-0 absolute top-0 -left-[100vw] md:relative ${
+				selectedConversation && "-left-0"
+			}`}
+		>
 			{!selectedConversation ? (
 				<NoChatSelected />
 			) : (
 				<>
 					{/* header */}
-					<div className="bg-slate-500 px-4 py-2 mb-2 pb sticky top-0 z-50">
+					{/* <div className="bg-slate-500 px-4 py-2 mb-2 pb sticky top-0 z-50"> */}
+					<div className="bg-slate-500 px-4 py-2 mb-2 sticky top-0 z-50">
 						<span
 							className="text-3xl pr-2 md:hidden hover:scale-150 inline-flex transition-all relative top-[2px]"
 							onClick={() => {
