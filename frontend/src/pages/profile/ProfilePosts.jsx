@@ -1,12 +1,12 @@
 import { useEffect, useRef, useState } from "react";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 
 import { CiCirclePlus, CiLock } from "react-icons/ci";
 
 import ProfilePostsSkeleton from "../../components/skeletons/ProfilePostsSkeleton";
 import Loading from "../../components/common/Loading";
 
-import Post from "../../components/common/Post";
+import Post from "../../components/common/post/Post";
 
 const Posts = ({
 	pageUsername = "",

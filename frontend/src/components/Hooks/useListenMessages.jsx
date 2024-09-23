@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useSocketContext } from "../../context/useSocketContext";
+import useSocketContext from "../../context/useSocketContext";
 import useConversation from "../../zustand/useConversation";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";

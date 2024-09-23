@@ -1,17 +1,17 @@
 import { useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { Helmet } from "react-helmet-async";
 
-import { useUsername } from "../../components/Hooks/useUsername";
+import useUsername from "../../components/Hooks/useUsername";
 import { useLogout } from "../../components/Hooks/useLogout";
 
 import { CiBookmark, CiHeart, CiLogout, CiUser } from "react-icons/ci";
 
+import SetPageTitle from "../../components/common/SetPageTitle";
 import Loading from "../../components/common/Loading";
 
 import Posts from "./ProfilePosts";
-import ProfileHeader from "./ProfileHeader.jsx";
+import ProfileHeader from "./ProfileHeader";
 
 const ProfilePage = () => {
 	const [postFeedType, setPostFeedType] = useState("me");
@@ -51,11 +51,8 @@ const ProfilePage = () => {
 
 	return (
 		<>
-			<Helmet>
-				<title>
-					Profile {paramUsername} - DotDot Social Media
-				</title>
-			</Helmet>
+			<SetPageTitle title={`Profile ${paramUsername} - DotDot Social Media`} />
+
 			{!isValidatingUsername && !isValidUsername ? (
 				<>
 					<div className="flex-[4_4_0] border-r border-gray-700 min-h-screen w-full items-center justify-center text-center pt-14 text-5xl text-rose-600">

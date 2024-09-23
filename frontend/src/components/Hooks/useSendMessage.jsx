@@ -1,10 +1,12 @@
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 
 import useConversation from "../../zustand/useConversation";
 
 const useSendMessage = () => {
 	const { messages, setMessages } = useConversation();
+
+	const queryClinet = useQueryClient();
 
 	const { mutateAsync: sendMessage, isPending: isLoading } = useMutation({
 		mutationFn: async ({ message, to }) => {
@@ -34,11 +36,26 @@ const useSendMessage = () => {
 				} else {
 					setMessages([data.data]);
 				}
+
+				return data.data;
 			} catch (error) {
 				throw new Error(error);
 			}
 		},
-		onSuccess: () => {},
+		onSuccess: (newMessage) => {
+			queryClinet.setQueryData(["chatConversations"], (oldData) => {
+				return oldData.map((c) => {
+					if (c?.participants[0]._id === newMessage.to) {
+						return {
+							...c,
+							lastMessage: newMessage,
+						};
+					} else {
+						return c;
+					}
+				});
+			});
+		},
 		onError: (error) => {
 			toast.error(error.message);
 		},

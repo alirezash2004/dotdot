@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-export function useUsername({ username, authUsername }) {
+const useUsername = ({ username, authUsername }) => {
 	const [usernameValidate, setUsernameValidate] = useState(false);
 	const [isMyProfile, setIsMyProfile] = useState(false);
 	const [isValidatingUsername, setIsValidatingUsername] = useState(true);
@@ -25,4 +25,6 @@ export function useUsername({ username, authUsername }) {
 		isMyProfile,
 		isValidatingUsername,
 	};
-}
+};
+
+export default useUsername;

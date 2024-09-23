@@ -2,7 +2,7 @@ import { Navigate, Route, Routes } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
 import { useQuery } from "@tanstack/react-query";
 
-import Sidebar from "./components/common/Sidebar";
+import Sidebar from "./components/common/sidebar/Sidebar";
 import Loading from "./components/common/Loading";
 
 import LoginPage from "./pages/auth/login/LoginPage";

@@ -90,9 +90,9 @@ const HorizontalScrollCarousel = ({ imgs, handleDeleteImage }) => {
 					transition={SPRING_OPTIONS}
 					onDragEnd={onDragEnd}
 					className="flex cursor-grab items-center active:cursor-grabbing"
-					onDoubleClick={() =>
-						!handleDeleteImage ? animate(sequance("." + PID)) : ""
-					}
+					// onDoubleClick={() =>
+					// 	!handleDeleteImage ? animate(sequance("." + PID)) : ""
+					// }
 				>
 					<Images imgIndex={imgIndex} />
 				</motion.div>

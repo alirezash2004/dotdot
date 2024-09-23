@@ -1,10 +1,11 @@
-import ChatMessageContainer from "../../components/chat/messages/ChatMessageContainer";
-import ChatSideBar from "../../components/chat/sidebar/ChatSideBar";
+import ChatMessageContainer from "./messageContainer/ChatMessageContainer";
+
+import ChatSideBar from "./sideBar/ChatSideBar";
 import useListenMessages from "../../components/Hooks/useListenMessages";
 
 const ChatPage = () => {
 	useListenMessages();
-	
+
 	return (
 		<>
 			<ChatMessageContainer />

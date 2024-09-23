@@ -1,10 +1,10 @@
 import { useState } from "react";
 import { useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { Helmet } from "react-helmet-async";
 import toast from "react-hot-toast";
 
-import Post from "../../components/common/Post";
+import SetPageTitle from "../../components/common/SetPageTitle";
+import Post from "../../components/common/post/Post";
 import PostSkeleton from "../../components/skeletons/PostSkeleton";
 
 const PostPage = () => {
@@ -38,9 +38,8 @@ const PostPage = () => {
 
 	return (
 		<>
-			<Helmet>
-				<title>Post - DotDot Social Media</title>
-			</Helmet>
+			<SetPageTitle title="Post - DotDot Social Media" />
+
 			<div className="flex flex-[4_4_0] flex-col pt-10 mb-12">
 				{(isPending || isFetching) && <PostSkeleton />}
 				{!isPending && !isFetching && !post && (

@@ -2,17 +2,17 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRef, useState } from "react";
 import toast from "react-hot-toast";
 
-import useGetFollowingRelations from "../../components/Hooks/useGetFollowingRelations.jsx";
-import useUploadFiles from "../../components/Hooks/useUploadFiles.jsx";
+import useGetFollowingRelations from "../../components/Hooks/useGetFollowingRelations";
+import useUploadFiles from "../../components/Hooks/useUploadFiles";
 
 import changeHost from "../../utils/changeHost.js";
 
-import { usePageProfile } from "../../components/Hooks/usePageProfile.jsx";
+import usePageProfile from "../../components/Hooks/usePageProfile";
 
-import Loading from "../../components/common/Loading.jsx";
+import Loading from "../../components/common/Loading";
 import ProfileTopSkeleton from "../../components/skeletons/ProfileTopSkeleton";
 
-import EditProfileModel from "./EditProfileModel.jsx";
+import EditProfileModel from "./EditProfileModel";
 
 import { CiEdit } from "react-icons/ci";
 import { Link } from "react-router-dom";
@@ -35,7 +35,6 @@ const ProfileHeader = ({ pageUsername }) => {
 		fetchProfilePage,
 	} = usePageProfile({
 		username: pageUsername,
-		isMyProfile: isMyProfile,
 		authPageId: authPage._id,
 	});
 

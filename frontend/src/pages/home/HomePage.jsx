@@ -1,15 +1,14 @@
-import { Helmet } from "react-helmet-async";
-
-import Posts from "../../components/common/Posts";
-import TopBar from "../../components/common/TopBar";
+import SetPageTitle from "../../components/common/SetPageTitle";
+import TopBar from "./topbar/TopBar";
+import Posts from "./posts/Posts";
 
 const HomePage = () => {
 	return (
 		<>
-			<Helmet>
-				<title>Home - DotDot Social Media</title>
-			</Helmet>
+			<SetPageTitle title="Home - DotDot Social Media" />
+
 			<TopBar />
+
 			<Posts />
 		</>
 	);

@@ -1,13 +1,7 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 
-export function usePageProfile({
-	username,
-	isMyProfile,
-	authPageId,
-	disable = false,
-}) {
-	const [isPageFetched, setIsPageFetched] = useState(false);
+const usePageProfile = ({ username, authPageId, disable = false }) => {
 	const [isFollowing, setIsFollowing] = useState(false);
 
 	const {
@@ -18,15 +12,11 @@ export function usePageProfile({
 	} = useQuery({
 		queryKey: ["pageprofile"],
 		queryFn: async () => {
-			setIsPageFetched(false);
-
 			const res = await fetch(`/api/v1.0/pages/${username}`);
 			const data = await res.json();
 
 			if (!res.ok || data.success === false)
 				throw new Error(data.msg || "Failed To Fetch Page!");
-
-			setIsPageFetched(true);
 
 			return data.data;
 		},
@@ -75,4 +65,6 @@ export function usePageProfile({
 		fetchProfilePage,
 		fetchPageOnly,
 	};
-}
+};
+
+export default usePageProfile;
