@@ -36,10 +36,8 @@ const NewpostPage = () => {
 		setPosted(false);
 		let UploadedfileTokens;
 		if (fileTokens.length === files.length) {
-			console.log("use", fileTokens);
 			UploadedfileTokens = fileTokens;
 		} else {
-			console.log("nouse");
 			UploadedfileTokens = await upload(files);
 			if (isUploadError) return;
 		}

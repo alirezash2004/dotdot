@@ -42,7 +42,7 @@ const usePageProfile = ({ username, authPageId, disable = false }) => {
 
 			return data;
 		},
-		enabled: isTargetPageFetching ? false : true,
+		enabled: isTargetPageFetching || !targetPage._id ? false : true,
 	});
 
 	const fetchProfilePage = async () => {

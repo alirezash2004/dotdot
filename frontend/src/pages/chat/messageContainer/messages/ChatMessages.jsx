@@ -4,7 +4,7 @@ import useGetMessages from "../../../../components/Hooks/useGetMessages";
 
 import ChatMessage from "./message/ChatMessage";
 
-import Loading from "../../../../components/common/Loading";
+import ChatMessagesSkeleton from "../../../../components/skeletons/ChatMessagesSkeleton";
 
 const ChatMessages = () => {
 	const { loading, messages } = useGetMessages();
@@ -22,8 +22,16 @@ const ChatMessages = () => {
 	return (
 		<div className="px-4 flex-1 overflow-auto">
 			{loading ? (
-				<Loading />
-			) : !messages || messages?.length === 0 ? (
+				<>
+					<ChatMessagesSkeleton />
+					<ChatMessagesSkeleton chatPlace="start" />
+					<ChatMessagesSkeleton />
+					<ChatMessagesSkeleton chatPlace="start" />
+					<ChatMessagesSkeleton />
+					<ChatMessagesSkeleton chatPlace="start" />
+				</>
+			) : // <Loading />
+			!messages || messages?.length === 0 ? (
 				<p className="text-center my-5">No Messages</p>
 			) : null}
 			{!loading &&

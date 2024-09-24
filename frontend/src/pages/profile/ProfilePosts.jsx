@@ -60,7 +60,12 @@ const Posts = ({
 				if (!res.ok || data.success === false)
 					throw new Error(data.msg || "Failed To Fetch Posts!");
 
-				setTotalPosts((prevData) => [...prevData, ...data.posts]);
+				if (skip === 0) {
+					setTotalPosts(data.posts);
+				} else {
+					setTotalPosts((prevData) => [...prevData, ...data.posts]);
+				}
+
 				setSkip((prevData) => prevData + 6);
 				setIsPageAccess(true);
 

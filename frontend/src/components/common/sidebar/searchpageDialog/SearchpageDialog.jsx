@@ -5,6 +5,7 @@ import Loading from "../../Loading";
 import { CiSearch } from "react-icons/ci";
 import changeHost from "../../../../utils/changeHost.js";
 import { Link } from "react-router-dom";
+import SearchPageItemSkeleton from "../../../skeletons/SearchPageItemSkeleton.jsx";
 
 const SearchpageDialog = () => {
 	const [searchPageUsername, setSearchPageUsername] = useState("");
@@ -88,10 +89,39 @@ const SearchpageDialog = () => {
 					</div>
 					<table className="table mt-3">
 						<tbody>
-							{searchPageData &&
+							{isSearchPageFetching && (
+								<>
+									<SearchPageItemSkeleton />
+									<SearchPageItemSkeleton />
+									<SearchPageItemSkeleton hideDivider={true} />
+								</>
+							)}
+							{!isSearchPageFetching &&
+								searchPageData &&
+								searchPageData.length === 0 && (
+									<tr className="flex justify-between border-none pointer-events-none select-none">
+										<td className="flex-1 ">
+											<div className="flex items-center gap-3">
+												<div className="avatar">
+													<div className="mask mask-squircle h-12 w-12 ">
+														<img
+															src="https://placehold.co/400/EEE/31343C?font=montserrat&text=Not+\n+Found"
+															alt="Page Profile"
+														/>
+													</div>
+												</div>
+												<div className="flex flex-col gap-2">
+													Page Not Found!
+												</div>
+											</div>
+										</td>
+									</tr>
+								)}
+							{!isSearchPageFetching &&
+								searchPageData &&
 								searchPageData.length !== 0 &&
 								searchPageData.map((page, idx) => (
-									<tr key={idx} className="flex justify-between">
+									<tr key={idx} className="flex justify-between border-none">
 										<td className="flex-1 ">
 											<Link to={`/profile/${page.username}`}>
 												<div className="flex items-center gap-3">

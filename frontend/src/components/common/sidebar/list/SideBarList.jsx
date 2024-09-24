@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 
 import {
 	CiBellOn,
@@ -9,6 +9,7 @@ import {
 	CiSearch,
 	CiUser,
 } from "react-icons/ci";
+import toast from "react-hot-toast";
 
 const SideBarList = ({ authPage }) => {
 	const [islight, setIslight] = useState(
@@ -28,10 +29,19 @@ const SideBarList = ({ authPage }) => {
 		document.getElementById("searchpage_modal").showModal();
 	};
 
+	const { pathname } = useLocation();
+
+	let hideSearchBoxOpener = false;
+	if (pathname !== "/") {
+		hideSearchBoxOpener = true;
+	}
+
 	return (
 		<ul className="flex flex-row gap-6 w-full justify-around my-3 md:flex-col md:mt-5 md:mb-0 md:justify-start">
 			<label
-				className="input input-bordered items-center gap-2 mx-auto w-full input-xs py-5 mt-5 mb-0 hidden md:flex"
+				className={`input input-bordered items-center gap-2 mx-auto w-full input-xs py-5 mt-5 mb-0 hidden md:flex ${
+					hideSearchBoxOpener && "md:hidden"
+				}`}
 				onClick={handleOpenSearchBox}
 			>
 				<CiSearch className="text-lg" />

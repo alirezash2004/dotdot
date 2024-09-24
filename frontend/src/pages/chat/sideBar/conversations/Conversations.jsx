@@ -2,7 +2,7 @@ import useGetConversations from "../../../../components/Hooks/useGetConversation
 
 import Converasion from "./conversation/Conversation";
 
-import Loading from "../../../../components/common/Loading";
+import ConversationSkeleton from "../../../../components/skeletons/ConversationSkeleton";
 
 const Converasions = () => {
 	const { loading, conversations } = useGetConversations({
@@ -11,13 +11,21 @@ const Converasions = () => {
 
 	return (
 		<div className="py-2 flex flex-col overflow-auto">
-			{loading && <Loading />}
+			{loading && (
+				<>
+					<ConversationSkeleton />
+					<ConversationSkeleton />
+					<ConversationSkeleton />
+					<ConversationSkeleton />
+				</>
+			)}
 
 			{!loading && conversations.length === 0 && (
 				<p className="w-full text-center">No Conversations</p>
 			)}
 
-			{conversations &&
+			{!loading &&
+				conversations &&
 				conversations?.map((conversation, idx) => (
 					<Converasion
 						key={idx}
