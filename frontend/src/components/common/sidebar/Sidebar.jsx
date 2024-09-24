@@ -4,11 +4,12 @@ import useConversation from "../../../zustand/useConversation";
 
 import SideBarLogo from "./logo/SideBarLogo";
 import SideBarList from "./list/SideBarList";
-import SideBarProfile from "./profile/SideBarProfile.jsx";
+import SideBarProfile from "./profile/SideBarProfile";
+
 
 const Sidebar = () => {
 	const { data: authPage } = useQuery({ queryKey: ["authPage"] });
-
+	
 	const { selectedConversation } = useConversation();
 
 	return (
