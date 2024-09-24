@@ -408,19 +408,24 @@ export const likeUnlikePost = async (req, res, next) => {
 
         if (userLikedPost) {
             // unlike post
-            await Post.updateOne({ _id: postId }, { $pull: { likes: pageId } });
-            await Page.updateOne({ _id: pageId }, { $pull: { likedPosts: postId } });
+            await Promise.all([
+                Post.updateOne({ _id: postId }, { $pull: { likes: pageId } }),
+                Page.updateOne({ _id: pageId }, { $pull: { likedPosts: postId } }),
+            ])
             res.status(200).json({ success: true, data: { numberOfLikes: postObj.numberOfLikes - 1, isLiked: false }, msg: 'Post Unliked Successfully' });
         } else {
             // like post
-            await Post.updateOne({ _id: postId }, { $push: { likes: pageId } });
-            await Page.updateOne({ _id: pageId }, { $push: { likedPosts: postId } });
+            await Promise.all([
+                Post.updateOne({ _id: postId }, { $push: { likes: pageId } }),
+                Page.updateOne({ _id: pageId }, { $push: { likedPosts: postId } }),
+            ])
 
             if (pageId !== targetPageId) {
                 const notification = new Notification({
                     from: pageId,
                     to: targetPageId,
                     type: 'like',
+                    post: postId
                 });
 
                 await notification.save();
@@ -474,6 +479,7 @@ export const commentOnPost = async (req, res, next) => {
                 from: pageId,
                 to: targetPageId,
                 type: 'comment',
+                post: postId
             });
 
             await notification.save();

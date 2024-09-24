@@ -221,11 +221,15 @@ export const newFollowing = async (req, res, next) => {
 
         await followingRelationship.save();
 
-        const notification = new Notification({
-            from: pageId,
-            to: followedPageId,
-            type: 'follow',
-        });
+        let notification = await Notification.findOne({ from: pageId, to: followedPageId, type: 'follow' });
+
+        if (!notification) {
+            notification = new Notification({
+                from: pageId,
+                to: followedPageId,
+                type: 'follow',
+            });
+        }
 
         await Promise.all([
             Page.findByIdAndUpdate(pageId, { $inc: { followingCount: 1 } }).exec(),
@@ -265,9 +269,10 @@ export const removeFollowing = async (req, res, next) => {
         }
 
         await Promise.all([
-            FollowingRelationship.findOneAndDelete({ pageId: pageId, followedPageId: followedPageId }).exec(),
+            FollowingRelationship.deleteOne({ pageId: pageId, followedPageId: followedPageId }).exec(),
             Page.findByIdAndUpdate(pageId, { $inc: { followingCount: -1 } }).exec(),
             Page.findByIdAndUpdate(followedPageId, { $inc: { followersCount: -1 } }).exec(),
+            // Notification.deleteOne({ from: pageId, to: followedPageId, type: 'follow' })
         ])
 
         res.status(200).json({ success: true });
