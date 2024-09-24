@@ -7,7 +7,7 @@ import changeHost from "../../../../../utils/changeHost.js";
 
 import { formatDate } from "../../../../../utils/date";
 
-const ChatMessage = ({ message, lastMsg }) => {
+const ChatMessage = ({ message, lastMsg, refrence }) => {
 	const { data: authPage } = useQuery({ queryKey: ["authPage"] });
 	const { selectedConversation } = useConversation();
 	const isMyMessage = message.from === authPage._id;
@@ -28,7 +28,10 @@ const ChatMessage = ({ message, lastMsg }) => {
 	const messageType = message.message.text ? "text" : "post";
 
 	return (
-		<div className={`chat ${isMyMessage ? "chat-end" : "chat-start"} mt-2`}>
+		<div
+			className={`chat ${isMyMessage ? "chat-end" : "chat-start"} mt-2`}
+			ref={lastMsg ? refrence : null}
+		>
 			<div className="chat-image avatar">
 				<div className="w-10 rounded-full">
 					<img src={profilePicture} alt="" />
@@ -36,13 +39,13 @@ const ChatMessage = ({ message, lastMsg }) => {
 			</div>
 			<div
 				className={`chat-bubble ${post && "px-2"} text-white ${
-					isMyMessage && "bg-blue-500"
+					isMyMessage ? "bg-blue-500" : ""
 				}`}
 			>
 				{messageType === "text" && message.message.text}
 				{postNotExists && (
 					<Link className="relative flex w-60">
-						<span className="absolute left-0 top-0 w-full bg-slate-800 bg-opacity-70 z-50 text-lg rounded-md p-2">
+						<span className="absolute left-0 top-0 w-full bg-slate-800 bg-opacity-70 text-lg rounded-md p-2">
 							Post - Not Exist
 						</span>
 						<img

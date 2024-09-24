@@ -38,12 +38,12 @@ const Post = ({ post, postType = "" }) => {
 			<div className="flex mb-14 mx-4 md:mx-auto gap-2 flex-col items-start pb-4 border rounded-lg p-5 border-gray-700 md:w-3/4">
 				<PostTopbar post={post} />
 
-				{/* TODO: double tap animated like */}
+				{/* double tap animated like */}
 				<div
 					className="flex flex-col mt-2 w-full"
-					// onDoubleClick={() => {
-					// 	if (!isLiked) handleLikePost();
-					// }}
+					onDoubleClick={() => {
+						document.querySelector(`#like_post_${post._id}_btn`).click();
+					}}
 				>
 					{postMediaData}
 					{caption && (

@@ -124,8 +124,7 @@ const ChatMessageContainer = () => {
 			) : (
 				<>
 					{/* header */}
-					{/* <div className="bg-slate-500 px-4 py-2 mb-2 pb sticky top-0 z-50"> */}
-					<div className="bg-slate-300 dark:bg-slate-800 px-4 py-2 mb-2 sticky top-0 z-50 flex items-center gap-2">
+					<div className="bg-slate-300 dark:bg-slate-800 px-4 py-2 mb-2 sticky top-0 z-50 flex items-center gap-2 z-50">
 						<span
 							className="text-3xl hover:scale-150 inline-flex transition-all pr-2"
 							onClick={() => {

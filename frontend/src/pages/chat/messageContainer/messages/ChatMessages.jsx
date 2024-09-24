@@ -16,7 +16,7 @@ const ChatMessages = () => {
 				behavior: "smooth",
 				block: "end",
 			});
-		}, 100);
+		}, 500);
 	}, [messages]);
 
 	return (
@@ -37,12 +37,12 @@ const ChatMessages = () => {
 			{!loading &&
 				messages?.length > 0 &&
 				messages.map((message, idx) => (
-					<div key={idx} ref={lastMessageRef}>
-						<ChatMessage
-							message={message}
-							lastMsg={idx === messages.length - 1}
-						/>
-					</div>
+					<ChatMessage
+						key={idx}
+						message={message}
+						lastMsg={idx === messages.length - 1}
+						refrence={lastMessageRef}
+					/>
 				))}
 		</div>
 	);

@@ -24,25 +24,37 @@ const PostActionbarLike = ({ post, postType }) => {
 		likeUnlikePost();
 	};
 
+	const handleDoubleLike = (e) => {
+		e.preventDefault();
+		if (isLikeUnlikePending) return;
+		if (isLiked) return;
+		likeUnlikePost();
+	};
+
 	return (
-		<div
-			className="flex gap-1 items-center cursor-pointer group"
-			onClick={handleLikePost}
-		>
-			{!isLikeUnlikePending && (
-				<>
-					<CiHeart
-						className={`w-6 h-6 group-hover:text-red-400 ${
-							isLiked ? "text-red-400" : "text-slate-500"
-						}`}
-					/>
-					<span className="text-sm text-slate-500 group-hover:text-red-400">
-						{numberOfLikes}
-					</span>
-				</>
-			)}
-			{isLikeUnlikePending && <Loading size="sm" />}
-		</div>
+		<>
+			<div
+				className="flex gap-1 items-center cursor-pointer group"
+				onClick={handleLikePost}
+			>
+				{!isLikeUnlikePending && (
+					<>
+						<CiHeart
+							className={`w-6 h-6 group-hover:text-red-400 ${
+								isLiked ? "text-red-400" : "text-slate-500"
+							}`}
+						/>
+						<span className="text-sm text-slate-500 group-hover:text-red-400">
+							{numberOfLikes}
+						</span>
+					</>
+				)}
+				{isLikeUnlikePending && <Loading size="sm" />}
+			</div>
+			<form className="hidden" onSubmit={handleDoubleLike}>
+				<button id={`like_post_${postId}_btn`}>like</button>
+			</form>
+		</>
 	);
 };
 

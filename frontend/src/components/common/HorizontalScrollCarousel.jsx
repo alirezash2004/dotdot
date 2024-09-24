@@ -1,14 +1,8 @@
 import { useState } from "react";
-import {
-	animate,
-	motion,
-	useMotionValue,
-} from "framer-motion";
+import { animate, motion, useMotionValue } from "framer-motion";
 
 import { CiHeart, CiMedicalCross } from "react-icons/ci";
 
-const ONE_SECOND = 1000;
-const AUTO_DELAY = ONE_SECOND * 10;
 const DRAG_BUFFER = 20;
 
 const SPRING_OPTIONS = {
@@ -73,7 +67,7 @@ const HorizontalScrollCarousel = ({ imgs, handleDeleteImage }) => {
 					<CiHeart className="w-24 h-24 bg-red-600 rounded-full" />
 				</div>
 				<motion.div
-					drag='x'
+					drag="x"
 					dragConstraints={{
 						left: 0,
 						right: 0,
@@ -90,9 +84,9 @@ const HorizontalScrollCarousel = ({ imgs, handleDeleteImage }) => {
 					transition={SPRING_OPTIONS}
 					onDragEnd={onDragEnd}
 					className="flex cursor-grab items-center active:cursor-grabbing"
-					// onDoubleClick={() =>
-					// 	!handleDeleteImage ? animate(sequance("." + PID)) : ""
-					// }
+					onDoubleClick={() =>
+						!handleDeleteImage ? animate(sequance("." + PID)) : ""
+					}
 				>
 					<Images imgIndex={imgIndex} />
 				</motion.div>
