@@ -8,7 +8,9 @@ import { CiLocationArrow1, CiSearch } from "react-icons/ci";
 
 const TopBar = () => {
 	useEffect(() => {
-		animate([[".topbar", { top: 0 }]]);
+		setTimeout(() => {
+			animate([[".topbar", { top: 0 }, { delay: 0, duration: 0.3 }]]);
+		}, 100);
 	});
 
 	return (
