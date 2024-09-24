@@ -1,4 +1,6 @@
+import { useEffect } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { animate } from "framer-motion";
 import toast from "react-hot-toast";
 
 import { CiSettings } from "react-icons/ci";
@@ -53,8 +55,12 @@ const NotificationTopbar = ({ setIsDeletePending }) => {
 		deleteAllNotifications();
 	};
 
+	useEffect(() => {
+		animate([[".notifTopbar", { top: 0 }, { delay: 0, duration: 0.3 }]]);
+	});
+
 	return (
-		<div className="flex justify-between items-center p-4 border-b border-gray-700">
+		<div className="flex justify-between items-center p-4 border-b border-gray-700 relative -top-10 notifTopbar">
 			<p className="font-bold">Notifications</p>
 			<div className="dropdown dropdown-bottom dropdown-end">
 				<div

@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { animate } from "framer-motion";
 
 import ChatMessages from "./messages/ChatMessages";
 import ChatMessageInput from "./messageInput/ChatMessageInput";
@@ -16,8 +17,11 @@ import changeHost from "../../../utils/changeHost.js";
 import { CiSquareAlert, CiSquareChevLeft } from "react-icons/ci";
 
 const NoChatSelected = () => {
+	setTimeout(() => {
+		animate([[".nochat", { scale: 1 }, { delay: 0, duration: 0.3 }]]);
+	}, 100);
 	return (
-		<div className="hidden md:flex flex-col items-center justify-center w-full h-full gap-5 text-xl">
+		<div className="hidden md:flex flex-col items-center justify-center w-full h-full gap-5 text-xl scale-75 nochat transition-all">
 			<CiSquareAlert className="text-5xl" />
 			<p>There is no chat selected</p>
 			<p>Select a conversation</p>
