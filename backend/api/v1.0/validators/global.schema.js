@@ -15,6 +15,10 @@ export const usernameSchema = {
         exists: {
             errorMessage: 'username is required'
         },
+        matches: {
+            errorMessage: 'Username can only contains . and _ Username can\'t start with .',
+            options: /^(?![0-9.])[a-zA-Z][a-zA-Z0-9_.]*[^.]$/
+        },
         isEmpty: { negated: true },
         trim: true,
         escape: true,

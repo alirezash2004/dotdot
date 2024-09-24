@@ -144,6 +144,37 @@ export const updatePageinfo = async (req, res, next) => {
     }
 }
 
+export const searchForPagesByUsername = async (req, res, next) => {
+    try {
+        const data = req.validatedData;
+
+        const authUsername = req.user.username;
+
+        const targetPageUsername = data.username;
+
+        const pages = await Page.find({
+            username: {
+                $regex: new RegExp(targetPageUsername, 'i'),
+                $ne: authUsername
+            }
+        })
+            .select('username fullName profilePicture')
+            .limit(5);
+
+        if (!pages || pages.length === 0) {
+            return res.status(200).json({ success: true, data: [] });
+        }
+
+        return res.status(200).json({ success: true, data: pages });
+
+    } catch (err) {
+        console.log(`Error in searchForPagesByUsername : ${err}`);
+        const error = new Error(`Internal Server Error`)
+        error.status = 500;
+        return next(error);
+    }
+}
+
 export const updatePageProfile = async (req, res, next) => {
     try {
         const pageId = req.user._id.toString();
