@@ -3,10 +3,17 @@ import { Link } from "react-router-dom";
 import toast from "react-hot-toast";
 
 import changeHost from "../../../../utils/changeHost.js/index.js";
+import { formatDate } from "../../../../utils/date/index.js";
 
 import Loading from "../../../../components/common/Loading";
 
-import { CiChat1, CiHeart, CiTrash, CiUser } from "react-icons/ci";
+import {
+	CiChat1,
+	CiHeart,
+	CiLocationArrow1,
+	CiTrash,
+	CiUser,
+} from "react-icons/ci";
 
 const Notification = ({ notification, isDeletePending }) => {
 	const queryClient = useQueryClient();
@@ -46,6 +53,20 @@ const Notification = ({ notification, isDeletePending }) => {
 			},
 		});
 
+	const getNotificationLink = () => {
+		switch (notification.type) {
+			case "follow":
+				return `/profile/${notification.from.username}`;
+
+			case "message":
+				return `/chat/${notification.from.username}`;
+
+			case "like":
+			case "comment":
+				return `/post/${notification.post}`;
+		}
+	};
+
 	return (
 		<div className="border-b border-gray-800" key={notification._id}>
 			<div className="flex gap-2 items-center p-4 relative">
@@ -58,10 +79,10 @@ const Notification = ({ notification, isDeletePending }) => {
 				{notification.type === "comment" && (
 					<CiChat1 className="w-10 h-10 md:w-7 md:h-7 text-secondary" />
 				)}
-				<Link
-					to={`/profile/${notification.from.username}`}
-					className="flex gap-5 flex-wrap ml-2"
-				>
+				{notification.type === "message" && (
+					<CiLocationArrow1 className="w-10 h-10 md:w-7 md:h-7 text-secondary" />
+				)}
+				<Link to={getNotificationLink()} className="flex gap-5 flex-wrap ml-2">
 					<div className="avatar">
 						<div className="w-8 rounded-full">
 							<img
@@ -78,6 +99,9 @@ const Notification = ({ notification, isDeletePending }) => {
 						{notification.type === "like" && "Liked your post"}
 						{notification.type === "comment" && "Commented on your post"}
 						{notification.type === "message" && "Sent You A New Message"}
+						<span className="text-sm text-slate-500">
+							{formatDate(notification.createdAt)}
+						</span>
 					</div>
 				</Link>
 

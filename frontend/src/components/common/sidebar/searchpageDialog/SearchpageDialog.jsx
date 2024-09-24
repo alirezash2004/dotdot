@@ -67,8 +67,8 @@ const SearchpageDialog = () => {
 				<h3 className="font-bold text-lg mb-4">Search Pages</h3>
 
 				<form className="overflow-x-auto">
-					<div className="flex items-center">
-						<label className="input input-bordered flex items-center gap-4 flex-[4_4_0]">
+					<div className="flex items-center justify-around">
+						<label className="input input-bordered flex items-center gap-4 w-3/4">
 							@
 							<input
 								type="text"
@@ -80,7 +80,7 @@ const SearchpageDialog = () => {
 						</label>
 
 						<button
-							className={`btn btn-secondary rounded-full flex-[1_1_0] flex ml-4 btn-square`}
+							className={`btn btn-secondary rounded-full flex md:ml-4 btn-square`}
 							onClick={handleSearchByUsername}
 						>
 							{isSearchPageFetching && <Loading />}
