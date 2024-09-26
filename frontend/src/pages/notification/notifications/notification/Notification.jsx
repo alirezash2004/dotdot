@@ -56,6 +56,7 @@ const Notification = ({ notification, isDeletePending }) => {
 	const getNotificationLink = () => {
 		switch (notification.type) {
 			case "follow":
+			case "followrequest":
 				return `/profile/${notification.from.username}`;
 
 			case "message":
@@ -68,21 +69,24 @@ const Notification = ({ notification, isDeletePending }) => {
 	};
 
 	return (
-		<div className="border-b border-gray-800" key={notification._id}>
+		<div className="border-b border-gray-800">
 			<div className="flex gap-2 items-center p-4 relative">
 				{notification.type === "follow" && (
-					<CiUser className="w-10 h-10 md:w-7 md:h-7 text-primary" />
+					<CiUser className="w-7 h-7 text-primary" />
+				)}
+				{notification.type === "followAccept" && (
+					<CiUser className="w-7 h-7 text-primary" />
 				)}
 				{notification.type === "like" && (
-					<CiHeart className="w-10 h-10 md:w-7 md:h-7 text-red-500" />
+					<CiHeart className="w-7 h-7 text-red-500" />
 				)}
 				{notification.type === "comment" && (
-					<CiChat1 className="w-10 h-10 md:w-7 md:h-7 text-secondary" />
+					<CiChat1 className="w-7 h-7 text-secondary" />
 				)}
 				{notification.type === "message" && (
-					<CiLocationArrow1 className="w-10 h-10 md:w-7 md:h-7 text-secondary" />
+					<CiLocationArrow1 className="w-7 h-7 text-secondary" />
 				)}
-				<Link to={getNotificationLink()} className="flex gap-5 flex-wrap ml-2">
+				<Link to={getNotificationLink()} className="flex gap-3 flex-wrap ml-2">
 					<div className="avatar">
 						<div className="w-8 rounded-full">
 							<img
@@ -93,8 +97,10 @@ const Notification = ({ notification, isDeletePending }) => {
 							/>
 						</div>
 					</div>
-					<div className="flex gap-1 flex-wrap">
+					<div className="flex gap-1 flex-wrap items-center">
 						<span className="font-bold">@{notification.from.username}</span>{" "}
+						{notification.type === "followAccept" &&
+							"Accepted You Follow Request"}
 						{notification.type === "follow" && "Followed you"}
 						{notification.type === "like" && "Liked your post"}
 						{notification.type === "comment" && "Commented on your post"}

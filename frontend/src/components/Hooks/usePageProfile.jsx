@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 
 const usePageProfile = ({ username, authPageId, disable = false }) => {
-	const [isFollowing, setIsFollowing] = useState(false);
+	const [followingStatus, setFollowingStatus] = useState("none");
 
 	const {
 		data: targetPage,
@@ -38,7 +38,7 @@ const usePageProfile = ({ username, authPageId, disable = false }) => {
 			if (!res.ok || data.success === false)
 				throw new Error(data.msg || "Failed To Fetch FollowingRelationShip!");
 
-			setIsFollowing(data.isFollowing);
+			setFollowingStatus(data.followingStatus);
 
 			return data;
 		},
@@ -60,7 +60,7 @@ const usePageProfile = ({ username, authPageId, disable = false }) => {
 			isTargetPageFetching ||
 			isFollowingReltaionPending ||
 			isFollowingReltaionFetching,
-		isFollowing: isFollowing,
+		followingStatus: followingStatus,
 		targetPage: targetPage,
 		fetchProfilePage,
 		fetchPageOnly,

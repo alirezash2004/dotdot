@@ -31,7 +31,7 @@ const ProfileHeader = ({ pageUsername }) => {
 	const {
 		targetPage,
 		isFetching: isPageProfileFetching,
-		isFollowing,
+		followingStatus,
 		fetchProfilePage,
 	} = usePageProfile({
 		username: pageUsername,
@@ -43,13 +43,12 @@ const ProfileHeader = ({ pageUsername }) => {
 			mutationFn: async () => {
 				try {
 					const res = await fetch(`/api/v1.0/followingRelationships`, {
-						method: isFollowing ? "DELETE" : "POST",
+						method: followingStatus === "none" ? "POST" : "DELETE",
 						headers: {
 							"Content-Type": "application/json",
 						},
 						body: JSON.stringify({
-							pageId: authPage._id,
-							followedPageId: targetPage._id,
+							pageId: targetPage._id,
 						}),
 					});
 
@@ -67,12 +66,8 @@ const ProfileHeader = ({ pageUsername }) => {
 					throw new Error(error);
 				}
 			},
-			onSuccess: () => {
-				toast.success(
-					isFollowing
-						? `UnFollowed ${targetPage.username}`
-						: `You are now following ${targetPage.username}`
-				);
+			onSuccess: (returnData) => {
+				toast.success(returnData.msg);
 
 				fetchProfilePage();
 				// queryClinet.invalidateQueries({
@@ -258,8 +253,8 @@ const ProfileHeader = ({ pageUsername }) => {
 										<span>FOLLOWINGS</span>
 										<span>
 											{isMyProfile
-												? authPage.followersCount
-												: targetPage?.followersCount}
+												? authPage.followingCount
+												: targetPage?.followingCount}
 										</span>
 									</>
 								)}
@@ -294,8 +289,10 @@ const ProfileHeader = ({ pageUsername }) => {
 									<button
 										onClick={handleFollowUnfollow}
 										className={`btn w-48 md:w-auto md:px-16 ${
-											isFollowing ? "btn-secondary" : "btn-primary"
-										} ${
+											followingStatus === "accepted"
+												? "btn-secondary"
+												: "btn-primary"
+										} ${followingStatus === "pending" ? "btn-outline" : ""} ${
 											isPageProfileFetching || isFollowUnfollowPending
 												? "btn-disabled"
 												: ""
@@ -304,9 +301,15 @@ const ProfileHeader = ({ pageUsername }) => {
 										{(isPageProfileFetching || isFollowUnfollowPending) && (
 											<Loading />
 										)}
-										{!isPageProfileFetching && isFollowing
-											? "Following"
-											: "Follow"}
+										{!isPageProfileFetching &&
+											followingStatus === "accepted" &&
+											"Unfollow"}
+										{!isPageProfileFetching &&
+											followingStatus === "pending" &&
+											"Requested"}
+										{!isPageProfileFetching &&
+											followingStatus === "none" &&
+											"Follow"}
 									</button>
 									<Link
 										to={`/chat/${targetPage?.username}`}
@@ -373,13 +376,13 @@ const ProfileHeader = ({ pageUsername }) => {
 										</td>
 										<th className="flex justify-center">
 											{followingRelation.isFollowing && (
-												<button className="btn btn-secondary w-11/12 md:w-2/3">
+												<button className="btn btn-primary no-animation w-11/12 md:w-2/3">
 													Following
 												</button>
 											)}
 											{!followingRelation.isFollowing && (
-												<button className="btn btn-primary btn-outline w-11/12 md:w-2/3">
-													Follow
+												<button className="btn btn-disabled w-11/12 md:w-2/3">
+													Not Following
 												</button>
 											)}
 										</th>

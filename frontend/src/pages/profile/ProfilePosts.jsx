@@ -143,7 +143,7 @@ const Posts = ({
 							<p className="text-center my-4">OOPS! No Posts Found!</p>
 						)}
 					{!isLoading && posts && (
-						<div className="grid grid-cols-2 md:grid-cols-3 pb-20">
+						<div className="grid grid-cols-2 md:grid-cols-3">
 							{totalPosts.length !== 0 &&
 								totalPosts.map((post) => (
 									<Post key={post._id} post={post} postType="pageProfile" />
@@ -165,6 +165,8 @@ const Posts = ({
 							)}
 						</div>
 					)}
+
+					<div className="h-20 w-full bg-transparent"></div>
 				</>
 			)}
 		</>
