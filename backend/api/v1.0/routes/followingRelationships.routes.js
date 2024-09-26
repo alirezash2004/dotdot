@@ -4,10 +4,10 @@ import { checkSchema } from 'express-validator';
 import protectRoute from '../middleware/protectRoute.js';
 import validationResultHandler from '../middleware/validationResultHandler.js';
 
-import { checkIsFollowing, getFollowers, getFollowings, newFollowing, removeFollowing } from '../controllers/followingRelationships.controller.js';
+import { acceptFollow, checkIsFollowing, declineFollow, getFollowers, getFollowings, removeFollowing, followByPageId } from '../controllers/followingRelationships.controller.js';
 
 import followingRelationshipShcema from '../validators/followingRelationship.schema.js';
-import { pageIdSchema, skipQuerySchema } from '../validators/global.schema.js';
+import { followingRelationshipIdSchema, pageIdSchema, skipQuerySchema } from '../validators/global.schema.js';
 
 const router = Router();
 
@@ -17,9 +17,13 @@ router.get('/followers/:pageId', protectRoute, checkSchema(skipQuerySchema, ['qu
 
 router.get('/followings/:pageId', protectRoute, checkSchema(skipQuerySchema, ['query']), checkSchema(pageIdSchema, ['params']), validationResultHandler, getFollowings)
 
-router.post('/', protectRoute, checkSchema(followingRelationshipShcema), validationResultHandler, newFollowing);
+router.post('/', protectRoute, checkSchema(pageIdSchema, ['body']), validationResultHandler, followByPageId);
 
-router.delete('/', protectRoute, checkSchema(followingRelationshipShcema), validationResultHandler, removeFollowing);
+router.post('/action/:id', protectRoute, checkSchema(followingRelationshipIdSchema, ['params']), validationResultHandler, acceptFollow);
+
+router.delete('/action/:id', protectRoute, checkSchema(followingRelationshipIdSchema, ['params']), validationResultHandler, declineFollow);
+
+router.delete('/', protectRoute, checkSchema(pageIdSchema, ['body']), validationResultHandler, removeFollowing);
 
 // TODO: add get followings and get followers
 

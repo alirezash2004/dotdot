@@ -3,6 +3,7 @@ import { genPassword, validatePassword } from '../utils/passwordsUtil.js';
 
 import Page from '../models/page.model.js';
 import Notification from "../models/notification.model.js";
+import FollowingRelationship from '../models/followingRelationship.model.js';
 
 export const getMe = async (req, res, next) => {
     try {
@@ -12,7 +13,9 @@ export const getMe = async (req, res, next) => {
 
         const notifications = await Notification.countDocuments({ to: pageId, read: false })
 
-        res.status(200).json({ success: true, page: { ...page.toObject(), notifications } });
+        const followRequests = await FollowingRelationship.countDocuments({ followedPageId: pageId, status: 'pending' })
+
+        res.status(200).json({ success: true, page: { ...page.toObject(), notifications: notifications + followRequests } });
     } catch (err) {
         console.log(`Error in getMe : ${err}`);
         const error = new Error(`Internal Server Error`)

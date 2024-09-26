@@ -1,3 +1,4 @@
+import FollowingRelationship from "../models/followingRelationship.model.js";
 import Notification from "../models/notification.model.js";
 
 export const getNotifications = async (req, res, next) => {
@@ -14,7 +15,9 @@ export const getNotifications = async (req, res, next) => {
 
         await Notification.updateMany({ to: pageId }, { read: true });
 
-        return res.status(200).json({ success: true, notifications });
+        const followRequests = await FollowingRelationship.find({ followedPageId: pageId, status: 'pending' }).select('pageId').populate({ path: 'pageId', select: 'username fullName profilePicture' });
+
+        return res.status(200).json({ success: true, notifications, followRequests });
     } catch (err) {
         console.log(`Error in getNotifications : ${err}`);
         const error = new Error(`Internal Server Error`);

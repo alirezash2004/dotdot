@@ -26,7 +26,7 @@ export const getRecentPosts = async (req, res, next) => {
                     {
                         page: {
                             $in: await FollowingRelationship
-                                .find({ pageId, followedPageId: { $ne: pageId } }, 'followedPageId')
+                                .find({ pageId, followedPageId: { $ne: pageId }, status: 'accepted' }, 'followedPageId')
                                 .select('followedPageId')
                                 .distinct('followedPageId')
                         }
@@ -149,12 +149,12 @@ export const getPostByPostId = async (req, res, next) => {
         const currentPageId = req.user._id.toString();
         const targetPageId = post.page._id.toString();
 
-        const [targetPageType, isFollowing] = await Promise.all([
+        const [targetPageType, followingRelation] = await Promise.all([
             Page.findById(targetPageId).select('pageType').exec(),
-            FollowingRelationship.exists({ pageId: currentPageId, followedPageId: targetPageId }).exec(),
+            FollowingRelationship.findOne({ pageId: currentPageId, followedPageId: targetPageId }).exec(),
         ])
 
-        if (targetPageId !== currentPageId && (targetPageType.pageType === 'private' && !isFollowing)) {
+        if (targetPageId !== currentPageId && (targetPageType.pageType === 'private' && (!followingRelation || followingRelation.status !== 'accepted'))) {
             const error = new Error(`Page Is Private You have to follow it first`);
             error.status = 401;
             return next(error);
@@ -238,8 +238,8 @@ export const getPagePosts = async (req, res, next) => {
         }
 
         // access in response is to determine if page have access to load targetPage posts or not
-        const isFollowing = await FollowingRelationship.exists({ pageId: pageId, followedPageId: targetPage._id }).exec();
-        if (targetPage._id.toString() !== pageId && (targetPage.pageType === 'private' && !isFollowing)) {
+        const followingRelation = await FollowingRelationship.findOne({ pageId: pageId, followedPageId: targetPage._id }).exec();
+        if (targetPage._id.toString() !== pageId && (targetPage.pageType === 'private' && (!followingRelation || followingRelation.status !== 'accepted'))) {
             return res.status(401).json({ success: false, msg: `Page Is Private You have to follow it first`, access: false })
         }
 
@@ -391,12 +391,12 @@ export const likeUnlikePost = async (req, res, next) => {
 
         const targetPageId = post.page.toString();
 
-        const [targetPageType, isFollowing] = await Promise.all([
+        const [targetPageType, followingRelation] = await Promise.all([
             Page.findById(targetPageId).select('pageType').exec(),
-            FollowingRelationship.exists({ pageId: pageId, followedPageId: targetPageId }).exec(),
+            FollowingRelationship.findOne({ pageId: pageId, followedPageId: targetPageId }).exec(),
         ])
 
-        if (targetPageId !== pageId && (targetPageType.pageType === 'private' && !isFollowing)) {
+        if (targetPageId !== pageId && (targetPageType.pageType === 'private' && (!followingRelation || followingRelation.status !== 'accepted'))) {
             const error = new Error(`The Page Who Posted This Post Is Private You have to follow it first`);
             error.status = 401;
             return next(error);
@@ -457,12 +457,12 @@ export const commentOnPost = async (req, res, next) => {
 
         const targetPageId = post.page.toString();
 
-        const [targetPageType, isFollowing] = await Promise.all([
+        const [targetPageType, followingRelation] = await Promise.all([
             Page.findById(targetPageId).select('pageType').exec(),
-            FollowingRelationship.exists({ pageId: pageId, followedPageId: targetPageId }).exec(),
+            FollowingRelationship.findOne({ pageId: pageId, followedPageId: targetPageId }).exec(),
         ])
 
-        if (targetPageId !== pageId && (targetPageType.pageType === 'private' && !isFollowing)) {
+        if (targetPageId !== pageId && (targetPageType.pageType === 'private' && (!followingRelation || followingRelation.status !== 'accepted'))) {
             const error = new Error(`The Page Who Posted This Post Is Private You have to follow it first`);
             error.status = 401;
             return next(error);
@@ -525,12 +525,12 @@ export const saveUnsavePost = async (req, res, next) => {
 
         const targetPageId = post.page.toString();
 
-        const [targetPageType, isFollowing] = await Promise.all([
+        const [targetPageType, followingRelation] = await Promise.all([
             Page.findById(targetPageId).select('pageType').exec(),
-            FollowingRelationship.exists({ pageId: pageId, followedPageId: targetPageId }).exec(),
+            FollowingRelationship.findOne({ pageId: pageId, followedPageId: targetPageId }).exec(),
         ])
 
-        if (targetPageId !== pageId && (targetPageType.pageType === 'private' && !isFollowing)) {
+        if (targetPageId !== pageId && (targetPageType.pageType === 'private' && (!followingRelation || followingRelation.status !== 'accepted'))) {
             const error = new Error(`The Page Who Posted This Post Is Private You have to follow it first`);
             error.status = 401;
             return next(error);

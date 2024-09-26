@@ -34,3 +34,16 @@ export const pageIdSchema = {
         trim: true,
     }
 }
+
+export const followingRelationshipIdSchema = {
+    id: {
+        exists: {
+            errorMessage: "id is required"
+        },
+        isString: {
+            errorMessage: 'id must be a string'
+        },
+        isEmpty: { negated: true },
+        trim: true,
+    }
+}

@@ -7,6 +7,7 @@ import sharp from 'sharp';
 import { __filename, __dirname } from '../../../currentPath.js';
 import fs from 'fs';
 import path from 'path';
+import FollowingRelationship from '../models/followingRelationship.model.js';
 
 // @desc   Get page
 // @route  POST /api/v1.0/@:pageId
@@ -124,6 +125,18 @@ export const updatePageinfo = async (req, res, next) => {
         page.fullName = fullName || page.fullName;
         page.email = email || page.email;
         page.pageType = pageType || page.pageType;
+
+        // accept all pending follow requests
+        if (pageType === "public") {
+            const pendingRequests = await FollowingRelationship.find({ followedPageId: pageId, status: "pending" }).exec();
+            page.followersCount = page.followersCount + pendingRequests.length;
+
+            await Promise.all(
+                pendingRequests.map(request => Page.updateOne({ _id: request.pageId }, { $inc: { followingCount: 1 } }).exec())
+            )
+
+            await FollowingRelationship.updateMany({ followedPageId: pageId, status: "pending" }, { status: "accepted" })
+        }
 
         page.pageSetting.theme = theme || page.pageSetting.theme;
         page.pageSetting.language = language || page.pageSetting.language;
