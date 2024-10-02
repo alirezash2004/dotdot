@@ -77,6 +77,9 @@ const Notification = ({ notification, isDeletePending }) => {
 				{notification.type === "followAccept" && (
 					<CiUser className="w-7 h-7 text-primary" />
 				)}
+				{notification.type === "unFollow" && (
+					<CiUser className="w-7 h-7 text-red-500" />
+				)}
 				{notification.type === "like" && (
 					<CiHeart className="w-7 h-7 text-red-500" />
 				)}
@@ -102,6 +105,11 @@ const Notification = ({ notification, isDeletePending }) => {
 						{notification.type === "followAccept" &&
 							"Accepted You Follow Request"}
 						{notification.type === "follow" && "Followed you"}
+						{notification.type === "unFollow" && (
+							<span>
+								<span className="text-red-500">UnFollowed</span> you
+							</span>
+						)}
 						{notification.type === "like" && "Liked your post"}
 						{notification.type === "comment" && "Commented on your post"}
 						{notification.type === "message" && "Sent You A New Message"}
