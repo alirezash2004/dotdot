@@ -21,6 +21,8 @@ const Posts = ({
 				return `/api/v1.0/posts/saved?skip=`;
 			case "liked":
 				return `/api/v1.0/posts/likes?skip=`;
+			case "recent":
+				return `/api/v1.0/posts/recent?skip=`;
 		}
 	};
 

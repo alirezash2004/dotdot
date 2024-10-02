@@ -70,7 +70,7 @@ const NewpostPage = () => {
 		<>
 			<SetPageTitle title="NewPost - DotDot Social Media" />
 
-			<div className="flex-[4_4_0] border-r border-gray-700 min-h-screen pb-32">
+			<div className="flex-[4_4_0] border-r border-gray-700 pb-32">
 				<NewpostTopbar />
 
 				<NewPostSteps

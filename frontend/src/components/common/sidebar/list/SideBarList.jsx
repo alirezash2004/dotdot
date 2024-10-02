@@ -5,11 +5,11 @@ import {
 	CiBellOn,
 	CiChat1,
 	CiCirclePlus,
+	CiGrid41,
 	CiHome,
 	CiSearch,
 	CiUser,
 } from "react-icons/ci";
-import toast from "react-hot-toast";
 
 const SideBarList = ({ authPage }) => {
 	const [islight, setIslight] = useState(
@@ -32,7 +32,7 @@ const SideBarList = ({ authPage }) => {
 	const { pathname } = useLocation();
 
 	let hideSearchBoxOpener = false;
-	if (pathname !== "/") {
+	if (pathname !== "/" && pathname !== "/explore") {
 		hideSearchBoxOpener = true;
 	}
 
@@ -40,7 +40,7 @@ const SideBarList = ({ authPage }) => {
 		<ul className="flex flex-row gap-6 w-full justify-around my-3 md:flex-col md:mt-5 md:mb-0 md:justify-start">
 			<label
 				className={`input input-bordered items-center gap-2 mx-auto w-full input-xs py-5 mt-5 mb-0 hidden md:flex ${
-					hideSearchBoxOpener && "md:hidden"
+					hideSearchBoxOpener ? "md:hidden" : ""
 				}`}
 				onClick={handleOpenSearchBox}
 			>
@@ -54,16 +54,25 @@ const SideBarList = ({ authPage }) => {
 			<li className="flex justify-center md:justify-start">
 				<Link
 					to="/"
-					className="flex items-center gap-3 hover:bg-stone-600 transition-all rounded-full duration-300 py-2 px-2 max-w-fit cursor-pointer justify-center md:pr-4"
+					className="flex items-center gap-3 hover:bg-stone-600  rounded-full duration-100 py-2 px-2 max-w-fit cursor-pointer justify-center md:pr-4"
 				>
 					<CiHome className="w-8 h-8" />
 					<span className="text-lg hidden md:block">Home</span>
 				</Link>
 			</li>
+			<li className="flex justify-center md:justify-start">
+				<Link
+					to="/explore"
+					className="flex items-center gap-3 hover:bg-stone-600  rounded-full duration-100 py-2 px-2 max-w-fit cursor-pointer justify-center md:pr-4"
+				>
+					<CiGrid41 className="w-8 h-8" />
+					<span className="text-lg hidden md:block">Explore</span>
+				</Link>
+			</li>
 			<li className="hidden md:flex justify-center md:justify-start">
 				<Link
 					to="/chat"
-					className="flex items-center gap-3 hover:bg-stone-600 transition-all rounded-full duration-300 py-2 px-2 max-w-fit cursor-pointer justify-center md:pr-4"
+					className="flex items-center gap-3 hover:bg-stone-600  rounded-full duration-100 py-2 px-2 max-w-fit cursor-pointer justify-center md:pr-4"
 				>
 					<CiChat1 className="w-8 h-8" />
 					<span className="text-lg hidden md:block">Chat</span>
@@ -72,7 +81,7 @@ const SideBarList = ({ authPage }) => {
 			<li className="flex justify-center md:justify-start">
 				<Link
 					to="/newpost"
-					className="flex items-center gap-3 hover:bg-stone-600 transition-all rounded-full duration-300 py-2 px-2 max-w-fit cursor-pointer justify-center md:pr-4"
+					className="flex items-center gap-3 hover:bg-stone-600  rounded-full duration-100 py-2 px-2 max-w-fit cursor-pointer justify-center md:pr-4"
 				>
 					<CiCirclePlus className="w-8 h-8" />
 					<span className="text-lg hidden md:block">New</span>
@@ -81,7 +90,7 @@ const SideBarList = ({ authPage }) => {
 			<li className="flex justify-center md:justify-start md:hidden">
 				<Link
 					to={`/profile/${authPage.username}`}
-					className="flex items-center gap-3 hover:bg-stone-600 transition-all rounded-full duration-300 py-2 px-2 max-w-fit cursor-pointer justify-center md:pr-4"
+					className="flex items-center gap-3 hover:bg-stone-600  rounded-full duration-100 py-2 px-2 max-w-fit cursor-pointer justify-center md:pr-4"
 				>
 					<CiUser className="w-8 h-8" />
 					<span className="text-lg hidden md:block">Profile</span>
@@ -95,14 +104,14 @@ const SideBarList = ({ authPage }) => {
 				)}
 				<Link
 					to="/notifications"
-					className="flex items-center gap-3 hover:bg-stone-600 transition-all rounded-full duration-300 py-2 px-2 max-w-fit cursor-pointer justify-center md:pr-4"
+					className="flex items-center gap-3 hover:bg-stone-600  rounded-full duration-100 py-2 px-2 max-w-fit cursor-pointer justify-center md:pr-4"
 				>
 					<CiBellOn className="w-8 h-8" />
 					<span className="text-lg hidden md:block">Notifications</span>
 				</Link>
 			</li>
-			<li className="flex justify-center md:justify-start">
-				<div className="flex items-center gap-3 transition-all rounded-full duration-300 py-2 px-2 max-w-fit cursor-pointer justify-center md:pr-4">
+			<li className="justify-center md:justify-start hidden md:flex">
+				<div className="flex items-center gap-3  rounded-full duration-100 py-2 px-2 max-w-fit cursor-pointer justify-center md:pr-4">
 					<label className="swap swap-rotate rounded-full w-8 h-8">
 						{/* this hidden checkbox controls the state */}
 						<input
