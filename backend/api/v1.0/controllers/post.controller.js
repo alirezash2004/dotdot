@@ -22,24 +22,12 @@ export const getRecentPosts = async (req, res, next) => {
         // TODO: add process more comments of post
         const posts = await Post
             .find({
-                $or: [
-                    {
-                        page: {
-                            $in: await FollowingRelationship
-                                .find({ pageId, followedPageId: { $ne: pageId }, status: 'accepted' }, 'followedPageId')
-                                .select('followedPageId')
-                                .distinct('followedPageId')
-                        }
-                    },
-                    {
-                        page: {
-                            $in: await Page
-                                .find({ _id: { $ne: pageId }, pageType: 'public' }, '_id')
-                                .select('_id')
-                                .distinct('_id')
-                        },
-                    },
-                ]
+                page: {
+                    $in: await FollowingRelationship
+                        .find({ pageId, followedPageId: { $ne: pageId }, status: 'accepted' }, 'followedPageId')
+                        .select('followedPageId')
+                        .distinct('followedPageId')
+                }
             }, {
                 comments: { $slice: ['$comments', commentStart, commentStart + commentCount] },
                 numberOfLikes: { $size: '$likes' },
@@ -82,6 +70,71 @@ export const getRecentPosts = async (req, res, next) => {
         res.status(200).json({ success: true, posts: postsWithSaved });
     } catch (err) {
         console.log(`Error in getRecentPosts : ${err}`);
+        const error = new Error(`Internal Server Error`);
+        error.status = 500;
+        return next(error);
+    }
+}
+
+export const getExplorePosts = async (req, res, next) => {
+    try {
+        const pageId = req.user._id.toString();
+        const skip = parseInt(req.validatedData.skip) || 0;
+
+        const commentStart = 0;
+        const commentCount = 100;
+
+        // TODO: add process more comments of post
+        const posts = await Post
+            .find({
+                page: {
+                    $in: await Page
+                        .find({ _id: { $ne: pageId }, pageType: 'public' }, '_id')
+                        .select('_id')
+                        .distinct('_id')
+                },
+            }, {
+                comments: { $slice: ['$comments', commentStart, commentStart + commentCount] },
+                numberOfLikes: { $size: '$likes' },
+                numberOfShares: { $size: '$shares' },
+                isLiked: { $in: [req.user._id, '$likes'] },
+                assets: 1,
+                type: 1,
+                caption: 1,
+                createdAt: 1,
+            })
+            .populate({
+                path: 'page',
+                select: 'username fullName profilePicture pageType',
+            })
+            .populate({
+                path: 'comments',
+                populate: {
+                    path: 'page',
+                    select: 'username fullName profilePicture',
+                },
+                options: {
+                    limit: 2,
+                },
+            })
+            .skip(skip)
+            .limit(10)
+            .sort({ createdAt: -1 })
+            .exec();
+
+        if (posts.length === 0) {
+            return res.status(200).json({ success: true, posts: [] });
+        }
+
+        const savedRes = await Promise.all(
+            posts.map(post => Savedpost.exists({ pageId, postId: post._id }))
+        )
+
+        const postsWithSaved = posts.map((post, idx) => { return { ...post.toObject(), isSaved: !!savedRes[idx] } });
+
+        res.status(200).json({ success: true, posts: postsWithSaved });
+    } catch (err) {
+        console.log(`Error in getExplorePosts : ${err}`);
         const error = new Error(`Internal Server Error`);
         error.status = 500;
         return next(error);

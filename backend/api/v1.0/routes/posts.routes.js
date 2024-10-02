@@ -5,7 +5,7 @@ import { checkSchema } from 'express-validator';
 import protectRoute from '../middleware/protectRoute.js';
 import validationResultHandler from '../middleware/validationResultHandler.js';
 
-import { commentOnPost, deletePostByPostId, getLikedPosts, getPagePosts, getPostByPostId, getRecentPosts, getSavedPosts, likeUnlikePost, newPost, saveUnsavePost } from '../controllers/post.controller.js';
+import { commentOnPost, deletePostByPostId, getExplorePosts, getLikedPosts, getPagePosts, getPostByPostId, getRecentPosts, getSavedPosts, likeUnlikePost, newPost, saveUnsavePost } from '../controllers/post.controller.js';
 
 import { skipQuerySchema, usernameSchema } from '../validators/global.schema.js';
 import { postCommentSchema, postIdSchema, postsSchema } from '../validators/post.schema.js';
@@ -13,6 +13,8 @@ import { postCommentSchema, postIdSchema, postsSchema } from '../validators/post
 const router = express.Router();
 
 router.get('/recent', checkSchema(skipQuerySchema, ['query']), validationResultHandler, protectRoute, getRecentPosts);
+
+router.get('/explore', checkSchema(skipQuerySchema, ['query']), validationResultHandler, protectRoute, getExplorePosts);
 
 router.get('/likes', checkSchema(skipQuerySchema, ['query']), validationResultHandler, protectRoute, getLikedPosts);
 
