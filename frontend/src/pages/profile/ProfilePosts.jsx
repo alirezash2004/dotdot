@@ -21,12 +21,25 @@ const Posts = ({
 				return `/api/v1.0/posts/saved?skip=`;
 			case "liked":
 				return `/api/v1.0/posts/likes?skip=`;
-			case "recent":
-				return `/api/v1.0/posts/recent?skip=`;
+			case "explore":
+				return `/api/v1.0/posts/explore?skip=`;
 		}
 	};
 
 	const apiUri = getApi(postFeedType);
+
+	const getSkipStep = (postFeedType) => {
+		switch (postFeedType) {
+			case "me":
+			case "saved":
+			case "liked":
+				return 6;
+			case "explore":
+				return 10;
+		}
+	};
+
+	const skipStep = getSkipStep(postFeedType);
 
 	const [skip, setSkip] = useState(0);
 	const [totalPosts, setTotalPosts] = useState([]);
@@ -44,9 +57,11 @@ const Posts = ({
 	} = useQuery({
 		queryKey: ["profilePosts", pageUsername],
 		queryFn: async () => {
-			if (isLoadingNewPosts) {
-				return [];
-			}
+			if (isFetching) return [];
+
+			if (skip == 0 && posts && posts.length > 0) return [];
+
+			if (isLoadingNewPosts) return [];
 
 			setIsLoadingNewPosts(true);
 			try {
@@ -68,7 +83,7 @@ const Posts = ({
 					setTotalPosts((prevData) => [...prevData, ...data.posts]);
 				}
 
-				setSkip((prevData) => prevData + 6);
+				setSkip((prevData) => prevData + skipStep);
 				setIsPageAccess(true);
 
 				if (data.posts.length === 0) {
@@ -82,18 +97,20 @@ const Posts = ({
 				throw new Error(error);
 			}
 		},
-		enabled: false,
+		enabled: postFeedType === "explore" ? true : false,
 		retry: false,
 	});
 
 	useEffect(() => {
-		setIsPageAccess(true);
-		setDisabledLoading(false);
-		setSkip(0);
-		setTotalPosts([]);
-		setTimeout(() => {
-			refetch();
-		}, 100);
+		if (postFeedType !== "explore") {
+			setIsPageAccess(true);
+			setDisabledLoading(false);
+			setSkip(0);
+			setTotalPosts([]);
+			setTimeout(() => {
+				refetch();
+			}, 100);
+		}
 	}, [postFeedType, setSkip, refetch, isMyProfile]);
 
 	useEffect(() => {

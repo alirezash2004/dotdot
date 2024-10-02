@@ -55,11 +55,12 @@ const FollowRequest = ({ request, setFollowNotifications }) => {
 					className="flex gap-5 flex-wrap ml-2"
 				>
 					<div className="avatar">
-						<div className="w-8 rounded-full">
+						<div className="w-8 mask mask-squircle">
 							<img
 								src={
 									changeHost(page.profilePicture) || "/avatar-placeholder.png"
 								}
+								alt="Profile Picture"
 							/>
 						</div>
 					</div>

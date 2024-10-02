@@ -2,7 +2,6 @@ import { CiGrid41 } from "react-icons/ci";
 import SetPageTitle from "../../components/common/SetPageTitle";
 import SearchpageDialog from "../../components/common/sidebar/searchpageDialog/SearchpageDialog";
 import TopBar from "../home/topbar/TopBar";
-// import Posts from "../home/posts/Posts";
 import Posts from "../profile/ProfilePosts";
 
 const ExplorePage = () => {
@@ -21,7 +20,7 @@ const ExplorePage = () => {
 				</div>
 
 				<div className="flex flex-col mt-16 md:mt-0">
-					<Posts postFeedType="recent" />
+					<Posts postFeedType="explore" />
 				</div>
 			</div>
 		</>

@@ -13,7 +13,7 @@ export function PageProfilePost({ post, postUrl }) {
 			</div>
 			<img
 				src={postUrl}
-				alt=""
+				alt="Post Cover"
 				className="w-full object-cover opacity-80 group-hover/post:opacity-100 transition-opacity duration-200 pointer-events-none"
 			/>
 		</Link>

@@ -32,13 +32,13 @@ const PostTopbar = ({ post }) => {
 			<div className="avatar">
 				<Link
 					to={`/profile/${postSender.username}`}
-					className="w-8 rounded-full overflow-hidden"
+					className="w-8 overflow-hidden mask mask-squircle block"
 				>
 					<img
 						src={
 							changeHost(postSender.profilePicture) || "/avatar-placeholder.png"
 						}
-						className="aspect-square pointer-events-none"
+						className=" pointer-events-none"
 					/>
 				</Link>
 			</div>

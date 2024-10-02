@@ -139,7 +139,7 @@ const HorizontalScrollCarousel = ({ imgs, handleDeleteImage }) => {
 						}}
 						transition={SPRING_OPTIONS}
 						src={imgs[0]}
-						alt=""
+						alt="Post Media"
 						className="rounded-lg mx-auto object-cover pointer-events-none"
 					/>
 				)}
@@ -163,7 +163,7 @@ const HorizontalScrollCarousel = ({ imgs, handleDeleteImage }) => {
 								}}
 								transition={SPRING_OPTIONS}
 								src={imgs[0].blob}
-								alt=""
+								alt="Post Media"
 								className="rounded-lg mx-auto object-cover pointer-events-none"
 							/>
 						</div>

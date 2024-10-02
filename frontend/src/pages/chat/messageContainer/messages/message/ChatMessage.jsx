@@ -34,7 +34,7 @@ const ChatMessage = ({ message, lastMsg, refrence }) => {
 		>
 			<div className="chat-image avatar">
 				<div className="w-10 rounded-full">
-					<img src={profilePicture} alt="" />
+					<img src={profilePicture} alt="Profile Picture" />
 				</div>
 			</div>
 			<div
@@ -51,6 +51,7 @@ const ChatMessage = ({ message, lastMsg, refrence }) => {
 						<img
 							className="rounded-md aspect-square object-cover brightness-75 w-full"
 							src="https://placehold.co/400/bc0000/white?text=Post+not+found+\n+404&font=open-sans"
+							alt="Post not found"
 						/>
 					</Link>
 				)}
@@ -65,6 +66,7 @@ const ChatMessage = ({ message, lastMsg, refrence }) => {
 						<img
 							className="rounded-md aspect-square object-cover brightness-75 w-full"
 							src={post}
+							alt="Post Cover"
 						/>
 					</Link>
 				)}

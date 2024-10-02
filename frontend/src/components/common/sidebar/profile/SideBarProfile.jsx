@@ -21,6 +21,7 @@ const SideBarProfile = ({ authPage }) => {
 								? changeHost(authPage?.profilePicture)
 								: `https://avatar.iran.liara.run/username?username=${authPage?.username}`
 						}
+						alt="Profile Picture"
 					/>
 				</div>
 			</div>

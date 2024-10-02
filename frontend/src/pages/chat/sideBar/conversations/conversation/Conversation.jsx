@@ -35,7 +35,7 @@ const Converasion = ({ conversation, lastIdx }) => {
 			>
 				<div className={`avatar ${isOnline ? "online" : "offline"}`}>
 					<div className="w-10 rounded-full">
-						<img src={changeHost(targetPage.profilePicture)} alt="Avatar" />
+						<img src={changeHost(targetPage.profilePicture)} alt="Profile Picture" />
 					</div>
 				</div>
 				<div className="flex flex-col flex-1">

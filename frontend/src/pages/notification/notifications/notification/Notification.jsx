@@ -91,12 +91,13 @@ const Notification = ({ notification, isDeletePending }) => {
 				)}
 				<Link to={getNotificationLink()} className="flex gap-3 flex-wrap ml-2">
 					<div className="avatar">
-						<div className="w-8 rounded-full">
+						<div className="w-8 mask mask-squircle">
 							<img
 								src={
 									changeHost(notification.from.profilePicture) ||
 									"/avatar-placeholder.png"
 								}
+								alt="Profile Picture"
 							/>
 						</div>
 					</div>

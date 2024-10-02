@@ -139,11 +139,12 @@ const ChatMessageContainer = () => {
 							className="flex items-center gap-2"
 						>
 							<div className="avatar">
-								<div className="w-10 rounded-full">
+								<div className="w-10 mask mask-squircle">
 									<img
 										src={changeHost(
 											selectedConversation?.participants[0].profilePicture
 										)}
+										alt="Profile Picture"
 									/>
 								</div>
 							</div>

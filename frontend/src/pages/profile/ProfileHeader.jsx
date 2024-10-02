@@ -177,7 +177,7 @@ const ProfileHeader = ({ pageUsername }) => {
 					<div className="flex items-center flex-col gap-7 md:gap-0 md:flex-row w-full justify-around mt-8">
 						<div className="flex flex-col md:flex-row items-center gap-4">
 							<div className="avatar">
-								<div className="w-20 md:w-32 rounded-full relative group/avatar">
+								<div className="w-20 md:w-32 mask mask-squircle relative group/avatar">
 									<img
 										src={
 											profileImg.blob
@@ -187,9 +187,9 @@ const ProfileHeader = ({ pageUsername }) => {
 												: changeHost(targetPage?.profilePicture) ||
 												  "/avatar-placeholder.png"
 										}
+										alt="Profile Picture"
 										className="pointer-events-none"
 									/>
-									{/* <img src={"/avatar-placeholder.png"} /> */}
 									{isMyProfile && (
 										<div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 md:transform-none md:top-7 md:right-5 md:left-auto p-1 text-black bg-white rounded-full group-hover/avatar:opacity-100 opacity-50 md:opacity-100 transition-all cursor-pointer">
 											<CiEdit
