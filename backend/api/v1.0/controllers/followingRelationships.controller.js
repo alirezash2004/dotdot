@@ -74,7 +74,7 @@ export const getFollowers = async (req, res, next) => {
             error.status = 400;
             return error;
         }
-    
+
         const [targetPageType, isFollowing] = await Promise.all([
             Page.findById(pageId).select('pageType').exec(),
             FollowingRelationship.exists({ pageId: myPageId, followedPageId: pageId }).exec(),
@@ -370,12 +370,20 @@ export const removeFollowing = async (req, res, next) => {
         await FollowingRelationship.deleteOne({ _id: followingRelationship._id });
 
         if (followingRelationship.status === 'accepted') {
+            const notification = new Notification({
+                from: followingRelationship.pageId,
+                to: followingRelationship.followedPageId,
+                type: 'unFollow'
+            })
+
             await Promise.all([
                 Notification.deleteOne({ from: followingRelationship.pageId, to: followingRelationship.followedPageId, type: 'follow' }),
                 Page.findByIdAndUpdate(authPageId, { $inc: { followingCount: -1 } }).exec(),
                 Page.findByIdAndUpdate(pageId, { $inc: { followersCount: -1 } }).exec(),
+                notification.save()
             ])
         }
+
 
         return res.status(200).json({ success: true, msg: "Unfollowed Successfully" });
     } catch (err) {
