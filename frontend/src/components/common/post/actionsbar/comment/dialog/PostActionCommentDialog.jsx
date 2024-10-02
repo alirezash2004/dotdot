@@ -2,6 +2,7 @@ import { useRef, useState } from "react";
 
 import useCommentOnPost from "../../../../../Hooks/PostHooks/useCommentOnPost";
 
+import changeHost from "../../../../../../utils/changeHost.js";
 import { formatDate } from "../../../../../../utils/date";
 
 import Loading from "../../../../Loading";
@@ -52,8 +53,10 @@ const PostActionCommentDialog = ({ post, postType }) => {
 								<div className="w-8 rounded-full">
 									<img
 										src={
-											comment.page.profilePicture || "/avatar-placeholder.png"
+											changeHost(comment.page.profilePicture) ||
+											"/avatar-placeholder.png"
 										}
+										alt="profile picture"
 									/>
 								</div>
 							</div>
