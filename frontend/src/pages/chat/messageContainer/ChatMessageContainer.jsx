@@ -115,7 +115,8 @@ const ChatMessageContainer = () => {
 
 	return (
 		<div
-			className={`transition-all duration-500 md:min-w-[450px] md:flex-[4_4_0] flex flex-col w-screen md:w-auto h-[100vh] md:h-screen z-30 mb-1 md:mb-0 absolute top-0 md:-left-[0px] md:relative ${
+			// h-[100vh]
+			className={`transition-all duration-500 md:min-w-[450px] md:flex-[4_4_0] h-[100vh] flex flex-col w-screen md:w-auto md:h-screen z-30 mb-1 md:mb-0 absolute top-0 md:-left-[0px] md:relative ${
 				selectedConversation ? "-left-0" : "-left-[100vw] "
 			}`}
 		>

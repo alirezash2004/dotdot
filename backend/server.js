@@ -2,9 +2,19 @@ import express from "express";
 import path from 'path';
 import cookieParser from "cookie-parser";
 import session from "express-session";
-import connectToMongoDB from "./api/v1.0/db/connectToMongoDb.js";
+// import connectToMongoDB from "./api/v1.0/db/connectToMongoDb.js";
 import { configDotenv } from "dotenv";
+import mongoose from "mongoose";
 configDotenv();
+
+const connectToMongoDB = async () => {
+    try {
+        await mongoose.connect(process.env.MONGODB_CONNECT_URI);
+        console.log('Connected to database'['bgCyan']);
+    } catch (error) {
+        console.log(`Error: ${err}`['bgRed'])
+    }
+}
 
 import v1_0 from './api/versionRouter.js';
 

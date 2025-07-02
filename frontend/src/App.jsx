@@ -4,17 +4,31 @@ import { useQuery } from "@tanstack/react-query";
 
 import Sidebar from "./components/common/sidebar/Sidebar";
 import Loading from "./components/common/Loading";
+import React, { Suspense } from "react";
 
-import LoginPage from "./pages/auth/login/LoginPage";
-import SignUpPage from "./pages/auth/signup/SignUpPage";
+// import LoginPage from "./pages/auth/login/LoginPage";
+// import SignUpPage from "./pages/auth/signup/SignUpPage";
 
-import HomePage from "./pages/home/HomePage";
-import NotificationPage from "./pages/notification/NotificationPage";
-import ProfilePage from "./pages/profile/ProfilePage";
-import PostPage from "./pages/post/PostPage";
-import NewpostPage from "./pages/newpost/NewpostPage";
-import ChatPage from "./pages/chat/ChatPage";
-import ExplorePage from "./pages/explore/ExplorePage";
+const LoginPage = React.lazy(() => import("./pages/auth/login/LoginPage"));
+const SignUpPage = React.lazy(() => import("./pages/auth/signup/SignUpPage"));
+
+// import HomePage from "./pages/home/HomePage";
+// import NotificationPage from "./pages/notification/NotificationPage";
+// import ProfilePage from "./pages/profile/ProfilePage";
+// import PostPage from "./pages/post/PostPage";
+// import NewpostPage from "./pages/newpost/NewpostPage";
+// import ChatPage from "./pages/chat/ChatPage";
+// import ExplorePage from "./pages/explore/ExplorePage";
+
+const HomePage = React.lazy(() => import("./pages/home/HomePage"));
+const NotificationPage = React.lazy(() =>
+	import("./pages/notification/NotificationPage")
+);
+const ProfilePage = React.lazy(() => import("./pages/profile/ProfilePage"));
+const PostPage = React.lazy(() => import("./pages/post/PostPage"));
+const NewpostPage = React.lazy(() => import("./pages/newpost/NewpostPage"));
+const ChatPage = React.lazy(() => import("./pages/chat/ChatPage"));
+const ExplorePage = React.lazy(() => import("./pages/explore/ExplorePage"));
 
 function App() {
 	if (JSON.parse(localStorage.getItem("islight"))) {
@@ -55,48 +69,52 @@ function App() {
 		<>
 			<div className="flex max-w-6xl mx-auto flex-col-reverse md:flex-row font-[Vazir]">
 				{authPage && <Sidebar />}
-				<Routes>
-					<Route
-						path="/"
-						element={authPage ? <HomePage /> : <Navigate to="/login" />}
-					/>
-					<Route
-						path="/explore"
-						element={authPage ? <ExplorePage /> : <Navigate to="/login" />}
-					/>
-					<Route
-						path="/login"
-						element={!authPage ? <LoginPage /> : <Navigate to="/" />}
-					/>
-					<Route
-						path="/signup"
-						element={!authPage ? <SignUpPage /> : <Navigate to="/" />}
-					/>
-					<Route
-						path="/notifications"
-						element={authPage ? <NotificationPage /> : <Navigate to="/login" />}
-					/>
-					<Route
-						path="/profile/:username"
-						element={authPage ? <ProfilePage /> : <Navigate to="/login" />}
-					/>
-					<Route
-						path="/post/:id"
-						element={authPage ? <PostPage /> : <Navigate to="/login" />}
-					/>
-					<Route
-						path="/newpost"
-						element={authPage ? <NewpostPage /> : <Navigate to="/login" />}
-					/>
-					<Route
-						path="/chat"
-						element={authPage ? <ChatPage /> : <Navigate to="/login" />}
-					/>
-					<Route
-						path="/chat/:username"
-						element={authPage ? <ChatPage /> : <Navigate to="/login" />}
-					/>
-				</Routes>
+				<Suspense fallback={<Loading />}>
+					<Routes>
+						<Route
+							path="/"
+							element={authPage ? <HomePage /> : <Navigate to="/login" />}
+						/>
+						<Route
+							path="/explore"
+							element={authPage ? <ExplorePage /> : <Navigate to="/login" />}
+						/>
+						<Route
+							path="/login"
+							element={!authPage ? <LoginPage /> : <Navigate to="/" />}
+						/>
+						<Route
+							path="/signup"
+							element={!authPage ? <SignUpPage /> : <Navigate to="/" />}
+						/>
+						<Route
+							path="/notifications"
+							element={
+								authPage ? <NotificationPage /> : <Navigate to="/login" />
+							}
+						/>
+						<Route
+							path="/profile/:username"
+							element={authPage ? <ProfilePage /> : <Navigate to="/login" />}
+						/>
+						<Route
+							path="/post/:id"
+							element={authPage ? <PostPage /> : <Navigate to="/login" />}
+						/>
+						<Route
+							path="/newpost"
+							element={authPage ? <NewpostPage /> : <Navigate to="/login" />}
+						/>
+						<Route
+							path="/chat"
+							element={authPage ? <ChatPage /> : <Navigate to="/login" />}
+						/>
+						<Route
+							path="/chat/:username"
+							element={authPage ? <ChatPage /> : <Navigate to="/login" />}
+						/>
+					</Routes>
+				</Suspense>
 				<Toaster />
 			</div>
 		</>

@@ -5,7 +5,8 @@ export function PageProfilePost({ post, postUrl }) {
 	return (
 		<Link
 			to={`/post/${post?._id}`}
-			className="flex w-full aspect-square border border-slate-800 group/post relative bg-slate-900"
+			className="break-inside-avoid flex border border-slate-800 group/post relative bg-slate-900"
+			// className="flex w-full aspect-square border border-slate-800 group/post relative bg-slate-900"
 		>
 			<div className="absolute top-2 right-2 text-3xl text-slate-200 z-20">
 				{post.assets.length === 1 && <CiImageOn />}

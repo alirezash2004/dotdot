@@ -59,7 +59,7 @@ const Posts = ({
 		queryFn: async () => {
 			if (isFetching) return [];
 
-			if (skip == 0 && posts && posts.length > 0) return [];
+			// if (skip == 0 && posts && posts.length > 0) return [];
 
 			if (isLoadingNewPosts) return [];
 
@@ -161,6 +161,7 @@ const Posts = ({
 						totalPosts?.length === 0 && (
 							<p className="text-center my-4">OOPS! No Posts Found!</p>
 						)}
+					{/* <div className="columns-3 gap-0 w-[1200px] mx-auto pb-28"> */}
 					{!isLoading && posts && (
 						<div className="grid grid-cols-2 md:grid-cols-3">
 							{totalPosts.length !== 0 &&

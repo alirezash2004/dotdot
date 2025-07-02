@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1080" viewBox="0 0 1080 1080">
+  <defs>
+    <style>
+      .cls-1 {
+        font-size: 366.667px;
+        text-anchor: middle;
+        font-family: "Dancing Script";
+      }
+    </style>
+  </defs>
+  <text id="Dot" class="cls-1" transform="translate(395.212 521.675) scale(1.341)"><tspan x="0">Dot</tspan></text>
+  <text id="Dot-2" data-name="Dot" class="cls-1" transform="translate(642.023 870.429) scale(1.341)"><tspan x="0">Dot</tspan></text>
+</svg>
