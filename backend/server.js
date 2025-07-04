@@ -12,7 +12,7 @@ const connectToMongoDB = async () => {
         await mongoose.connect(process.env.MONGODB_CONNECT_URI);
         console.log('Connected to database'['bgCyan']);
     } catch (error) {
-        console.log(`Error: ${err}`['bgRed'])
+        console.log(`Error: ${error}`['bgRed'])
     }
 }
 
