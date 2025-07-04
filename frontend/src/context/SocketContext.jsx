@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { createContext, useEffect, useState } from "react";
 import { io } from "socket.io-client";
-import changeHost from "../utils/changeHost.js";
+// import changeHost from "../utils/changeHost.js";
 
 export const SocketContext = createContext();
 
@@ -12,8 +12,9 @@ export const SocketContextProvider = ({ children }) => {
 
 	useEffect(() => {
 		if (authPage) {
-			const socketConnection = io(changeHost("http://localhost:5000"), {
-				// const socketConnection = io(changeHost("https://dotdot.alirezashabany2004.ir"), {
+			// const socketConnection = io(changeHost("http://localhost:5000"), {
+			// const socketConnection = io(changeHost("https://dotdot.alirezashabany2004.ir"), {
+			const socketConnection = io("/", {
 				query: {
 					pageId: authPage._id,
 				},
