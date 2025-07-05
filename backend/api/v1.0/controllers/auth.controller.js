@@ -146,7 +146,7 @@ export const logout = async (req, res, next) => {
 }
 
 export const ping = async (req, res, next) => {
-    res.status(200).json({
+    return res.status(200).json({
         success: true,
         msg: 'Pong'
     });
