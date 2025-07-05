@@ -72,7 +72,7 @@ app.use(session({
 app.use(logger); // Logger middleware
 
 // fake delay - TODO: remove later
-app.use(function (req, res, next) { setTimeout(next, 1000) });
+// app.use(function (req, res, next) { setTimeout(next, 1000) });
 
 // setup static folder
 app.use(express.static(path.join(__dirname, 'backend', 'uploads'), {
