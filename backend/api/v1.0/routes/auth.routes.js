@@ -4,7 +4,7 @@ import { checkSchema } from 'express-validator';
 import protectRoute from '../middleware/protectRoute.js';
 import validationResultHandler from '../middleware/validationResultHandler.js';
 
-import { getMe, login, logout, signup } from '../controllers/auth.controller.js';
+import { getMe, login, logout, ping, signup } from '../controllers/auth.controller.js';
 
 import { newpageSchema } from '../validators/page.schema.js';
 import { loginInputsSchema } from '../validators/auth.schema.js';
@@ -18,5 +18,7 @@ router.post('/signup', checkSchema(newpageSchema), validationResultHandler, sign
 router.post('/login', checkSchema(loginInputsSchema), validationResultHandler, login);
 
 router.post('/logout', logout);
+
+router.get('/ping', ping);
 
 export default router;
