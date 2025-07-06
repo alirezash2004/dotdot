@@ -14,6 +14,7 @@ import logger from "./api/v1.0/middleware/logger.js";
 import customHeaders from "./api/v1.0/middleware/customHeaders.js";
 import { app, server } from "./socket/socket.js";
 import { ping } from "./api/v1.0/controllers/auth.controller.js";
+import compression from "compression";
 
 const __dirname = path.resolve();
 
@@ -85,14 +86,22 @@ app.use(express.static(path.join(__dirname, 'backend', 'uploads'), {
 // Routes
 app.use('/api/v1.0', v1_0);
 
+app.use(compression());
+
 // if the request is not api then load frontend(react)
 if (process.env.NODE_ENV === "production") {
-    app.use(express.static(path.join(__dirname, '/frontend/dist')));
+    app.use(express.static(path.join(__dirname, 'frontend', 'dist'), {
+        maxAge: '7d',
+        immutable: true
+    }));
 
     app.get("*", (req, res) => {
         res.sendFile(path.resolve(__dirname, "frontend", "dist", "index.html"));
     })
 }
+
+// set timeout to 5 minuts
+server.setTimeout(5 * 60 * 1000);
 
 server.listen(PORT, () => {
     connectToMongoDB();
